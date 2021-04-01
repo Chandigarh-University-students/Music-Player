@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    tools:context=".Playlists">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/FavoritesCardView"
+        android:layout_width="match_parent"
+        android:background="@color/backgroundColor"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundColor"
+            android:orientation="horizontal"
+            android:layout_margin="2dp"
+            android:weightSum="5">
+            <TextView
+                android:id="@+id/Favorites"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:text="@string/favorites"
+                android:textColor="@color/whiteText"
+                android:textSize="@dimen/big_text"/>
+
+            <ImageView
+                android:id="@+id/leftArrow"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_round_arrow_forward_ios_24" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/personalization"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/FavoritesCardView"
+        android:layout_margin="5dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        android:gravity="start"
+        android:text="@string/personalization"
+        android:textSize="@dimen/big_text"
+        android:textColor="@color/black"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPlaylists"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:layout_below="@+id/personalization"
+        />
+</RelativeLayout>
