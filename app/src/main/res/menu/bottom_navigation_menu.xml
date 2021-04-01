@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home_button"
+        android:enabled="true"
+        android:icon="@drawable/ic_round_home_button_24"
+        android:title="@string/home" />
+
+    <item
+        android:id="@+id/nowPlaying"
+        android:enabled="true"
+        android:icon="@drawable/ic_round_play_circle_outline_24"
+        android:title="@string/now_playing" />
+    <item
+        android:id="@+id/tab_playlist"
+        android:enabled="true"
+        android:icon="@drawable/ic_round_playlist_button_24"
+        android:title="@string/playlists" />
+</menu>
