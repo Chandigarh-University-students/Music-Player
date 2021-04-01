@@ -24,5 +24,35 @@ class MainActivity : AppCompatActivity() {
             bottomNavigationViewBackground.shapeAppearanceModel.toBuilder()
                 .setAllCorners(CornerFamily.ROUNDED, radius)
                 .build()
+
+        //initially load home_fragment into frame layout...
+//        supportFragmentManager.beginTransaction()
+//                        .replace(
+//                            R.id.frame, HOME_FRAGMENT()
+//                        ).commit()
+
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home_button -> {
+//                    supportFragmentManager.beginTransaction()
+//                        .replace(
+//                            R.id.frame, HOME_FRAGMENT()
+//                        ).commit()
+//                    true
+                }
+                R.id.nowPlaying -> {
+                    //TODO: Replace with MotionLayout
+                    true
+                }
+                R.id.tab_playlist -> {
+//                    supportFragmentManager.beginTransaction().replace(
+//                        R.id.frame, PLAYLIST_FRAGMENT
+//                    ).commit()
+//                    true
+                }
+            }
+            true
+
+        }
     }
 }
