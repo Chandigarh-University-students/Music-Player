@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    tools:context=".HomeFragment">
+
+    <TextView
+        android:id="@+id/recentTrackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/recent_tracks"
+        android:textColor="@color/textPrimary"
+        android:textSize="@dimen/big_text" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRecentTrack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/recentTrackBar"
+        android:layout_marginTop="12dp"
+        android:background="@color/secondaryColor"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/single_recent_track" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerAllSongs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/recyclerRecentTrack"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/single_song_item" />
+
+</RelativeLayout>

@@ -2,5 +2,7 @@
 <resources>
     <dimen name="radius_small">16dp</dimen>
     <dimen name="big_text">35sp</dimen>
+    <dimen name="recent_song_track">64dp</dimen>
     <dimen name="small_text">25sp</dimen>
+    <dimen name="text_thin">18sp</dimen>
 </resources>

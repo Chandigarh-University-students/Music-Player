@@ -3,8 +3,9 @@
     <string name="home">Home</string>
     <string name="now_playing">Now Playing</string>
     <string name="playlists">Playlists</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="personalization">Personalization</string>
     <string name="favorites">Favorites</string>
+    <string name="recent_tracks">Recent Tracks</string>
+    <string name="in_motion">In Motion</string>
+    <string name="trent_renzor_and_atticus_ross">Trent Renzor and Atticus Ross</string>
 </resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/recent_song_track"
+    android:background="@color/backgroundColor">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundColor">
+
+        <TextView
+            android:id="@+id/txtSongName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/in_motion"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/small_text" />
+
+        <TextView
+            android:id="@+id/txtSongArtistName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtSongName"
+            android:text="@string/trent_renzor_and_atticus_ross"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_thin" />
+
+        <ToggleButton
+            android:id="@+id/btnFav"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/fav_selector"
+            android:textOff=""
+            android:textOn="" />
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
