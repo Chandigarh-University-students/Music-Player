@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/backgroundColor"
     tools:context=".Playlists">
 
@@ -14,6 +15,7 @@
         android:id="@+id/FavoritesCardView"
         android:layout_width="match_parent"
         android:background="@color/backgroundColor"
+        android:layout_margin="5dp"
         android:padding="5dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar">
@@ -62,5 +64,7 @@
         android:layout_height="match_parent"
         android:padding="5dp"
         android:layout_below="@+id/personalization"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/single_playlist_item"
         />
 </RelativeLayout>

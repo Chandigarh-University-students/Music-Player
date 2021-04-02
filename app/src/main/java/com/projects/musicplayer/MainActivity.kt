@@ -25,11 +25,16 @@ class MainActivity : AppCompatActivity() {
                 .setAllCorners(CornerFamily.ROUNDED, radius)
                 .build()
 
+        //initially load  testing playlist fragment
+       /*supportFragmentManager.beginTransaction()
+                        .replace(
+                           R.id.frame, Playlists()
+                        ).commit()*/
+
+
         //initially load home_fragment into frame layout...
-//        supportFragmentManager.beginTransaction()
-//                        .replace(
-//                            R.id.frame, HOME_FRAGMENT()
-//                        ).commit()
+        supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame, HomeFragment()).commit()
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
