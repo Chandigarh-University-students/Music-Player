@@ -1,34 +1,64 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    tools:context=".MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:background="@color/backgroundColor"
         android:layout_height="match_parent">
 
-         <FrameLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:behavior_peekHeight="118dp"
+            app:layout_behavior="@string/bottom_sheet_behavior">
+
+
+            <include
+                android:id="@+id/b_sheet_Collapsed"
+                layout="@layout/bottom_sheet_collapsed"
+                android:visibility="visible" />
+
+            <include
+                android:id="@+id/b_sheet_Expanded"
+                layout="@layout/bottom_sheet_expanded"
+                android:visibility="gone" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <FrameLayout
             android:id="@+id/frame"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_marginBottom="118dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigationView"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            android:layout_marginHorizontal="4dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="4dp"
-            android:background="@color/secondaryColor"
-            app:itemIconSize="40dp"
-            android:layout_alignBottom="@id/frame"
-            app:itemIconTint="@color/color_bottom_nav"
-            app:labelVisibilityMode="unlabeled"
-            app:menu="@menu/bottom_navigation_menu" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/secondaryColor"
+        app:itemIconSize="40dp"
+        app:itemIconTint="@color/color_bottom_nav"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_navigation_menu" />
 </RelativeLayout>
