@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SongRepeatState">
+        <attr name="state_repeat_off" format="boolean" />
+        <attr name="state_repeat_all" format="boolean" />
+        <attr name="state_repeat_one" format="boolean" />
+    </declare-styleable>
+</resources>
