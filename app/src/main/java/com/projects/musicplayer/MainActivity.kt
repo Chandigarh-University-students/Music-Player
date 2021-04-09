@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.cardview.widget.CardView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
@@ -19,11 +20,37 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var b_sheet_Collapsed: LinearLayout
     lateinit var b_sheet_Expanded: RelativeLayout
-    lateinit var btnMinimizeToolbar: ImageButton
+
 
     //testing
-    lateinit var testState: TextView
+//    lateinit var testState: TextView
+//    lateinit var musicCoverPic:ImageView
+    /**Now Playing Controls*/
+
+    /*EXPANDED BOTTOM SHEET ELEMENTS*/
+    //toolbar elements
+    lateinit var btnMinimizeToolbar: ImageButton
+    lateinit var txtCurrPlaying: TextView
+    lateinit var btnSongList: ImageButton
+
+    //current song in now playing
+    lateinit var songNowPlaying: CardView
+    lateinit var txtSongName: TextView
+    lateinit var txtSongArtistName: TextView
+    lateinit var btnFav: ToggleButton
+    //current song in now playing
+
+    lateinit var controlSeekBar: SeekBar
+    lateinit var txtCurrentDuration: TextView
+    lateinit var txtTotalDuration: TextView
+    lateinit var btnControlShuffle: ToggleButton
     lateinit var btnRepeatControl: RepeatTriStateButton
+
+    lateinit var btnPrevControl: ImageButton
+    lateinit var btnPlayPauseControl: ToggleButton
+    lateinit var btnNextControl: ImageButton
+
+    /*EXPANDED BOTTOM SHEET ELEMENTS*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +61,80 @@ class MainActivity : AppCompatActivity() {
         flFragment = findViewById(R.id.frame)
         b_sheet_Collapsed = findViewById(R.id.b_sheet_Collapsed)
         b_sheet_Expanded = findViewById(R.id.b_sheet_Expanded)
-        btnMinimizeToolbar = findViewById(R.id.btnMinimizeToolbar)
 
-        //testing
-        testState = findViewById(R.id.testState)
+
+
+        btnMinimizeToolbar = findViewById(R.id.btnMinimizeToolbar)
+        txtCurrPlaying = findViewById(R.id.txtCurrPlaying)
+        btnSongList = findViewById(R.id.btnSongList)
+
+        songNowPlaying = findViewById(R.id.songNowPlaying)
+        txtSongName = findViewById(R.id.txtSongName)
+        txtSongArtistName = findViewById(R.id.txtSongArtistName)
+        btnFav = findViewById(R.id.btnFav)
+        controlSeekBar = findViewById(R.id.controlSeekBar)
+        txtCurrentDuration = findViewById(R.id.txtCurrentDuration)
+        txtTotalDuration = findViewById(R.id.txtTotalDuration)
+        btnControlShuffle = findViewById(R.id.btnControlShuffle)
         btnRepeatControl = findViewById(R.id.btnRepeatControl)
+
+        btnPrevControl = findViewById(R.id.btnPrevControl)
+        btnPlayPauseControl = findViewById(R.id.btnPlayPauseControl)
+        btnNextControl = findViewById(R.id.btnNextControl)
+
+
+
+
+
+        setUpBottomSheet()
+
+        initUI()
+
+        setUpBottomNav()
+
+        setUpExpandedNowPlaying()
+
+
+        //initially load  testing playlist fragment
+        /*supportFragmentManager.beginTransaction()
+                         .replace(
+                            R.id.frame, Playlists()
+                         ).commit()*/
+
+
+    }
+
+    fun setUpExpandedNowPlaying() {
+        btnMinimizeToolbar.setOnClickListener {
+            mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
+                bottomNavigationView.selectedItemId = R.id.home_button
+        }
+
+        controlSeekBar.max = 50
+        txtCurrentDuration.text = controlSeekBar.progress.toString()
+        txtTotalDuration.text = controlSeekBar.max.toString()
+
+
+        controlSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                var progress = 0
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    progresValue: Int, fromUser: Boolean
+                ) {
+                    progress = progresValue
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    //implement if starting touch
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    txtCurrentDuration.text = progress.toString()
+                }
+            })
+
         //testing callback for evey state change
         btnRepeatControl.addCheckedStateCallback(
             object :
@@ -52,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                                 "NO_REPEAT",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            testState.text = "NO_REPEAT"
+//                            testState.text = "NO_REPEAT"
                         }
                         RepeatTriStateButton.REPEAT_ALL -> {
                             Toast.makeText(
@@ -60,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                                 "REPEAT_ALL",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            testState.text = "REPEAT_ALL"
+//                            testState.text = "REPEAT_ALL"
                         }
                         RepeatTriStateButton.REPEAT_ONE -> {
                             Toast.makeText(
@@ -68,35 +164,14 @@ class MainActivity : AppCompatActivity() {
                                 "REPEAT_ONE",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            testState.text = "REPEAT_ONE"
+//                            testState.text = "REPEAT_ONE"
                         }
                         else -> println("DEFAULT STATE")
                     }
                 }
 
             }
-
         )
-
-
-        setUpBottomSheet()
-
-        initUI()
-
-        setUpBottomNav()
-
-        btnMinimizeToolbar.setOnClickListener {
-            mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
-                bottomNavigationView.selectedItemId = R.id.home_button
-        }
-
-        //initially load  testing playlist fragment
-        /*supportFragmentManager.beginTransaction()
-                         .replace(
-                            R.id.frame, Playlists()
-                         ).commit()*/
-
 
     }
 
