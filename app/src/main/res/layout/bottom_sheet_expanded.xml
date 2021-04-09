@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+
     android:background="@color/backgroundColor">
 
     <LinearLayout
@@ -22,6 +23,7 @@
             android:src="@drawable/ic_minimize" />
 
         <TextView
+            android:id="@+id/txtCurrPlaying"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.6"
@@ -46,12 +48,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/b_sheet_ExpandedToolbar"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="24dp"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
             android:orientation="vertical"
             android:padding="12dp">
 
@@ -83,32 +86,131 @@
                     layout="@layout/single_song_item" />
             </LinearLayout>
 
-            <!--            build slider -->
-            <!--            build controlls-->
-            <!--            testing of repeat button -->
-            <LinearLayout
+            <SeekBar
+                android:id="@+id/controlSeekBar"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:maxHeight="12dp"
+                android:minHeight="12dp"
+                android:paddingVertical="4dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:progress="20"
+                android:progressDrawable="@drawable/seekbar_style"
+                android:thumb="@drawable/custom_thumb" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp">
+
+                <TextView
+                    android:id="@+id/txtCurrentDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:gravity="center_horizontal"
+                    android:text="0"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="@dimen/small_text" />
+
+                <TextView
+                    android:id="@+id/txtTotalDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center_horizontal"
+                    android:text="100"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="@dimen/small_text" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <ToggleButton
+                    android:id="@+id/btnControlShuffle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/shuffle_selector"
+                    android:textOff=""
+                    android:textOn="" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:id="@+id/btnPrevControl"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/shape_prev_next_background"
+                        android:contentDescription="@string/previous_song"
+                        android:src="@drawable/ic_previous_control" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <LinearLayout
+
+                        android:layout_width="62dp"
+                        android:layout_height="60dp">
+
+
+                        <ToggleButton
+                            android:id="@+id/btnPlayPauseControl"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/play_pause_selector"
+                            android:textOff=""
+                            android:textOn="" />
+
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:id="@+id/btnNextControl"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/shape_prev_next_background"
+                        android:contentDescription="@string/next_song"
+                        android:src="@drawable/ic_next_control" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
                 <com.projects.musicplayer.uicomponents.RepeatTriStateButton
                     android:id="@+id/btnRepeatControl"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:clickable="true"
-                    android:focusable="true"
-                    />
-            </LinearLayout>
+                    android:focusable="true" />
 
-            <TextView
-                android:id="@+id/testState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/textPrimary"
-                android:textSize="@dimen/small_text" />
+            </RelativeLayout>
 
 
         </LinearLayout>
