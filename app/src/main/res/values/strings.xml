@@ -10,4 +10,6 @@
     <string name="trent_renzor_and_atticus_ross">Trent Renzor and Atticus Ross</string>
     <string name="playlist_name">Playlist Name</string>
     <string name="NoSong">No Song</string>
+    <string name="previous_song">Previous Song</string>
+    <string name="next_song">Next Song</string>
 </resources>
