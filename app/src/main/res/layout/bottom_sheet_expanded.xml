@@ -92,7 +92,7 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <com.projects.musicplayer.RepeatTriStateButton
+                <com.projects.musicplayer.uicomponents.RepeatTriStateButton
                     android:id="@+id/btnRepeatControl"
                     android:layout_width="32dp"
                     android:layout_height="32dp"

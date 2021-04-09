@@ -1,4 +1,4 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.uicomponents
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,6 +6,7 @@ import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.widget.CheckBox
 import androidx.core.content.ContextCompat
+import com.projects.musicplayer.R
 import java.util.ArrayList
 
 @SuppressLint("AppCompatCustomView")
