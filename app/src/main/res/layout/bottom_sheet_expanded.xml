@@ -85,6 +85,30 @@
 
             <!--            build slider -->
             <!--            build controlls-->
+            <!--            testing of repeat button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.projects.musicplayer.RepeatTriStateButton
+                    android:id="@+id/btnRepeatControl"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+
+                    android:clickable="true"
+                    android:focusable="true"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/testState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/small_text" />
 
 
         </LinearLayout>

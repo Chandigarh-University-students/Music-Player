@@ -20,6 +20,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var b_sheet_Expanded: RelativeLayout
     lateinit var btnMinimizeToolbar: ImageButton
 
+    //testing
+    lateinit var testState: TextView
+    lateinit var btnRepeatControl: RepeatTriStateButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,6 +34,49 @@ class MainActivity : AppCompatActivity() {
         b_sheet_Collapsed = findViewById(R.id.b_sheet_Collapsed)
         b_sheet_Expanded = findViewById(R.id.b_sheet_Expanded)
         btnMinimizeToolbar = findViewById(R.id.btnMinimizeToolbar)
+
+        //testing
+        testState = findViewById(R.id.testState)
+        btnRepeatControl = findViewById(R.id.btnRepeatControl)
+        //testing callback for evey state change
+        btnRepeatControl.addCheckedStateCallback(
+            object :
+                RepeatTriStateButton.CheckedStateCallback() {
+
+                override fun onStateChanged(newState: Int) {
+                    when (newState) {
+                        RepeatTriStateButton.NO_REPEAT -> {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "NO_REPEAT",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            testState.text = "NO_REPEAT"
+                        }
+                        RepeatTriStateButton.REPEAT_ALL -> {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "REPEAT_ALL",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            testState.text = "REPEAT_ALL"
+                        }
+                        RepeatTriStateButton.REPEAT_ONE -> {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "REPEAT_ONE",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            testState.text = "REPEAT_ONE"
+                        }
+                        else -> println("DEFAULT STATE")
+                    }
+                }
+
+            }
+
+        )
+
 
         setUpBottomSheet()
 
