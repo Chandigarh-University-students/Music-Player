@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:example="http://schemas.android.com/apk/res-auto">
-
-    <item android:drawable="@drawable/ic_no_repeat" example:state_repeat_off="true" />
-    <item android:drawable="@drawable/ic_repeat_all" example:state_repeat_all="true" />
-    <item android:drawable="@drawable/ic_repeat_one" example:state_repeat_one="true" />
-
-</selector>

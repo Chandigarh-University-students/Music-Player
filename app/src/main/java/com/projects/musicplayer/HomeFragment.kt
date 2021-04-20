@@ -16,7 +16,7 @@ class HomeFragment : Fragment() {
     lateinit var adapterAllSongs: AllSongsAapter
 
     lateinit var recyclerViewRecentTracks: RecyclerView
-    lateinit var adapterRecentTracks: AllSongsAapter
+    lateinit var adapterRecentTracks: RecentTracksAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,16 +28,24 @@ class HomeFragment : Fragment() {
 
 
         if (activity != null) {
-            //TODO: WORK ON RECYCLER RECENT TRACKS AND ADAPTER RECENT TRACKS
             adapterAllSongs = AllSongsAapter(activity as Context)
+            adapterRecentTracks = RecentTracksAdapter(activity as Context)
+
             recyclerViewAllSongs.adapter = adapterAllSongs
+            recyclerViewRecentTracks.adapter = adapterRecentTracks
+
             recyclerViewAllSongs.layoutManager = LinearLayoutManager(activity)
+            val horizontalLayoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            recyclerViewRecentTracks.layoutManager = horizontalLayoutManager
+
             recyclerViewAllSongs.addItemDecoration(
                 DividerItemDecoration(
                     recyclerViewAllSongs.context,
                     (recyclerViewAllSongs.layoutManager as LinearLayoutManager).orientation
                 )
             )
+
             adapterAllSongs.setSongs(
                 listOf(
                     Song("In Motion", "Trent Renzor and Atticus Ross"),
@@ -53,6 +61,7 @@ class HomeFragment : Fragment() {
                     Song("In Motion", "Trent Renzor and Atticus Ross")
                 )
             )
+            adapterRecentTracks.setTotalTracks(10)
         }
 
         return view
