@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                     //TODO : REPLACE WITH PLAYLIST FRAGMENT
                     //testing layout using HomeFragment()
                     supportFragmentManager.beginTransaction().replace(
-                        R.id.frame, HomeFragment()
+                        R.id.frame, Playlists()
                     ).commit()
                     true
                 }
