@@ -12,4 +12,5 @@
     <string name="NoSong">No Song</string>
     <string name="previous_song">Previous Song</string>
     <string name="next_song">Next Song</string>
+    <string name="music_player">Music Player</string>
 </resources>

@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.TypeConverters
 
 @Database(entities = [PlaylistEntity::class], version = 1)
-@TypeConverters(Converters::class)
+@TypeConverters(PlaylistConverter::class)
 abstract class PlaylistRoomDatabase {
     abstract fun playlistDao(): PlaylistDao
 
