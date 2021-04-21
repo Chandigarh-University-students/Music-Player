@@ -8,7 +8,7 @@ import androidx.room.*
 interface RecentSongsDao {
     //Inserting song to recents
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAfterFirstFetch(recentSongEntity: RecentSongEntity)
+    suspend fun addRecentSong(recentSongEntity: RecentSongEntity)
 
     // Deleting a song in case
     @Delete

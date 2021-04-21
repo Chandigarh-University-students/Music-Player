@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "recent_songs_table")
 data class RecentSongEntity(
     @field:PrimaryKey val songId: Int,
-    @field:ColumnInfo(name = "lastPlayed") val lastPlayed: String //check
+    @field:ColumnInfo(name = "lastPlayed") val lastPlayed: Long //check -> [Set to long by using type converters]
 )
 

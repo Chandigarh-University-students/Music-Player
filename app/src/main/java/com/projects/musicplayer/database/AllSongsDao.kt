@@ -14,7 +14,7 @@ interface AllSongsDao {
     @Delete
     suspend fun removeSong(songEntity: SongEntity)
 
-    //Retreive all songs from the database
+    //Retrieve all songs from the database
     @get:Query("SELECT * from all_songs_table")
     val allSongs: LiveData<List<SongEntity>>
 
