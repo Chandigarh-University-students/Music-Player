@@ -6,9 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.viewmodel.AllSongsViewModel
+import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 class HomeFragment : Fragment() {
 
@@ -17,6 +23,22 @@ class HomeFragment : Fragment() {
 
     lateinit var recyclerViewRecentTracks: RecyclerView
     lateinit var adapterRecentTracks: RecentTracksAdapter
+
+    //view model related
+    private lateinit var mAllSongsViewModel: AllSongsViewModel
+    private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
+        mAllSongsViewModel =
+            ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
+
+        mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
+            adapterAllSongs.setSongs(it!!)
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,21 +68,22 @@ class HomeFragment : Fragment() {
                 )
             )
 
-            adapterAllSongs.setSongs(
-                listOf(
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-                    Song("In Motion", "Trent Renzor and Atticus Ross")
-                )
-            )
+
+//            adapterAllSongs.setSongs(
+//                listOf(
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
+//                    Song("In Motion", "Trent Renzor and Atticus Ross")
+//                )
+//            )
             adapterRecentTracks.setTotalTracks(10)
         }
 

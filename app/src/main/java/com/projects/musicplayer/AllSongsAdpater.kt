@@ -9,11 +9,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.database.SongEntity
 
 class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.AllSongsViewHolder>() {
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
-    private var songs: List<Song>? = null
+
+    //    private var songs: List<Song>? = null
+    private var songs: List<SongEntity>? = null
 
     class AllSongsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
@@ -27,17 +30,33 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
         return AllSongsViewHolder(songItemView)
     }
 
+    //    override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
+//        if (songs != null) {
+//            val currentSong: Song = songs!![position]
+//            holder.txtSongName.text = currentSong.songName
+//            holder.txtSongArtistName.text = currentSong.artistName
+//            holder.btnFav.isChecked = songs!![position].isFav
+//
+//            holder.btnFav.setOnClickListener {
+//                songs!![position].isFav = !songs!![position].isFav
+//                notifyItemChanged(position)
+//                Log.d("ALLSONGINFO",songs.toString())
+//            }
+//        } else {
+//            holder.txtSongName.setText(R.string.NoSong)
+//        }
+//    }
     override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
         if (songs != null) {
-            val currentSong: Song = songs!![position]
+            val currentSong: SongEntity = songs!![position]
             holder.txtSongName.text = currentSong.songName
             holder.txtSongArtistName.text = currentSong.artistName
-            holder.btnFav.isChecked = songs!![position].isFav
+            holder.btnFav.isChecked = songs!![position].isFav == 1
 
             holder.btnFav.setOnClickListener {
-                songs!![position].isFav = !songs!![position].isFav
+//                songs!![position].isFav = !songs!![position].isFav
                 notifyItemChanged(position)
-                Log.d("ALLSONGINFO",songs.toString())
+                Log.d("ALLSONGINFO", songs.toString())
             }
         } else {
             holder.txtSongName.setText(R.string.NoSong)
@@ -45,7 +64,11 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
     }
 
 
-    fun setSongs(mSongs: List<Song>) {
+    //    fun setSongs(mSongs: List<Song>) {
+//        songs = mSongs
+//        notifyDataSetChanged()
+//    }
+    fun setSongs(mSongs: List<SongEntity>) {
         songs = mSongs
         notifyDataSetChanged()
     }

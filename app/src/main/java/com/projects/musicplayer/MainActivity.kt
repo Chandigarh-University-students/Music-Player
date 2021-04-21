@@ -15,12 +15,17 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.projects.musicplayer.database.SongEntity
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
+import com.projects.musicplayer.viewmodel.AllSongsViewModel
+import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.lang.Long.parseLong
 
 class MainActivity : AppCompatActivity() {
@@ -65,6 +70,15 @@ class MainActivity : AppCompatActivity() {
     private val READ_STORAGE_PERMISSION_REQUEST_CODE = 1
     private val TAG = "PermissionDemo"
 
+
+    //view model related
+    private lateinit var mAllSongsViewModel: AllSongsViewModel
+    private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+
+    //coroutine scopes
+    val uiscope = CoroutineScope(Dispatchers.Main)
+    val dbScope = CoroutineScope(Dispatchers.IO)
+
     /*EXPANDED BOTTOM SHEET ELEMENTS*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,8 +117,17 @@ class MainActivity : AppCompatActivity() {
             Context.MODE_PRIVATE
         )
 
+        //init View Model obejct
+        //use of view model factory to pass parameter to view model
+        mAllSongsViewModelFactory = AllSongsViewModelFactory(application)
+        mAllSongsViewModel =
+            ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
+
 
         setUpBottomSheet()
+
+        //TODO: CHECK SYNC AUDIO FETCH AND LOADING OF HOME_FRAGMENT
+        getAudioFiles()
 
         initUI()
 
@@ -112,7 +135,6 @@ class MainActivity : AppCompatActivity() {
 
         setUpExpandedNowPlaying()
 
-        getAudioFiles()
         //initially load  testing playlist fragment
         /*supportFragmentManager.beginTransaction()
                          .replace(
@@ -362,8 +384,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupPermissions() {
-        val permission = ContextCompat.checkSelfPermission(this,
-            Manifest.permission.READ_EXTERNAL_STORAGE)
+        val permission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "Permission to record denied")
@@ -372,12 +396,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeRequest() {
-        ActivityCompat.requestPermissions(this,
+        ActivityCompat.requestPermissions(
+            this,
             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-            READ_STORAGE_PERMISSION_REQUEST_CODE)
+            READ_STORAGE_PERMISSION_REQUEST_CODE
+        )
     }
 
-    private fun getAudioFiles(){
+    private fun getAudioFiles() {
 
         setupPermissions()
         //TODO if user has denied permission then all files can not be fetched
@@ -406,26 +432,32 @@ class MainActivity : AppCompatActivity() {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 val songName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                val artistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-                val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
+                val artistName =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
+                val duration =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
                 val url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
 
-                val songEntity = SongEntity(songs.size+1,songName,artistName,parseLong(duration),url,-1)
-                Log.i("FetchCheck",songEntity.toString())
+                val songEntity =
+                    SongEntity(songs.size + 1, songName, artistName, parseLong(duration), url, -1)
+                Log.i("FetchCheck", songEntity.toString())
                 songs.add(songEntity)
             } while (cursor.moveToNext())
         }
         //TODO - To send songs list to DB
         //TODO set shared preferences for isLoaded
-
+        //fetch and initialize db with all songs at once
+        mAllSongsViewModel.insertSongs(songs)
+        sharedPreferences.edit().putBoolean("songLoaded", true).apply()
     }
 
-    private fun checkDatabaseInitialized()
-    {
+    private fun checkDatabaseInitialized() {
         val isLoaded = sharedPreferences.getBoolean("songLoaded", false)
 
         if (!isLoaded) {
             //TODO fetch the files if not loaded
+            getAudioFiles()
         }
+
     }
 }
