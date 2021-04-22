@@ -14,7 +14,7 @@ class AllSongsRepository(application: Application) {
     init {
         db = AllSongsDatabase.getAllSongsDatabase(application)
         mAllSongsDao = db.allSongsDao()
-        db.close()
+        //db.close()
     }
 
     suspend fun insertSongs(songsList: List<SongEntity>) =
