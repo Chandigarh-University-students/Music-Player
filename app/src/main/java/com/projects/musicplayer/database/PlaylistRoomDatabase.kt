@@ -3,11 +3,15 @@ package com.projects.musicplayer.database
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [PlaylistEntity::class], version = 1)
-@TypeConverters(PlaylistConverter::class)
-abstract class PlaylistRoomDatabase {
+
+//@TypeConverters(PlaylistConverter::class)
+
+
+@Database(entities = [PlaylistEntity::class], version = 1, exportSchema = false)
+abstract class PlaylistRoomDatabase : RoomDatabase() {
     abstract fun playlistDao(): PlaylistDao
 
     companion object {

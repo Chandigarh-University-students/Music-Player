@@ -8,6 +8,6 @@ import androidx.room.TypeConverters
 @Entity(tableName = "playlist_table")
 data class PlaylistEntity(
     @field:PrimaryKey val id: Int,
-    @field:ColumnInfo(name = "name") val name: String,
-    @field:ColumnInfo(name = "songs") val songs: List<Int>
+    @field:ColumnInfo(name = "name") val name: String
+//    , @field:ColumnInfo(name = "songs") val songs: List<Int>
 )

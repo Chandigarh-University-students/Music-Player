@@ -2,6 +2,7 @@ package com.projects.musicplayer
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -28,6 +30,7 @@ class HomeFragment : Fragment() {
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
 
+    private val uiscope = CoroutineScope(Dispatchers.Main)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,8 +39,16 @@ class HomeFragment : Fragment() {
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
         mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
+            Log.i("LIVEDATA-UPDATE","Setting all songs again")
             adapterAllSongs.setSongs(it!!)
         })
+
+        adapterAllSongs.favClickCallback = fun(id: Int) {
+            //update fav whenever fav button clicked
+            uiscope.launch {
+                mAllSongsViewModel.updateFav(id)
+            }
+        }
     }
 
     override fun onCreateView(

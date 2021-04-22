@@ -442,12 +442,21 @@ class MainActivity : AppCompatActivity() {
                     SongEntity(songs.size + 1, songName, artistName, parseLong(duration), url, -1)
                 Log.i("FetchCheck", songEntity.toString())
                 songs.add(songEntity)
+
+
+                //insert song one by one
+                //WORKING!!!
+//                mAllSongsViewModel.insertSong(songEntity)
+
+
             } while (cursor.moveToNext())
         }
         //TODO - To send songs list to DB
         //TODO set shared preferences for isLoaded
         //fetch and initialize db with all songs at once
+        //WORKING!!! TO INSERT MULTIPLE SONGS AT ONCE
         mAllSongsViewModel.insertSongs(songs)
+        //finally set shared pref
         sharedPreferences.edit().putBoolean("songLoaded", true).apply()
     }
 

@@ -10,6 +10,9 @@ interface AllSongsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAfterFirstFetch(songsList: List<SongEntity>)
 
+    @Insert
+    suspend fun insert(song: SongEntity)
+
     // Deleting a song in case
     @Delete
     suspend fun removeSong(songEntity: SongEntity)
@@ -20,15 +23,15 @@ interface AllSongsDao {
 
     //Get one song by it's id
     @Query(value = "SELECT * FROM all_songs_table WHERE songId = :id")
-    suspend fun getSongById(id: String): SongEntity
+    suspend fun getSongById(id: Int): SongEntity
 
     //Check if this song is favorite
     @Query(value = "SELECT isFav FROM all_songs_table WHERE songId = :id")
-    suspend fun checkFav(id: String): Int
+    suspend fun checkFav(id: Int): Int
 
     //Update favorite for this song, either add or remove from fav
     @Query(value = "Update all_songs_table set isFav=isFav*(-1) WHERE songId=:id")
-    suspend fun updateFav(id: String)
+    suspend fun updateFav(id: Int)
 
 }
 

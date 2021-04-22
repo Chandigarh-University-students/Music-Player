@@ -6,9 +6,10 @@ import android.content.Context
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [SongEntity::class], version = 1)
+@Database(entities = [SongEntity::class], version = 1, exportSchema = false)
 abstract class AllSongsDatabase : RoomDatabase() {
-    abstract fun AllSongsDao(): AllSongsDao
+//    abstract fun AllSongsDao(): AllSongsDao
+    abstract fun allSongsDao(): AllSongsDao
 
     companion object {
         @Volatile

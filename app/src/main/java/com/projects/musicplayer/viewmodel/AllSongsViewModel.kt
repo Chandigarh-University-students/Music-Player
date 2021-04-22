@@ -23,6 +23,13 @@ class AllSongsViewModel(application: Application) : ViewModel() {
         }
     }
 
+    fun insertSong(song: SongEntity) {
+        //use of coroutine scope from viewModelScope
+        viewModelScope.launch {
+            mAllSongsRepository.insertSong(song)
+        }
+    }
+
     fun removeSong(songEntity: SongEntity) {
         //use of coroutine scope from viewModelScope
         viewModelScope.launch {

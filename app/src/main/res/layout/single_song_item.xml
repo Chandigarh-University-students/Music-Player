@@ -13,18 +13,24 @@
             android:id="@+id/txtSongName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
             android:text="@string/in_motion"
             android:textColor="@color/textPrimary"
-            android:textSize="@dimen/small_text" />
+            android:textSize="@dimen/text_thin" />
 
         <TextView
             android:id="@+id/txtSongArtistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtSongName"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
             android:text="@string/trent_renzor_and_atticus_ross"
             android:textColor="@color/textPrimary"
-            android:textSize="@dimen/text_thin" />
+            android:textSize="@dimen/radius_small" />
 
         <ToggleButton
             android:id="@+id/btnFav"

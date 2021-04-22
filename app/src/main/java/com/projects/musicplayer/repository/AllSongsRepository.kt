@@ -13,20 +13,23 @@ class AllSongsRepository(application: Application) {
 
     init {
         db = AllSongsDatabase.getAllSongsDatabase(application)
-        mAllSongsDao = db.AllSongsDao()
+        mAllSongsDao = db.allSongsDao()
         db.close()
     }
 
     suspend fun insertSongs(songsList: List<SongEntity>) =
         mAllSongsDao.insertAfterFirstFetch(songsList)
 
+
+    suspend fun insertSong(songEntity: SongEntity) = mAllSongsDao.insert(songEntity)
+
     suspend fun removeSong(songEntity: SongEntity) = mAllSongsDao.removeSong(songEntity)
 
-    suspend fun getSongById(id: Int):SongEntity = mAllSongsDao.getSongById(id.toString())
+    suspend fun getSongById(id: Int): SongEntity = mAllSongsDao.getSongById(id)
 
-    suspend fun checkFav(id: Int):Int = mAllSongsDao.checkFav(id.toString())
+    suspend fun checkFav(id: Int): Int = mAllSongsDao.checkFav(id)
 
-    suspend fun updateFav(id: Int) = mAllSongsDao.updateFav(id.toString())
+    suspend fun updateFav(id: Int) = mAllSongsDao.updateFav(id)
 
 
     val mAllSongs: LiveData<List<SongEntity>>
