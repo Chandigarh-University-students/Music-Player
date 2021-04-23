@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/backgroundColor"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <EditText
+        android:id="@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/textPrimary"
+        android:gravity="center"
+        android:hint="@string/enter_playlist_name"
+        android:inputType="text|textNoSuggestions"
+        android:textColorHint="@color/backgroundColor">
+
+        <requestFocus />
+    </EditText>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="4dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:padding="8dp"
+            android:text="CANCEL"
+            android:textAllCaps="true"
+            android:textColor="@color/secondaryColor"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/btnOK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
+            android:background="@color/white"
+            android:clickable="true"
+            android:padding="8dp"
+            android:text="CREATE"
+            android:textAllCaps="true"
+            android:textColor="@color/primaryColor"
+            android:textSize="15sp" />
+
+    </RelativeLayout>
+
+</LinearLayout>
