@@ -1,4 +1,4 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.activity
 
 import android.Manifest
 import android.content.Context
@@ -20,6 +20,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.projects.musicplayer.fragments.HomeFragment
+import com.projects.musicplayer.fragments.PlaylistsFragment
+import com.projects.musicplayer.R
 import com.projects.musicplayer.database.SongEntity
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
@@ -138,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         //initially load  testing playlist fragment
         /*supportFragmentManager.beginTransaction()
                          .replace(
-                            R.id.frame, Playlists()
+                            R.id.frame, PlaylistsFragment()
                          ).commit()*/
 
 
@@ -148,7 +151,8 @@ class MainActivity : AppCompatActivity() {
         btnMinimizeToolbar.setOnClickListener {
             mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
-                bottomNavigationView.selectedItemId = R.id.home_button
+                bottomNavigationView.selectedItemId =
+                    R.id.home_button
         }
 
         controlSeekBar.max = 50
@@ -218,7 +222,10 @@ class MainActivity : AppCompatActivity() {
     fun initUI() {
         //initially load home_fragment into frame layout...
         supportFragmentManager.beginTransaction()
-            .replace(R.id.frame, HomeFragment()).commit()
+            .replace(
+                R.id.frame,
+                HomeFragment()
+            ).commit()
         //set initial state of bottom sheet
         mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
@@ -243,7 +250,8 @@ class MainActivity : AppCompatActivity() {
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     supportFragmentManager.beginTransaction()
                         .replace(
-                            R.id.frame, HomeFragment()
+                            R.id.frame,
+                            HomeFragment()
                         ).commit()
                     true
                 }
@@ -257,7 +265,8 @@ class MainActivity : AppCompatActivity() {
                     //TODO : REPLACE WITH PLAYLIST FRAGMENT
                     //testing layout using HomeFragment()
                     supportFragmentManager.beginTransaction().replace(
-                        R.id.frame, Playlists()
+                        R.id.frame,
+                        PlaylistsFragment()
                     ).commit()
                     true
                 }
@@ -377,7 +386,8 @@ class MainActivity : AppCompatActivity() {
 
             //if current selected tab is now playing then set current selected tab to home tab
             if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
-                bottomNavigationView.selectedItemId = R.id.home_button
+                bottomNavigationView.selectedItemId =
+                    R.id.home_button
 
         } else
             super.onBackPressed()

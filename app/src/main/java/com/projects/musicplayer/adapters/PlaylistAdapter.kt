@@ -1,13 +1,13 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.rest.PlaylistModel
+import com.projects.musicplayer.R
 
 class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
 
@@ -19,7 +19,9 @@ class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : Re
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllPlaylistViewHolder {
         val playlistItemView: View = mInflater.inflate(R.layout.single_playlist_item, parent, false)
-        return AllPlaylistViewHolder(playlistItemView)
+        return AllPlaylistViewHolder(
+            playlistItemView
+        )
     }
 
     override fun onBindViewHolder(holder: AllPlaylistViewHolder, position: Int) {

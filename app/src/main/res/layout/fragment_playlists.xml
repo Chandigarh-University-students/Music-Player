@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/backgroundColor"
-    tools:context=".Playlists">
+    tools:context=".fragments.PlaylistsFragment">
 
     <include
         android:id="@+id/toolbar"

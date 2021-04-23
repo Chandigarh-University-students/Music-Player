@@ -1,4 +1,4 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.R
 
 
 class RecentTracksAdapter(context: Context) :
@@ -47,7 +48,9 @@ class RecentTracksAdapter(context: Context) :
         viewType: Int
     ): RecentTrackViewHolder {
         val songTrackView: View = mInflater.inflate(R.layout.single_recent_track, parent, false)
-        return RecentTrackViewHolder(songTrackView)
+        return RecentTrackViewHolder(
+            songTrackView
+        )
     }
 
 

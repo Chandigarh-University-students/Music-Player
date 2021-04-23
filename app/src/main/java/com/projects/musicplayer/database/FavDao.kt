@@ -18,5 +18,5 @@ interface FavDao {
     val allFav: LiveData<List<FavEntity>>
 
     @Query(value = "SELECT * FROM fav_table WHERE id = :id")
-    suspend fun checkFav(id: Int): FavEntity
+    suspend fun checkFav(id: Int): List<FavEntity> //TODO What to return?
 }

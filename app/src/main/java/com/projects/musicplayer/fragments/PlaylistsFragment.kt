@@ -1,4 +1,4 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -10,12 +10,15 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.adapters.PlaylistAdapter
+import com.projects.musicplayer.rest.PlaylistModel
+import com.projects.musicplayer.R
 
 
-class Playlists : Fragment() {
+class PlaylistsFragment : Fragment() {
     
     lateinit var recyclerViewPlaylists: RecyclerView
-    lateinit var recylcerViewPlaylistadapter:PlaylistAdapter
+    lateinit var recylcerViewPlaylistadapter: PlaylistAdapter
     lateinit var toolbar: Toolbar
 
 
@@ -27,7 +30,7 @@ class Playlists : Fragment() {
          val view = inflater.inflate(R.layout.fragment_playlists, container, false)
         recyclerViewPlaylists=view.findViewById(R.id.recyclerViewPlaylists)
         toolbar = view.findViewById(R.id.toolbar)
-        toolbar.title="Playlists"
+        toolbar.title="PlaylistsFragment"
 
         if (activity != null) {
 
@@ -49,7 +52,11 @@ class Playlists : Fragment() {
                 PlaylistModel("Playlist 15")
             )
 
-            recylcerViewPlaylistadapter = PlaylistAdapter(activity as Context,playlists)
+            recylcerViewPlaylistadapter =
+                PlaylistAdapter(
+                    activity as Context,
+                    playlists
+                )
             recyclerViewPlaylists.adapter = recylcerViewPlaylistadapter
             recyclerViewPlaylists.layoutManager = LinearLayoutManager(activity)
             recyclerViewPlaylists.addItemDecoration(

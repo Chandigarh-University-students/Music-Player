@@ -1,4 +1,4 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.adapters
 
 
 import android.content.Context
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.R
 import com.projects.musicplayer.database.SongEntity
 
 class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.AllSongsViewHolder>() {
@@ -31,7 +32,9 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllSongsViewHolder {
         val songItemView: View = mInflater.inflate(R.layout.single_song_item, parent, false)
-        return AllSongsViewHolder(songItemView)
+        return AllSongsViewHolder(
+            songItemView
+        )
     }
 
     //    override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
@@ -76,7 +79,9 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 //        songs = mSongs
 //        notifyDataSetChanged()
 //    }
-    fun setSongs(mSongs: List<SongEntity>) {
+    fun
+
+            setSongs(mSongs: List<SongEntity>) {
         songs = mSongs
         notifyDataSetChanged()
     }

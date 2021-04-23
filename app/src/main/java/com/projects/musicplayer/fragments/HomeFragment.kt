@@ -1,4 +1,4 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -12,6 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.projects.musicplayer.adapters.AllSongsAapter
+import com.projects.musicplayer.R
+import com.projects.musicplayer.adapters.RecentTracksAdapter
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -61,8 +64,10 @@ class HomeFragment : Fragment() {
 
 
         if (activity != null) {
-            adapterAllSongs = AllSongsAapter(activity as Context)
-            adapterRecentTracks = RecentTracksAdapter(activity as Context)
+            adapterAllSongs =
+                AllSongsAapter(activity as Context)
+            adapterRecentTracks =
+                RecentTracksAdapter(activity as Context)
 
             recyclerViewAllSongs.adapter = adapterAllSongs
             recyclerViewRecentTracks.adapter = adapterRecentTracks

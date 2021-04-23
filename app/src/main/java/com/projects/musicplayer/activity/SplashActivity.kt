@@ -1,7 +1,8 @@
-package com.projects.musicplayer
+package com.projects.musicplayer.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.projects.musicplayer.R
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
