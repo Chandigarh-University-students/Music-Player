@@ -127,8 +127,14 @@ class MainActivity : AppCompatActivity() {
         setUpBottomSheet()
 
         //TODO: CHECK SYNC AUDIO FETCH AND LOADING OF HOME_FRAGMENT
-        getAudioFiles()
-
+        if (!isDatabaseInitialized()) {
+            Toast.makeText(
+                this,
+                "Fetching Songs from MediaStore for first time",
+                Toast.LENGTH_SHORT
+            ).show()
+            getAudioFiles()
+        }
         initUI()
 
         setUpBottomNav()
@@ -460,13 +466,6 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences.edit().putBoolean("songLoaded", true).apply()
     }
 
-    private fun checkDatabaseInitialized() {
-        val isLoaded = sharedPreferences.getBoolean("songLoaded", false)
+    private fun isDatabaseInitialized(): Boolean = sharedPreferences.getBoolean("songLoaded", false)
 
-        if (!isLoaded) {
-            //TODO fetch the files if not loaded
-            getAudioFiles()
-        }
-
-    }
 }
