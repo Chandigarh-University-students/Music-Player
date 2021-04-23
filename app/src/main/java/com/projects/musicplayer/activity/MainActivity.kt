@@ -30,6 +30,7 @@ import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.lang.Long.parseLong
+import java.util.Arrays.equals
 
 class MainActivity : AppCompatActivity() {
     lateinit var bottomNavigationView: BottomNavigationView
@@ -130,12 +131,15 @@ class MainActivity : AppCompatActivity() {
         setUpBottomSheet()
 
         //TODO: CHECK SYNC AUDIO FETCH AND LOADING OF HOME_FRAGMENT
-        if (!isDatabaseInitialized()) {
+
+
+        if (!isDatabaseInitialized() || !permissionGranted()) {
             Toast.makeText(
                 this,
                 "Fetching Songs from MediaStore for first time",
                 Toast.LENGTH_SHORT
             ).show()
+            setupPermissions()
             getAudioFiles()
         }
         initUI()
@@ -399,6 +403,15 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
     }
 
+    fun permissionGranted() : Boolean{
+        val permission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+
+        return (permission == PackageManager.PERMISSION_GRANTED)
+    }
+
     private fun setupPermissions() {
         val permission = ContextCompat.checkSelfPermission(
             this,
@@ -419,9 +432,26 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    override fun  onRequestPermissionsResult(requestCode:Int,permissions: Array<String>, grantResults:IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
+            for (i in permissions.indices) {
+                val permission: String = permissions[i];
+                val grantResult: Int = grantResults[i];
+
+                if (permission == Manifest.permission.READ_EXTERNAL_STORAGE) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        getAudioFiles()
+                    }
+                }
+            }
+        }
+
+    }
+
     private fun getAudioFiles() {
 
-        setupPermissions()
         //TODO if user has denied permission then all files can not be fetched
         // val audioList: MutableList<ModelAudio> = mutableListOf()
         val songs = mutableListOf<SongEntity>()
