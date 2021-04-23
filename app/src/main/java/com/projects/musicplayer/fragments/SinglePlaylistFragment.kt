@@ -15,8 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.SinglePlaylistAdapter
+import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.RecentSongsViewModel
+import com.projects.musicplayer.viewmodel.RecentSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +33,8 @@ class SinglePlaylistFragment : Fragment() {
     //view model related //TODO Check
 //    private lateinit var mSinglePlaylistViewModel: SinglePlaylistViewModel
 //    private lateinit var mSinglePlaylistViewModelFactory: SinglePlaylistViewModelFactory
+    private lateinit var mRecentSongsViewModel: RecentSongsViewModel
+    private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
 //TODO ViewModel for single playlist
@@ -48,6 +53,24 @@ class SinglePlaylistFragment : Fragment() {
             //update fav whenever fav button clicked
             uiscope.launch {
                 //mSinglePlaylistViewModel.updateFav(id)
+            }
+
+            //TODO for adding to recent tracks
+            mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
+            mRecentSongsViewModel =
+                ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+
+            /**Nothing to observe in this fragment for recent song*/
+       /*     mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
+                Log.i("LIVEDATA-UPDATE","Setting recent songs again")//TODO continue
+                adapterRecentTracks.addTracks(it!!)
+            })*/
+
+            singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(song: RecentSongEntity) {
+                //update fav whenever fav button clicked
+                uiscope.launch {
+                    mRecentSongsViewModel.insertAfterDeleteSong(song)
+                }
             }
         }
     }

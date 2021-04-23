@@ -15,8 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.adapters.AllSongsAapter
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.RecentTracksAdapter
+import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.RecentSongsViewModel
+import com.projects.musicplayer.viewmodel.RecentSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +35,9 @@ class HomeFragment : Fragment() {
     //view model related
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+    private lateinit var mRecentSongsViewModel: RecentSongsViewModel
+    private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
+
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
@@ -50,6 +56,31 @@ class HomeFragment : Fragment() {
             //update fav whenever fav button clicked
             uiscope.launch {
                 mAllSongsViewModel.updateFav(id)
+            }
+        }
+
+
+
+        mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
+        mRecentSongsViewModel =
+            ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+
+        mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
+            Log.i("LIVEDATA-UPDATE","Setting recent songs again")//TODO continue
+            adapterRecentTracks.addTracks(it!!)
+        })
+
+        adapterAllSongs.onSongClickCallback = fun(song: RecentSongEntity) {
+            //update recent tracks
+            uiscope.launch {
+                mRecentSongsViewModel.insertAfterDeleteSong(song)
+            }
+        }
+
+        adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
+            //update recent tracks
+            uiscope.launch {
+                mRecentSongsViewModel.insertAfterDeleteSong(song)
             }
         }
     }
@@ -100,7 +131,7 @@ class HomeFragment : Fragment() {
 //                    Song("In Motion", "Trent Renzor and Atticus Ross")
 //                )
 //            )
-            adapterRecentTracks.setTotalTracks(10)
+            //adapterRecentTracks.setTotalTracks(10)
         }
 
         return view

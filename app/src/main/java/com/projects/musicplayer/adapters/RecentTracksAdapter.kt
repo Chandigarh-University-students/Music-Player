@@ -1,12 +1,19 @@
 package com.projects.musicplayer.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
+import com.projects.musicplayer.database.RecentSongEntity
+import com.projects.musicplayer.database.SongEntity
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class RecentTracksAdapter(context: Context) :
@@ -14,10 +21,14 @@ class RecentTracksAdapter(context: Context) :
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
 
-    private var totalTracks: Int? = null
+    private var songs: List<RecentSongEntity>? = null
+   // private var totalTracks: Int? = null
+
+    var onSongClickCallback: ((song: RecentSongEntity) -> Unit)? = null
 
     class RecentTrackViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgSingleRecentTrack: ImageView = view.findViewById(R.id.imgSingleRecentTrack)
+        val cardViewForRecentTrack:CardView = view.findViewById(R.id.cardViewForRecentTrack)
     }
 
     /**
@@ -76,13 +87,30 @@ class RecentTracksAdapter(context: Context) :
      * @param position The position of the item within the adapter's data set.
      */
     override fun onBindViewHolder(holder: RecentTrackViewHolder, position: Int) {
-        if (totalTracks != null) {
-            holder.imgSingleRecentTrack.setImageResource(R.drawable.drawable_cover)
+        if (songs != null) {
+            holder.imgSingleRecentTrack.setImageResource(R.drawable.drawable_cover) //TODO using songs!![position]
+
+            holder.cardViewForRecentTrack.setOnClickListener{
+                //TODO play song
+
+                //TODO add to recent again, maybe using a callback
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
+                val currentLocalTime = cal.time
+                val date: DateFormat = SimpleDateFormat("HH:mm:ss a")
+                // you can get seconds by adding  "...:ss" to it
+                // you can get seconds by adding  "...:ss" to it
+                date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
+
+                val localTime: String = date.format(currentLocalTime)
+                onSongClickCallback?.invoke(RecentSongEntity(songs!![position].songId,songs!![position].albumCover,localTime))
+                Log.d("RECENTSONGupdated", RecentSongEntity(songs!![position].songId,songs!![position].albumCover,localTime).toString())
+
+            }
         }
     }
 
-    fun setTotalTracks(mTracks: Int) {
-        totalTracks = mTracks
+    fun addTracks(mSongs: List<RecentSongEntity>) {
+        songs=mSongs
         notifyDataSetChanged()
     }
 
@@ -92,8 +120,8 @@ class RecentTracksAdapter(context: Context) :
      * @return The total number of items in this adapter.
      */
     override fun getItemCount(): Int {
-        return if (totalTracks != null)
-            totalTracks!!;
+        return if (songs != null)
+            songs!!.size;
         else 0;
     }
 }

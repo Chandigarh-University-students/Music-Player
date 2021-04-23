@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 
 @Database(entities = [RecentSongEntity::class], version = 1, exportSchema = false)
-@TypeConverters(RecentSongConverter::class)
+//@TypeConverters(RecentSongConverter::class)
 abstract class RecentSongsDatabase : RoomDatabase() {
     abstract fun recentSongsDao(): RecentSongsDao
 
@@ -25,7 +25,7 @@ abstract class RecentSongsDatabase : RoomDatabase() {
                         context.applicationContext,
                         RecentSongsDatabase::class.java,
                         "recent_songs_database"
-                    )
+                    )/**.addTypeConverter(RecentSongConverter())*/
                         .fallbackToDestructiveMigration()
                         .build()
                 }
