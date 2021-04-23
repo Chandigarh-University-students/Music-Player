@@ -18,9 +18,17 @@ interface PlaylistDao {
 //    //get all song_id in playlist of given playlist_id
 //    @Query("SELECT songs from playlist_table WHERE id = :id")
 //    fun getPlaylistSongsById(id: Int): LiveData<List<Int>>
-
-    //pass entire list of songs whenever a new song is added/deleted from that individual playlist
+//
+//    //pass entire list of songs whenever a new song is added/deleted from that individual playlist
 //    @Query("UPDATE playlist_table SET songs=:mSongs WHERE id = :id")
 //    suspend fun updatePlaylist(id: Int, mSongs: List<Int>)
+
+//get all song_id in playlist of given playlist_id
+    @Query("SELECT songs from playlist_table WHERE id = :id")
+    fun getPlaylistSongsById(id: Int): LiveData<String>
+
+    //pass entire list of songs whenever a new song is added/deleted from that individual playlist
+    @Query("UPDATE playlist_table SET songs=:mSongs WHERE id = :id")
+    suspend fun updatePlaylist(id: Int, mSongs: String)
 
 }
