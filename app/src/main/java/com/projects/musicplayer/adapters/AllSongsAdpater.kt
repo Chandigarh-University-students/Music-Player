@@ -85,7 +85,7 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
                 val currentLocalTime = cal.time
-                val date: DateFormat = SimpleDateFormat("HH:mm:ss a")
+                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
                 // you can get seconds by adding  "...:ss" to it
                 // you can get seconds by adding  "...:ss" to it
                 date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))

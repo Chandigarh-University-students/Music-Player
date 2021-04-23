@@ -82,8 +82,7 @@ class SinglePlaylistAdapter(context: Context) : RecyclerView.Adapter<SinglePlayl
                 //TODO add to recent, maybe using a callback
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
                 val currentLocalTime = cal.time
-                val date: DateFormat = SimpleDateFormat("HH:mm:ss a")
-                // you can get seconds by adding  "...:ss" to it
+                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")                // you can get seconds by adding  "...:ss" to it
                 // you can get seconds by adding  "...:ss" to it
                 date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
 

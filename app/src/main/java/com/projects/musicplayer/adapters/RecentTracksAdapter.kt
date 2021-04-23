@@ -96,7 +96,7 @@ class RecentTracksAdapter(context: Context) :
                 //TODO add to recent again, maybe using a callback
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
                 val currentLocalTime = cal.time
-                val date: DateFormat = SimpleDateFormat("HH:mm:ss a")
+                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
                 // you can get seconds by adding  "...:ss" to it
                 // you can get seconds by adding  "...:ss" to it
                 date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
