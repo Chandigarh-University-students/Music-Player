@@ -15,6 +15,7 @@
     <string name="music_player">Music Player</string>
     <string name="create_playlist">Create Playlist</string>
     <string name="enter_playlist_name">Enter Playlist Name</string>
+    <string name="choose_playlist">Choose Playlist:</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
