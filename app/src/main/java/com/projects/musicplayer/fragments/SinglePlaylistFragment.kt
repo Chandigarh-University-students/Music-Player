@@ -24,6 +24,7 @@ import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class SinglePlaylistFragment : Fragment() {
@@ -65,23 +66,23 @@ class SinglePlaylistFragment : Fragment() {
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
-            Log.i("LIVEDATAPLAYLISTUPDATE","Setting all songs again in playlist")
-                uiscope.launch {
-                val songIDs = PlaylistConverter.toList(mPlaylistViewModel.getPlaylistSongsByIdLive(playlistId).value)
-                val songList : MutableList<SongEntity> = mutableListOf<SongEntity>()
-                if (songIDs != null) {
-                    for(id in songIDs) {
-                        songList.add(mAllSongsViewModel.getSongById(id))
+            mPlaylistViewModel.getPlaylistSongsByIdLive(playlistId).observe(viewLifecycleOwner,Observer{
+                var mSongs = mutableListOf<SongEntity>()
+                runBlocking {
+                    val listSongIds=PlaylistConverter.toList(it)
+                    if(listSongIds!=null){
+                        for (id in listSongIds){
+                            mSongs.add(mAllSongsViewModel.getSongByIdSuspend(id))
+                        }
                     }
-                    Log.i("SONGID"," List<Int> songIds "+songIDs.size.toString())
-                    Log.i("SONGLIST"," List<SongEntity> songs "+songList.size.toString())
-                    singlePlaylistRecyclerViewAdapter.setSongs(songList)
+                    else{
+                        //TODO print no songs, add some
+                    }
                 }
-                else {
-                    Log.e("ERRORPLAYLIST","No songs")
+                Log.i("LIVEDATAPLAYLISTUPDATE",mSongs.toString())
+                singlePlaylistRecyclerViewAdapter.setSongs(mSongs)
+            })
 
-                }
-            }
         })
 
         /**ViewModel for FavSongs*/
