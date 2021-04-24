@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.SinglePlaylistAdapter
+import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.viewmodel.AllSongsViewModel
-import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
-import com.projects.musicplayer.viewmodel.RecentSongsViewModel
-import com.projects.musicplayer.viewmodel.RecentSongsViewModelFactory
+import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,40 +30,70 @@ class SinglePlaylistFragment : Fragment() {
     lateinit var singlePlaylistRecyclerViewAdapter: SinglePlaylistAdapter
 
     //view model related //TODO Check
-//    private lateinit var mSinglePlaylistViewModel: SinglePlaylistViewModel
-//    private lateinit var mSinglePlaylistViewModelFactory: SinglePlaylistViewModelFactory
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
+    private lateinit var mPlaylistViewModel: PlaylistViewModel
+    private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
+    private lateinit var mAllSongsViewModel: AllSongsViewModel
+    private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
-//TODO ViewModel for single playlist
+    //playlist info
+    //TODO for obtaining info for this playlist
+    private var playlistId=0
+    private var playlistName="Playlist"
+    private var playListSongs = "songs "
+
+
+    //TODO ViewModel for single playlist
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)/*
+        super.onViewCreated(view, savedInstanceState)
+
+        /** Viewmodel for ALLSongs*/
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
-        mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
-            Log.i("LIVEDATA-UPDATE","Setting all songs again")
-            adapterAllSongs.setSongs(it!!)
+        /** Viewmodel for Playlist*/
+        mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)
+        mPlaylistViewModel =
+            ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
+
+        mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
+            Log.i("LIVEDATAPLAYLISTUPDATE","Setting all songs again in playlist")
+                uiscope.launch {
+                val songIDs = PlaylistConverter.toList(mPlaylistViewModel.getPlaylistSongsById(playlistId).value)
+                val songList : MutableList<SongEntity> = mutableListOf<SongEntity>()
+                if (songIDs != null) {
+                    for(id in songIDs) {
+                        songList.add(mAllSongsViewModel.getSongById(id))
+                    }
+                    Log.i("SONGID"," List<Int> songIds "+songIDs.size.toString())
+                    Log.i("SONGLIST"," List<SongEntity> songs "+songList.size.toString())
+                    singlePlaylistRecyclerViewAdapter.setSongs(songList)
+                }
+                else {
+                    Log.e("ERRORPLAYLIST","No songs")
+
+                }
+            }
         })
-*/
+
         singlePlaylistRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
             uiscope.launch {
-                //mSinglePlaylistViewModel.updateFav(id)
+                //TODO add to favourites both places
+                mAllSongsViewModel.updateFav(id)
+                //TODO in fav database also
             }
+        }
 
-            //TODO for adding to recent tracks
+            /** Viewmodel for RecentSongs*/
             mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
             mRecentSongsViewModel =
                 ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
 
-            /**Nothing to observe in this fragment for recent song*/
-       /*     mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
-                Log.i("LIVEDATA-UPDATE","Setting recent songs again")//TODO continue
-                adapterRecentTracks.addTracks(it!!)
-            })*/
 
             singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(song: RecentSongEntity) {
                 //update fav whenever fav button clicked
@@ -72,7 +101,6 @@ class SinglePlaylistFragment : Fragment() {
                     mRecentSongsViewModel.insertAfterDeleteSong(song)
                 }
             }
-        }
     }
 
     override fun onCreateView(
@@ -84,9 +112,19 @@ class SinglePlaylistFragment : Fragment() {
 
         toolbar=view.findViewById(R.id.SinglePlaylistToolbar)
         singlePlaylistRecyclerView=view.findViewById(R.id.recyclerViewSinglePlaylist)
-        toolbar.title="Playlist Name" //TODO Can be either of three things, logic to set
+
 
         if (activity != null){
+            // set this playlist according to which fragment called it
+            playlistId = arguments?.get("ID") as Int
+            playlistName = arguments?.get("NAME") as String
+            //TODO Only for debugging purposes, otherwise this argument will be deleted from Bundle
+            playListSongs = arguments?.get("SONGS") as String
+            Log.i("PLAYLISTINFO",playlistName)
+            Log.i("PLAYLISSONGTINFO",playListSongs.length.toString())
+
+            toolbar.title = playlistName
+
             singlePlaylistRecyclerViewAdapter= SinglePlaylistAdapter(activity as Context)
             singlePlaylistRecyclerView.adapter=singlePlaylistRecyclerViewAdapter
             singlePlaylistRecyclerView.layoutManager= LinearLayoutManager(activity)
@@ -96,7 +134,6 @@ class SinglePlaylistFragment : Fragment() {
                 (singlePlaylistRecyclerView.layoutManager as LinearLayoutManager).orientation
             )
             )
-
         }
         return view
     }

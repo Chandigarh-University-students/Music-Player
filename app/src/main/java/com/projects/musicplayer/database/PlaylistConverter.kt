@@ -14,12 +14,12 @@ class PlaylistConverter {
 
         @TypeConverter
         @JvmStatic
-        fun toList(data: String?): List<Int?>? {
+        fun toList(data: String?): List<Int>? { //TODO changed Int? to Int
             if (data == null) {
                 return Collections.emptyList()
             }
-            val listType: Type = object : TypeToken<List<Int?>?>() {}.getType()
-            return gson.fromJson<List<Int?>>(data, listType)
+            val listType: Type = object : TypeToken<List<Int>?>() {}.getType()
+            return gson.fromJson<List<Int>>(data, listType)
         }
 
         @TypeConverter

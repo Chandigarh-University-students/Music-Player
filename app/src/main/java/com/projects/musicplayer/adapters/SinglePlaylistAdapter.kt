@@ -10,17 +10,19 @@ import android.widget.ToggleButton
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
+import com.projects.musicplayer.database.PlaylistConverter
+import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SinglePlaylistAdapter(context: Context) : RecyclerView.Adapter<SinglePlaylistAdapter.SinglePlaylistViewHolder>() {
+class SinglePlaylistAdapter(
+    context: Context
+) : RecyclerView.Adapter<SinglePlaylistAdapter.SinglePlaylistViewHolder>() {
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
-
-    //    private var songs: List<Song>? = null
     private var songs: List<SongEntity>? = null
 
     //callbacks for item click listeners fro updating live data
@@ -42,26 +44,10 @@ class SinglePlaylistAdapter(context: Context) : RecyclerView.Adapter<SinglePlayl
         )
     }
 
-    //    override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
-//        if (songs != null) {
-//            val currentSong: Song = songs!![position]
-//            holder.txtSongName.text = currentSong.songName
-//            holder.txtSongArtistName.text = currentSong.artistName
-//            holder.btnFav.isChecked = songs!![position].isFav
-//
-//            holder.btnFav.setOnClickListener {
-//                songs!![position].isFav = !songs!![position].isFav
-//                notifyItemChanged(position)
-//                Log.d("ALLSONGINFO",songs.toString())
-//            }
-//        } else {
-//            holder.txtSongName.setText(R.string.NoSong)
-//        }
-//    }
     override fun onBindViewHolder(holder: SinglePlaylistViewHolder, position: Int) {
         if (songs != null) {
+
             val currentSong: SongEntity = songs!![position]
-//            val currentSong: Song = songs!![position]
             holder.txtSongName.text = currentSong.songName
             holder.txtSongArtistName.text = currentSong.artistName
             holder.btnFav.isChecked = songs!![position].isFav > 0
@@ -103,6 +89,7 @@ class SinglePlaylistAdapter(context: Context) : RecyclerView.Adapter<SinglePlayl
 //        notifyDataSetChanged()
 //    }
     fun setSongs(mSongs: List<SongEntity>) {
+        //TODO add songs taking care of list and String
         songs = mSongs
         notifyDataSetChanged()
     }

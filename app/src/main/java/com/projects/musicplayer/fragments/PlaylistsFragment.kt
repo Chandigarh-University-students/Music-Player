@@ -58,6 +58,17 @@ class PlaylistsFragment : Fragment() {
             recylcerViewPlaylistadapter.setPlayLists(it!!)
         })
 
+        recylcerViewPlaylistadapter.onPlaylistClickCallback = fun (playlist:PlaylistEntity) {
+            //load singlePlaylist fragment into frame layout...
+            // always open SInglePlaylist with a Bundle except when adding a song to playlist
+            val bundle=Bundle()
+            bundle.putInt("ID",playlist.id)
+            bundle.putString("NAME",playlist.name)
+            bundle.putString("SONGS",playlist.songs)
+            activity!!.supportFragmentManager.beginTransaction()
+                .add(R.id.frame,SinglePlaylistFragment::class.java,bundle)
+                .commit()
+        }
     }
 
     override fun onCreateView(
@@ -78,7 +89,6 @@ class PlaylistsFragment : Fragment() {
 
         playlistInputDialog.positiveButtonCallback = fun(playlistName: String) {
             if (playlistName.isNotBlank()) {
-                //TODO: CREATE NEW PLAYLIST
                 mPlaylistViewModel.createPlaylist(
                     PlaylistEntity(
                         playlistName.hashCode(),
@@ -101,34 +111,6 @@ class PlaylistsFragment : Fragment() {
         }
 
         if (activity != null) {
-
-            val playlists = listOf(
-                PlaylistModel("Playlist 1"),
-                PlaylistModel("Playlist 2"),
-                PlaylistModel("Playlist 3"),
-                PlaylistModel("Playlist 4"),
-                PlaylistModel("Playlist 5"),
-                PlaylistModel("Playlist 6"),
-                PlaylistModel("Playlist 7"),
-                PlaylistModel("Playlist 8"),
-                PlaylistModel("Playlist 9"),
-                PlaylistModel("Playlist 10"),
-                PlaylistModel("Playlist 11"),
-                PlaylistModel("Playlist 12"),
-                PlaylistModel("Playlist 13"),
-                PlaylistModel("Playlist 14"),
-                PlaylistModel("Playlist 15"),
-                PlaylistModel("Playlist 16"),
-                PlaylistModel("Playlist 17"),
-                PlaylistModel("Playlist 18"),
-                PlaylistModel("Playlist 19"),
-                PlaylistModel("Playlist 20"),
-                PlaylistModel("Playlist 21"),
-                PlaylistModel("Playlist 22"),
-                PlaylistModel("Playlist 23"),
-                PlaylistModel("Playlist 24")
-
-            )
 
             recylcerViewPlaylistadapter =
                 PlaylistAdapter(
