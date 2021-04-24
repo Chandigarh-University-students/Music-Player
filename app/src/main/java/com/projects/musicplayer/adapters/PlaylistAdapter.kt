@@ -8,10 +8,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.rest.PlaylistModel
 import com.projects.musicplayer.R
+import com.projects.musicplayer.database.PlaylistEntity
+import com.projects.musicplayer.database.SongEntity
 
-class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
+//class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
+class PlaylistAdapter(context: Context) :
+    RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
+
+    private var playlists: List<PlaylistEntity>? = null
 
     class AllPlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val playlistName: TextView = view.findViewById(R.id.playlistName)
@@ -25,19 +31,25 @@ class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : Re
     }
 
     override fun onBindViewHolder(holder: AllPlaylistViewHolder, position: Int) {
-        val currentPlaylist: PlaylistModel = playlists[position]
-        holder.playlistName.text = currentPlaylist.playlistName
+        val currentPlaylist: PlaylistEntity = playlists!![position]
+        holder.playlistName.text = currentPlaylist.name
 
     }
 
 
-    fun setSongs(mplaylists: List<PlaylistModel>) {
+    //    fun setPlayLists(mplaylists: List<PlaylistModel>) {
+//        playlists = mplaylists
+//        notifyDataSetChanged()
+//    }
+    fun setPlayLists(mplaylists: List<PlaylistEntity>) {
         playlists = mplaylists
         notifyDataSetChanged()
     }
 
-     override fun getItemCount(): Int {
-        return playlists.size;
+    override fun getItemCount(): Int {
+        return if (playlists != null)
+            playlists!!.size;
+        else 0;
     }
 
 }

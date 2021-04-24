@@ -8,19 +8,24 @@ import java.util.*
 
 
 class PlaylistConverter {
-    val gson = Gson()
 
-    @TypeConverter
-    fun toList(data: String?): List<Int?>? {
-        if (data == null) {
-            return Collections.emptyList()
+    companion object {
+        val gson = Gson()
+
+        @TypeConverter
+        @JvmStatic
+        fun toList(data: String?): List<Int?>? {
+            if (data == null) {
+                return Collections.emptyList()
+            }
+            val listType: Type = object : TypeToken<List<Int?>?>() {}.getType()
+            return gson.fromJson<List<Int?>>(data, listType)
         }
-        val listType: Type = object : TypeToken<List<Int?>?>() {}.getType()
-        return gson.fromJson<List<Int?>>(data, listType)
-    }
 
-    @TypeConverter
-    fun toString(someObjects: List<Int?>?): String? {
-        return gson.toJson(someObjects)
+        @TypeConverter
+        @JvmStatic
+        fun fromList(someObjects: List<Int?>?): String? {
+            return gson.toJson(someObjects)
+        }
     }
 }

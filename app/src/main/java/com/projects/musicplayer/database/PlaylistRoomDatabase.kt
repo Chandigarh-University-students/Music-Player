@@ -16,16 +16,16 @@ abstract class PlaylistRoomDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        lateinit var PLAYLIST_INSTANCE: FavRoomDatabase
+        lateinit var PLAYLIST_INSTANCE: PlaylistRoomDatabase
 
         //To return Singleton INSTANCE of Database
-        fun getPlaylistDatabase(context: Context): FavRoomDatabase {
+        fun getPlaylistDatabase(context: Context): PlaylistRoomDatabase {
             synchronized(FavRoomDatabase::class.java) {
                 if (!::PLAYLIST_INSTANCE.isInitialized) {
 
                     PLAYLIST_INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
-                        FavRoomDatabase::class.java,
+                        PlaylistRoomDatabase::class.java,
                         "playlist_database"
                     )
                         .fallbackToDestructiveMigration()
