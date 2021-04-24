@@ -86,7 +86,7 @@ class PlaylistsFragment : Fragment() {
         fabCreatePlaylist = view.findViewById(R.id.fabCreatePlaylist)
         playlistInputDialog = CustomDialog(activity as Context)
         favCardView = view.findViewById(R.id.favCardView)
-        toolbar.title = "PlaylistsFragment"
+        toolbar.title = "Playlists"
 
         favCardView.setOnClickListener {
             activity!!.supportFragmentManager.beginTransaction()
