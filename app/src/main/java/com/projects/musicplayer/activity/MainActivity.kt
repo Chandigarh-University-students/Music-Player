@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                 "Fetching Songs from MediaStore for first time",
                 Toast.LENGTH_SHORT
             ).show()
+            if(!permissionGranted())
             setupPermissions()
             getAudioFiles()
         }

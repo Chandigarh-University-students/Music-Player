@@ -7,12 +7,21 @@
     android:background="@color/backgroundColor"
     tools:context=".fragments.HomeFragment">
 
+    <include
+        android:id="@+id/homeToolbar"
+        android:visibility="visible"
+        layout="@layout/toolbar"
+        />
+
     <TextView
         android:id="@+id/recentTrackBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_below="@+id/homeToolbar"
+        android:visibility="gone"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/secondaryColor"
         android:text="@string/recent_tracks"
         android:textColor="@color/textPrimary"
         android:textSize="@dimen/big_text" />
@@ -22,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/recentTrackBar"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="2dp"
         android:background="@color/secondaryColor"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

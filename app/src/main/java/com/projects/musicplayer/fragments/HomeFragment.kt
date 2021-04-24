@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -30,6 +31,9 @@ class HomeFragment : Fragment() {
     lateinit var recyclerViewRecentTracks: RecyclerView
     lateinit var adapterRecentTracks: RecentTracksAdapter
 
+    lateinit var recentTrackBar:TextView
+    lateinit var toolbar:androidx.appcompat.widget.Toolbar
+
     //view model related
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
@@ -44,6 +48,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         /**ViewModel for ALLSongs*/
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
         mAllSongsViewModel =
@@ -110,6 +115,8 @@ class HomeFragment : Fragment() {
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
+                toolbar.visibility=View.GONE
+                recentTrackBar.visibility=View.VISIBLE
             }
         }
 
@@ -130,6 +137,9 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         recyclerViewAllSongs = view.findViewById(R.id.recyclerAllSongs)
         recyclerViewRecentTracks = view.findViewById(R.id.recyclerRecentTrack)
+        recentTrackBar=view.findViewById(R.id.recentTrackBar)
+        toolbar=view.findViewById(R.id.homeToolbar)
+
 
 
         if (activity != null) {
