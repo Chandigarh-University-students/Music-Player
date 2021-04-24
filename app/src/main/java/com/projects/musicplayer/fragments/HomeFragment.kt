@@ -23,6 +23,8 @@ import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.uicomponents.CustomDialog
 import com.projects.musicplayer.viewmodel.*
+import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +43,8 @@ class HomeFragment : Fragment() {
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
+    private lateinit var mFavSongsViewModel: FavSongsViewModel
+    private lateinit var mFavSongsViewModelFactory: FavSongsViewModelFactory
 
     private lateinit var mPlaylistViewModel: PlaylistViewModel
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
@@ -52,11 +56,19 @@ class HomeFragment : Fragment() {
 
     var selectedSongId = -1
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /**ViewModel for ALLSongs*/
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
+
+        /**ViewModel for FavSongs*/
+        mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
+        mFavSongsViewModel =
+            ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
+
 
         mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
             Log.i("LIVEDATA-UPDATE", "Setting all songs again")
@@ -77,7 +89,7 @@ class HomeFragment : Fragment() {
             createPlaylistDialog.setDialogPlaylists(it!!)
         })
 
-
+        /**ViewModel for RecentSongs*/
         mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
         mRecentSongsViewModel =
             ViewModelProvider(
@@ -90,17 +102,20 @@ class HomeFragment : Fragment() {
             adapterRecentTracks.addTracks(it!!)
         })
 
-        adapterAllSongs.onSongClickCallback = fun(song: RecentSongEntity) {
+        adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity,song: SongEntity) {
             //update recent tracks
             uiscope.launch {
-                mRecentSongsViewModel.insertAfterDeleteSong(song)
+                //TODO both play song and add to recent
+                mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
             }
         }
 
         adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
             //update recent tracks
             uiscope.launch {
+                //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
+                //TODO play here using id
             }
         }
     }
@@ -162,7 +177,6 @@ class HomeFragment : Fragment() {
 
 
         }
-
         return view
     }
 

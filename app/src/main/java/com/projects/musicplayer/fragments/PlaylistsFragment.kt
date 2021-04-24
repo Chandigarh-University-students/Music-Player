@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +30,7 @@ import com.projects.musicplayer.viewmodel.*
 import kotlinx.android.synthetic.main.playlist_dialog.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class PlaylistsFragment : Fragment() {
@@ -38,6 +40,7 @@ class PlaylistsFragment : Fragment() {
     lateinit var toolbar: Toolbar
     lateinit var fabCreatePlaylist: FloatingActionButton
     lateinit var playlistInputDialog: CustomDialog
+    lateinit var favCardView:CardView
 
     //view model related
     private lateinit var mPlaylistViewModel: PlaylistViewModel
@@ -55,9 +58,21 @@ class PlaylistsFragment : Fragment() {
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
-            recylcerViewPlaylistadapter.setPlayLists(it!!)
+            uiscope.launch{
+                recylcerViewPlaylistadapter.setPlayLists(it!!) }
         })
 
+        recylcerViewPlaylistadapter.onPlaylistClickCallback = fun (playlist:PlaylistEntity) {
+            //load singlePlaylist fragment into frame layout...
+            // always open SInglePlaylist with a Bundle except when adding a song to playlist
+            val bundle=Bundle()
+            bundle.putInt("ID",playlist.id)
+            bundle.putString("NAME",playlist.name)
+            bundle.putString("SONGS",playlist.songs)
+            activity!!.supportFragmentManager.beginTransaction()
+                .add(R.id.frame,SinglePlaylistFragment::class.java,bundle)
+                .commit()
+        }
     }
 
     override fun onCreateView(
@@ -70,7 +85,14 @@ class PlaylistsFragment : Fragment() {
         toolbar = view.findViewById(R.id.toolbar)
         fabCreatePlaylist = view.findViewById(R.id.fabCreatePlaylist)
         playlistInputDialog = CustomDialog(activity as Context)
-        toolbar.title = "PlaylistsFragment"
+        favCardView = view.findViewById(R.id.favCardView)
+        toolbar.title = "Playlists"
+
+        favCardView.setOnClickListener {
+            activity!!.supportFragmentManager.beginTransaction()
+                .replace(R.id.frame,FavFragment())
+                .commit()
+        }
 
         fabCreatePlaylist.setOnClickListener {
             playlistInputDialog.show()
@@ -78,7 +100,6 @@ class PlaylistsFragment : Fragment() {
 
         playlistInputDialog.positiveButtonCallback = fun(playlistName: String) {
             if (playlistName.isNotBlank()) {
-                //TODO: CREATE NEW PLAYLIST
                 mPlaylistViewModel.createPlaylist(
                     PlaylistEntity(
                         playlistName.hashCode(),
@@ -102,34 +123,6 @@ class PlaylistsFragment : Fragment() {
 
         if (activity != null) {
 
-            val playlists = listOf(
-                PlaylistModel("Playlist 1"),
-                PlaylistModel("Playlist 2"),
-                PlaylistModel("Playlist 3"),
-                PlaylistModel("Playlist 4"),
-                PlaylistModel("Playlist 5"),
-                PlaylistModel("Playlist 6"),
-                PlaylistModel("Playlist 7"),
-                PlaylistModel("Playlist 8"),
-                PlaylistModel("Playlist 9"),
-                PlaylistModel("Playlist 10"),
-                PlaylistModel("Playlist 11"),
-                PlaylistModel("Playlist 12"),
-                PlaylistModel("Playlist 13"),
-                PlaylistModel("Playlist 14"),
-                PlaylistModel("Playlist 15"),
-                PlaylistModel("Playlist 16"),
-                PlaylistModel("Playlist 17"),
-                PlaylistModel("Playlist 18"),
-                PlaylistModel("Playlist 19"),
-                PlaylistModel("Playlist 20"),
-                PlaylistModel("Playlist 21"),
-                PlaylistModel("Playlist 22"),
-                PlaylistModel("Playlist 23"),
-                PlaylistModel("Playlist 24")
-
-            )
-
             recylcerViewPlaylistadapter =
                 PlaylistAdapter(
                     activity as Context
@@ -147,7 +140,5 @@ class PlaylistsFragment : Fragment() {
 
         return view
     }
-
-
 }
 

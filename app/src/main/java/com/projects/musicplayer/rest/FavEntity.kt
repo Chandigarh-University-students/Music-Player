@@ -1,4 +1,4 @@
-package com.projects.musicplayer.database
+package com.projects.musicplayer.rest
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

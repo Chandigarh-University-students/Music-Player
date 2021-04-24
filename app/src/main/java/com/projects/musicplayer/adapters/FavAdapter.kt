@@ -10,26 +10,23 @@ import android.widget.ToggleButton
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.PlaylistConverter
-import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SinglePlaylistAdapter(
-    context: Context
-) : RecyclerView.Adapter<SinglePlaylistAdapter.SinglePlaylistViewHolder>() {
+class FavAdapter (context: Context
+) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var songs: List<SongEntity>? = null
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((recentSong: RecentSongEntity,song :SongEntity) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity, song : SongEntity) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
 
-    class SinglePlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class FavViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
         val txtSongArtistName: TextView = view.findViewById(R.id.txtSongArtistName)
         val btnFav: ToggleButton = view.findViewById(R.id.btnFav)
@@ -37,14 +34,14 @@ class SinglePlaylistAdapter(
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SinglePlaylistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {
         val songItemView: View = mInflater.inflate(R.layout.single_song_item, parent, false)
-        return SinglePlaylistViewHolder(
+        return FavViewHolder(
             songItemView
         )
     }
 
-    override fun onBindViewHolder(holder: SinglePlaylistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
         if (songs != null) {
 
             val currentSong: SongEntity = songs!![position]

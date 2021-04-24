@@ -37,7 +37,7 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((song: RecentSongEntity) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity,song:SongEntity) -> Unit)? = null
 
 
     class AllSongsViewHolder(view: View) : RecyclerView.ViewHolder(view),
@@ -111,21 +111,8 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
                 val localTime: String = date.format(currentLocalTime)
 
-                onSongClickCallback?.invoke(
-                    RecentSongEntity(
-                        currentSong.songId,
-                        currentSong.albumCover,
-                        localTime
-                    )
-                )
-                Log.d(
-                    "RECENTSONGupdated",
-                    RecentSongEntity(
-                        currentSong.songId,
-                        currentSong.albumCover,
-                        localTime
-                    ).toString()
-                )
+                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime),currentSong)
+                Log.d("RECENTSONGupdated", RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime).toString())
 
             }
         } else {

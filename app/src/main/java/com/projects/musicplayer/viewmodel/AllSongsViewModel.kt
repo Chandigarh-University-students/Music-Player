@@ -15,6 +15,8 @@ class AllSongsViewModel(application: Application) : ViewModel() {
     val allSongs: LiveData<List<SongEntity>>
         get() = mAllSongsRepository.mAllSongs
 
+    val favSongs: LiveData<List<SongEntity>>
+        get() = mAllSongsRepository.mFavSongs
 
     fun insertSongs(songsList: List<SongEntity>) {
         //use of coroutine scope from viewModelScope
@@ -52,7 +54,6 @@ class AllSongsViewModel(application: Application) : ViewModel() {
         viewModelScope.launch {
             isFav = mAllSongsRepository.checkFav(id)
         }
-
         return isFav
     }
 

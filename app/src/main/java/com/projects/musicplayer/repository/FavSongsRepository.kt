@@ -2,7 +2,9 @@ package com.projects.musicplayer.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import com.projects.musicplayer.database.*
+import com.projects.musicplayer.rest.FavDao
+import com.projects.musicplayer.rest.FavEntity
+import com.projects.musicplayer.rest.FavRoomDatabase
 
 class FavSongsRepository(application: Application) {
     private var mFavSongsDao: FavDao
@@ -19,7 +21,7 @@ class FavSongsRepository(application: Application) {
 
     suspend fun removeSong(favSongEntity: FavEntity) = mFavSongsDao.removeFromFav(favSongEntity)
 
-    suspend fun checkFav(id: Int): List<FavEntity> = mFavSongsDao.checkFav(id)
+    fun checkFav(id: Int): LiveData<Int> = mFavSongsDao.checkFav(id)
 
     val mAllFavSongs: LiveData<List<FavEntity>>
         get() {

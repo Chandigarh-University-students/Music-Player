@@ -29,6 +29,7 @@ import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import java.io.File
 import java.lang.Long.parseLong
 import java.util.Arrays.equals
 
@@ -400,7 +401,10 @@ class MainActivity : AppCompatActivity() {
                     R.id.home_button
 
         } else
-            super.onBackPressed()
+            when (supportFragmentManager.findFragmentById(R.id.frame)) {
+                !is HomeFragment -> initUI()
+                else -> super.onBackPressed()
+            }
     }
 
     fun permissionGranted() : Boolean{
@@ -452,8 +456,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun getAudioFiles() {
 
-        //TODO if user has denied permission then all files can not be fetched
-        // val audioList: MutableList<ModelAudio> = mutableListOf()
         val songs = mutableListOf<SongEntity>()
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
@@ -482,7 +484,8 @@ class MainActivity : AppCompatActivity() {
                     cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val duration =
                     cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                val url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
+                val url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))//.replace("\","\\\"")
+                //val url = File(resolver.openFileDescriptor(uri, "r"))
 
                 val songEntity =
                     SongEntity(songs.size + 1, songName, artistName, parseLong(duration), url, -1)

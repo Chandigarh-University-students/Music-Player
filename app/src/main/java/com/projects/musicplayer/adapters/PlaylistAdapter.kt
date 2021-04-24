@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.rest.PlaylistModel
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.PlaylistEntity
+import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
 
 //class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
@@ -18,9 +20,11 @@ class PlaylistAdapter(context: Context) :
     val mInflater: LayoutInflater = LayoutInflater.from(context)
 
     private var playlists: List<PlaylistEntity>? = null
+    var onPlaylistClickCallback: ((playlist: PlaylistEntity) -> Unit)? = null
 
     class AllPlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val playlistName: TextView = view.findViewById(R.id.playlistName)
+        val playlistCardView: CardView = view.findViewById(R.id.PlaylistsCardView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllPlaylistViewHolder {
@@ -33,6 +37,12 @@ class PlaylistAdapter(context: Context) :
     override fun onBindViewHolder(holder: AllPlaylistViewHolder, position: Int) {
         val currentPlaylist: PlaylistEntity = playlists!![position]
         holder.playlistName.text = currentPlaylist.name
+
+        holder.playlistCardView.setOnClickListener {
+            //TODO open singlePlaylist for this particular playlist
+            onPlaylistClickCallback?.invoke(currentPlaylist)
+        }
+
 
     }
 
