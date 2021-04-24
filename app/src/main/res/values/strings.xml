@@ -15,4 +15,5 @@
     <string name="music_player">Music Player</string>
     <string name="create_playlist">Create Playlist</string>
     <string name="enter_playlist_name">Enter Playlist Name</string>
+    <string name="choose_playlist">Choose Playlist:</string>
 </resources>

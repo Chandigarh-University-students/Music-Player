@@ -1,5 +1,6 @@
 package com.projects.musicplayer.fragments
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -16,12 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.adapters.AllSongsAapter
 import com.projects.musicplayer.R
+import com.projects.musicplayer.adapters.PlaylistDialogAdapter
 import com.projects.musicplayer.adapters.RecentTracksAdapter
+import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.viewmodel.AllSongsViewModel
-import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
-import com.projects.musicplayer.viewmodel.RecentSongsViewModel
-import com.projects.musicplayer.viewmodel.RecentSongsViewModelFactory
+import com.projects.musicplayer.uicomponents.CustomDialog
+import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,8 +42,15 @@ class HomeFragment : Fragment() {
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
 
+    private lateinit var mPlaylistViewModel: PlaylistViewModel
+    private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
+
+    lateinit var createPlaylistDialog: AddToPlaylist
+    lateinit var playlistInputDialog: CustomDialog
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
+
+    var selectedSongId = -1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,6 +70,12 @@ class HomeFragment : Fragment() {
             }
         }
 
+        mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)
+        mPlaylistViewModel =
+            ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
+        mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
+            createPlaylistDialog.setDialogPlaylists(it!!)
+        })
 
 
         mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
@@ -96,11 +110,36 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        playlistInputDialog = CustomDialog(activity as Context)
+        createPlaylistDialog = AddToPlaylist(activity as Context)
         recyclerViewAllSongs = view.findViewById(R.id.recyclerAllSongs)
         recyclerViewRecentTracks = view.findViewById(R.id.recyclerRecentTrack)
 
+        createPlaylistDialog.setOnDismissListener {
+            val playlistId: Int = createPlaylistDialog.selectedPlaylistId
+            if (playlistId != -1) {
+                Toast.makeText(
+                    activity as Context,
+                    "$selectedSongId added to $playlistId",
+                    Toast.LENGTH_SHORT
+                ).show()
+                //TODO: ADD selectedSongId to playlistId
+            } else {
+                Toast.makeText(
+                    activity as Context,
+                    "No Playlist Selected",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+
+
+
+
 
         if (activity != null) {
+
             adapterAllSongs =
                 AllSongsAapter(activity as Context)
             adapterRecentTracks =
@@ -122,22 +161,6 @@ class HomeFragment : Fragment() {
             )
 
 
-//            adapterAllSongs.setSongs(
-//                listOf(
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross")
-//                )
-//            )
-            //adapterRecentTracks.setTotalTracks(10)
         }
 
         return view
@@ -145,7 +168,6 @@ class HomeFragment : Fragment() {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
 
-        var selectedSongId = -1
         try {
             selectedSongId = adapterAllSongs.getSelectedSongId()
         } catch (e: Exception) {
@@ -154,11 +176,13 @@ class HomeFragment : Fragment() {
         }
         when (item.itemId) {
             R.id.ctx_add_to_playlist -> {
-                Toast.makeText(
-                    activity as Context,
-                    "$selectedSongId add to playlist",
-                    Toast.LENGTH_SHORT
-                ).show()
+
+                try {
+                    createPlaylistDialog.show()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
             }
             else -> {
 
@@ -169,3 +193,43 @@ class HomeFragment : Fragment() {
     }
 
 }
+
+class AddToPlaylist(
+    context: Context
+) : Dialog(context) {
+
+    private var playlists: List<PlaylistEntity>? = null
+
+    fun setDialogPlaylists(_playlists: List<PlaylistEntity>) {
+        playlists = _playlists
+    }
+
+
+    var recyclerView: RecyclerView? = null
+    var adapter: PlaylistDialogAdapter? = null
+
+    var selectedPlaylistId = -1
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.add_to_playlist_dialog)
+
+
+        recyclerView = findViewById(R.id.recyclerViewPlaylists)
+
+        adapter = PlaylistDialogAdapter(context)
+        recyclerView?.adapter = adapter
+        recyclerView?.layoutManager = LinearLayoutManager(context)
+
+        adapter?.playlistClickCallback = fun(id: Int) {
+            selectedPlaylistId = id
+            dismiss()
+        }
+
+        adapter?.setPlayLists(playlists!!)
+
+    }
+
+}
+
