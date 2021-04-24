@@ -5,8 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projects.musicplayer.database.FavEntity
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.rest.FavEntity
 import com.projects.musicplayer.repository.FavSongsRepository
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-package com.projects.musicplayer.database
+package com.projects.musicplayer.rest
 
 import androidx.room.Database
 import androidx.room.Room
@@ -17,7 +17,7 @@ abstract class FavRoomDatabase : RoomDatabase() {
         //To return Singleton INSTANCE of Database
         fun getFavDatabase(context: Context): FavRoomDatabase {
             synchronized(FavRoomDatabase::class.java) {
-                if (!::FAV_INSTANCE.isInitialized) {
+                if (!Companion::FAV_INSTANCE.isInitialized) {
 
                     FAV_INSTANCE = Room.databaseBuilder(
                         context.applicationContext,

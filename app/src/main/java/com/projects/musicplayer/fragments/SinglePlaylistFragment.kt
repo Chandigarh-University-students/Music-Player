@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.SinglePlaylistAdapter
-import com.projects.musicplayer.database.FavEntity
 import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity

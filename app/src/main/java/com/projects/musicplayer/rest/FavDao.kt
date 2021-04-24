@@ -1,7 +1,8 @@
-package com.projects.musicplayer.database
+package com.projects.musicplayer.rest
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.projects.musicplayer.rest.FavEntity
 
 @Dao
 interface FavDao {

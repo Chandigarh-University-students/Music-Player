@@ -2,7 +2,9 @@ package com.projects.musicplayer.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import com.projects.musicplayer.database.*
+import com.projects.musicplayer.rest.FavDao
+import com.projects.musicplayer.rest.FavEntity
+import com.projects.musicplayer.rest.FavRoomDatabase
 
 class FavSongsRepository(application: Application) {
     private var mFavSongsDao: FavDao
