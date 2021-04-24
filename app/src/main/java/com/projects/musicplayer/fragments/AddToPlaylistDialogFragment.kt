@@ -99,7 +99,7 @@ class AddToPlaylistDialogFragment : BottomSheetDialogFragment() {
         view: View
     ) : RecyclerView.ViewHolder(view) {
         val playlistName: TextView = itemView.findViewById(R.id.playlistName)
-        val playlistCard: CardView = itemView.findViewById(R.id.FavoritesCardView)
+        val playlistCard: CardView = itemView.findViewById(R.id.favCardView)
 
     }
 

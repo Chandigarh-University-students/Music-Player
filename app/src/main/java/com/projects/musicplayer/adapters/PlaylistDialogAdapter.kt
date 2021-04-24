@@ -22,7 +22,7 @@ class PlaylistDialogAdapter(context: Context) :
 
     class AllPlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val playlistName: TextView = view.findViewById(R.id.playlistName)
-        val playlistItem: CardView = view.findViewById(R.id.FavoritesCardView)
+        val playlistItem: CardView = view.findViewById(R.id.PlaylistsCardView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllPlaylistViewHolder {
