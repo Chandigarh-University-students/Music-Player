@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,6 +25,7 @@ import com.projects.musicplayer.viewmodel.RecentSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class HomeFragment : Fragment() {
 
@@ -48,7 +51,7 @@ class HomeFragment : Fragment() {
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
         mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
-            Log.i("LIVEDATA-UPDATE","Setting all songs again")
+            Log.i("LIVEDATA-UPDATE", "Setting all songs again")
             adapterAllSongs.setSongs(it!!)
         })
 
@@ -63,10 +66,13 @@ class HomeFragment : Fragment() {
 
         mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
         mRecentSongsViewModel =
-            ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+            ViewModelProvider(
+                this,
+                mRecentSongsViewModelFactory
+            ).get(RecentSongsViewModel::class.java)
 
         mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
-            Log.i("LIVEDATA-UPDATE","Setting recent songs again")//TODO continue
+            Log.i("LIVEDATA-UPDATE", "Setting recent songs again")//TODO continue
             adapterRecentTracks.addTracks(it!!)
         })
 
@@ -135,6 +141,31 @@ class HomeFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        var selectedSongId = -1
+        try {
+            selectedSongId = adapterAllSongs.getSelectedSongId()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return super.onContextItemSelected(item)
+        }
+        when (item.itemId) {
+            R.id.ctx_add_to_playlist -> {
+                Toast.makeText(
+                    activity as Context,
+                    "$selectedSongId add to playlist",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            else -> {
+
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 
 }

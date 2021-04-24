@@ -3,6 +3,7 @@ package com.projects.musicplayer.adapters
 
 import android.content.Context
 import android.util.Log
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,16 @@ import java.util.*
 
 class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.AllSongsViewHolder>() {
 
+    private var selectedSongId: Int = -1
+
+
+    private fun setSelectedSongId(p: Int) {
+        selectedSongId = p
+    }
+
+    fun getSelectedSongId():Int = selectedSongId
+
+
     val mInflater: LayoutInflater = LayoutInflater.from(context)
 
     //    private var songs: List<Song>? = null
@@ -29,11 +40,25 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
     var onSongClickCallback: ((song: RecentSongEntity) -> Unit)? = null
 
 
-    class AllSongsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class AllSongsViewHolder(view: View) : RecyclerView.ViewHolder(view),
+        View.OnCreateContextMenuListener {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
         val txtSongArtistName: TextView = view.findViewById(R.id.txtSongArtistName)
         val btnFav: ToggleButton = view.findViewById(R.id.btnFav)
-        val cardViewForSong:CardView = view.findViewById(R.id.cardViewForSong)
+        val cardViewForSong: CardView = view.findViewById(R.id.cardViewForSong)
+
+        init {
+            view.setOnCreateContextMenuListener(this)
+        }
+
+
+        override fun onCreateContextMenu(
+            menu: ContextMenu?,
+            v: View?,
+            menuInfo: ContextMenu.ContextMenuInfo?
+        ) {
+            menu!!.add(0, R.id.ctx_add_to_playlist, 0, "Add To Playlist")
+        }
 
     }
 
@@ -44,22 +69,11 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
         )
     }
 
-    //    override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
-//        if (songs != null) {
-//            val currentSong: Song = songs!![position]
-//            holder.txtSongName.text = currentSong.songName
-//            holder.txtSongArtistName.text = currentSong.artistName
-//            holder.btnFav.isChecked = songs!![position].isFav
-//
-//            holder.btnFav.setOnClickListener {
-//                songs!![position].isFav = !songs!![position].isFav
-//                notifyItemChanged(position)
-//                Log.d("ALLSONGINFO",songs.toString())
-//            }
-//        } else {
-//            holder.txtSongName.setText(R.string.NoSong)
-//        }
-//    }
+    override fun onViewRecycled(holder: AllSongsViewHolder) {
+        holder.cardViewForSong.setOnLongClickListener(null)
+        super.onViewRecycled(holder)
+    }
+
     override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
         if (songs != null) {
             val currentSong: SongEntity = songs!![position]
@@ -68,6 +82,11 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
             holder.txtSongArtistName.text = currentSong.artistName
             holder.btnFav.isChecked = songs!![position].isFav > 0
 //            holder.btnFav.isChecked = songs!![position].isFav
+
+            holder.cardViewForSong.setOnLongClickListener {
+                setSelectedSongId(currentSong.songId)
+                false
+            }
 
             holder.btnFav.setOnClickListener {
 //                songs!![position].isFav = !songs!![position].isFav
@@ -92,8 +111,21 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
                 val localTime: String = date.format(currentLocalTime)
 
-                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime))
-                Log.d("RECENTSONGupdated", RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime).toString())
+                onSongClickCallback?.invoke(
+                    RecentSongEntity(
+                        currentSong.songId,
+                        currentSong.albumCover,
+                        localTime
+                    )
+                )
+                Log.d(
+                    "RECENTSONGupdated",
+                    RecentSongEntity(
+                        currentSong.songId,
+                        currentSong.albumCover,
+                        localTime
+                    ).toString()
+                )
 
             }
         } else {
@@ -106,9 +138,7 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 //        songs = mSongs
 //        notifyDataSetChanged()
 //    }
-    fun
-
-            setSongs(mSongs: List<SongEntity>) {
+    fun setSongs(mSongs: List<SongEntity>) {
         songs = mSongs
         notifyDataSetChanged()
     }
