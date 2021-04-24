@@ -12,7 +12,7 @@
     <string name="NoSong">No Song</string>
     <string name="previous_song">Previous Song</string>
     <string name="next_song">Next Song</string>
-    <string name="music_player">Music Player</string>
+    <string name="music_player">Sangeet</string>
     <string name="create_playlist">Create Playlist</string>
     <string name="enter_playlist_name">Enter Playlist Name</string>
     <string name="choose_playlist">Choose Playlist:</string>
