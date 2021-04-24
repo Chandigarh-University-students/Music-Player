@@ -401,7 +401,10 @@ class MainActivity : AppCompatActivity() {
                     R.id.home_button
 
         } else
-            super.onBackPressed()
+            when (supportFragmentManager.findFragmentById(R.id.frame)) {
+                !is HomeFragment -> initUI()
+                else -> super.onBackPressed()
+            }
     }
 
     fun permissionGranted() : Boolean{

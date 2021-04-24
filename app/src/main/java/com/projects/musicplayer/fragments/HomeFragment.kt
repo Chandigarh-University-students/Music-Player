@@ -41,6 +41,7 @@ class HomeFragment : Fragment() {
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         /**ViewModel for ALLSongs*/
