@@ -20,6 +20,11 @@ class PlaylistViewModel(application: Application) : ViewModel() {
         }
     }
 
+    fun updatePlaylist(id: Int, mSongs: List<Int>) {
+        viewModelScope.launch {
+            mPlaylistRepository.updatePlaylist(id,mSongs)
+        }
+    }
 
     fun deletePlaylist(playlistEntity: PlaylistEntity) {
         viewModelScope.launch {
@@ -27,8 +32,10 @@ class PlaylistViewModel(application: Application) : ViewModel() {
         }
     }
 
-    fun getPlaylistSongsById(id: Int): LiveData<String> =
-        mPlaylistRepository.getPlaylistSongsById(id)
+    fun getPlaylistSongsByIdLive(id: Int): LiveData<String> =
+        mPlaylistRepository.getPlaylistSongsByIdLive(id)
 
-
+    suspend fun getPlaylistSongsById(id: Int): String? {
+        return mPlaylistRepository.getPlaylistSongsById(id)
+    }
 }

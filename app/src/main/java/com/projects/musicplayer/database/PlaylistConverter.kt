@@ -24,7 +24,7 @@ class PlaylistConverter {
 
         @TypeConverter
         @JvmStatic
-        fun fromList(someObjects: List<Int?>?): String? {
+        fun fromList(someObjects: List<Int>?): String? {
             return gson.toJson(someObjects)
         }
     }

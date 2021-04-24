@@ -18,6 +18,8 @@ import com.projects.musicplayer.adapters.SinglePlaylistAdapter
 import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.rest.FavSongsViewModel
+import com.projects.musicplayer.rest.FavSongsViewModelFactory
 import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +67,7 @@ class SinglePlaylistFragment : Fragment() {
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
             Log.i("LIVEDATAPLAYLISTUPDATE","Setting all songs again in playlist")
                 uiscope.launch {
-                val songIDs = PlaylistConverter.toList(mPlaylistViewModel.getPlaylistSongsById(playlistId).value)
+                val songIDs = PlaylistConverter.toList(mPlaylistViewModel.getPlaylistSongsByIdLive(playlistId).value)
                 val songList : MutableList<SongEntity> = mutableListOf<SongEntity>()
                 if (songIDs != null) {
                     for(id in songIDs) {
@@ -83,7 +85,8 @@ class SinglePlaylistFragment : Fragment() {
         })
 
         /**ViewModel for FavSongs*/
-        mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
+        mFavSongsViewModelFactory =
+            FavSongsViewModelFactory(activity!!.application)
         mFavSongsViewModel =
             ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
 

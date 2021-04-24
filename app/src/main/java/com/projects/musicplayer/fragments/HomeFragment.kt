@@ -20,15 +20,18 @@ import com.projects.musicplayer.adapters.AllSongsAapter
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.PlaylistDialogAdapter
 import com.projects.musicplayer.adapters.RecentTracksAdapter
+import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.uicomponents.CustomDialog
 import com.projects.musicplayer.viewmodel.*
 import com.projects.musicplayer.database.SongEntity
-import com.projects.musicplayer.viewmodel.*
+import com.projects.musicplayer.rest.FavSongsViewModel
+import com.projects.musicplayer.rest.FavSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
 class HomeFragment : Fragment() {
@@ -49,8 +52,7 @@ class HomeFragment : Fragment() {
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
     private lateinit var mFavSongsViewModel: FavSongsViewModel
     private lateinit var mFavSongsViewModelFactory: FavSongsViewModelFactory
-
-    private lateinit var mPlaylistViewModel: PlaylistViewModel
+       private lateinit var mPlaylistViewModel: PlaylistViewModel
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
 
     lateinit var createPlaylistDialog: AddToPlaylist
@@ -68,11 +70,6 @@ class HomeFragment : Fragment() {
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
-
-        /**ViewModel for FavSongs*/
-        mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
-        mFavSongsViewModel =
-            ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
 
 
         mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
@@ -107,6 +104,7 @@ class HomeFragment : Fragment() {
             adapterRecentTracks.addTracks(it!!)
         })
 
+
         adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity,song: SongEntity) {
             //update recent tracks
             uiscope.launch {
@@ -125,6 +123,60 @@ class HomeFragment : Fragment() {
                 //TODO play here using id
             }
         }
+
+
+        /**ViewModel for playlists*/
+        mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)
+        mPlaylistViewModel =
+            ViewModelProvider(
+                this,
+                mPlaylistViewModelFactory
+            ).get(PlaylistViewModel::class.java)
+
+
+
+
+        createPlaylistDialog.setOnDismissListener {
+            val playlistId: Int = createPlaylistDialog.selectedPlaylistId
+            if (playlistId != -1) {
+                var songs: String? = "sample"
+              /*  mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner,Observer {
+                    mPlaylistViewModel.getPlaylistSongsById(playlistId).observe(viewLifecycleOwner,Observer{
+                        songs= it
+                    })
+                })*/
+
+                Toast.makeText(
+                    activity as Context,
+                    "$selectedSongId added to $playlistId",
+                    Toast.LENGTH_SHORT
+                ).show()
+                //TODO: ADD selectedSongId to playlistId
+                runBlocking{
+                        songs = mPlaylistViewModel.getPlaylistSongsById(playlistId)
+
+                }
+                uiscope.launch {
+                    val listOfSongs : List<Int>? = PlaylistConverter.toList(songs)
+                    if(listOfSongs==null)
+                        mPlaylistViewModel.updatePlaylist(playlistId,listOf(selectedSongId))
+                    else{
+                        val songs = (listOfSongs as MutableList<Int>)
+                        songs.add(selectedSongId)
+                        Log.i("PLAYLISTSONGS", songs.toString())
+                        mPlaylistViewModel.updatePlaylist(playlistId,songs)
+                    }
+                }
+
+            } else {
+                Toast.makeText(
+                    activity as Context,
+                    "No Playlist Selected",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
     }
 
     override fun onCreateView(
@@ -138,28 +190,6 @@ class HomeFragment : Fragment() {
         recyclerViewRecentTracks = view.findViewById(R.id.recyclerRecentTrack)
         recentTrackBar=view.findViewById(R.id.recentTrackBar)
         toolbar=view.findViewById(R.id.homeToolbar)
-
-
-        createPlaylistDialog.setOnDismissListener {
-            val playlistId: Int = createPlaylistDialog.selectedPlaylistId
-            if (playlistId != -1) {
-                Toast.makeText(
-                    activity as Context,
-                    "$selectedSongId added to $playlistId",
-                    Toast.LENGTH_SHORT
-                ).show()
-                //TODO: ADD selectedSongId to playlistId
-            } else {
-                Toast.makeText(
-                    activity as Context,
-                    "No Playlist Selected",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-
-
 
 
 

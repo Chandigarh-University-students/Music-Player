@@ -1,4 +1,4 @@
-package com.projects.musicplayer.viewmodel
+package com.projects.musicplayer.rest
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -17,7 +17,9 @@ class FavSongsViewModelFactory(private val application: Application) : ViewModel
     </T> */
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FavSongsViewModel::class.java)) {
-            return FavSongsViewModel(application) as T
+            return FavSongsViewModel(
+                application
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

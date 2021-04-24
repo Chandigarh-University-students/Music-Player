@@ -1,4 +1,4 @@
-package com.projects.musicplayer.viewmodel
+package com.projects.musicplayer.rest
 
 import android.app.Application
 import android.util.Log
