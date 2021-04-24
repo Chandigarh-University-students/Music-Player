@@ -19,7 +19,7 @@ class FavSongsRepository(application: Application) {
 
     suspend fun removeSong(favSongEntity: FavEntity) = mFavSongsDao.removeFromFav(favSongEntity)
 
-    suspend fun checkFav(id: Int): List<FavEntity> = mFavSongsDao.checkFav(id)
+    fun checkFav(id: Int): LiveData<Int> = mFavSongsDao.checkFav(id)
 
     val mAllFavSongs: LiveData<List<FavEntity>>
         get() {

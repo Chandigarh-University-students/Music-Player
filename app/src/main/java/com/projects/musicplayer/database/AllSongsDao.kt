@@ -21,6 +21,10 @@ interface AllSongsDao {
     @get:Query("SELECT * from all_songs_table")
     val allSongs: LiveData<List<SongEntity>>
 
+    //Retrieve all fav songs from the database
+    @get:Query("SELECT * from all_songs_table where isFav=1")
+    val favSongs: LiveData<List<SongEntity>>
+
     //Get one song by it's id
     @Query(value = "SELECT * FROM all_songs_table WHERE songId = :id")
     suspend fun getSongById(id: Int): SongEntity

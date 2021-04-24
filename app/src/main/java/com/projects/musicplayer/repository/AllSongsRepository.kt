@@ -37,4 +37,9 @@ class AllSongsRepository(application: Application) {
             return mAllSongsDao.allSongs
         }
 
+    val mFavSongs: LiveData<List<SongEntity>>
+        get() {
+            return mAllSongsDao.favSongs
+        }
+
 }

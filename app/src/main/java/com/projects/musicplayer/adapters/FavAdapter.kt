@@ -1,6 +1,5 @@
 package com.projects.musicplayer.adapters
 
-
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,53 +16,35 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.AllSongsViewHolder>() {
+class FavAdapter (context: Context
+) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
-
-    //    private var songs: List<Song>? = null
     private var songs: List<SongEntity>? = null
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((recentSong: RecentSongEntity,song:SongEntity) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity, song : SongEntity) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
 
-
-    class AllSongsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class FavViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
         val txtSongArtistName: TextView = view.findViewById(R.id.txtSongArtistName)
         val btnFav: ToggleButton = view.findViewById(R.id.btnFav)
-        val cardViewForSong:CardView = view.findViewById(R.id.cardViewForSong)
+        val cardViewForSong: CardView = view.findViewById(R.id.cardViewForSong)
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllSongsViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {
         val songItemView: View = mInflater.inflate(R.layout.single_song_item, parent, false)
-        return AllSongsViewHolder(
+        return FavViewHolder(
             songItemView
         )
     }
 
-    //    override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
-//        if (songs != null) {
-//            val currentSong: Song = songs!![position]
-//            holder.txtSongName.text = currentSong.songName
-//            holder.txtSongArtistName.text = currentSong.artistName
-//            holder.btnFav.isChecked = songs!![position].isFav
-//
-//            holder.btnFav.setOnClickListener {
-//                songs!![position].isFav = !songs!![position].isFav
-//                notifyItemChanged(position)
-//                Log.d("ALLSONGINFO",songs.toString())
-//            }
-//        } else {
-//            holder.txtSongName.setText(R.string.NoSong)
-//        }
-//    }
-    override fun onBindViewHolder(holder: AllSongsViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
         if (songs != null) {
+
             val currentSong: SongEntity = songs!![position]
-//            val currentSong: Song = songs!![position]
             holder.txtSongName.text = currentSong.songName
             holder.txtSongArtistName.text = currentSong.artistName
             holder.btnFav.isChecked = songs!![position].isFav > 0
@@ -74,7 +55,7 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 //                notifyItemChanged(position)
                 favClickCallback?.invoke(currentSong.songId)
 //                notifyDataSetChanged()
-                Log.d("ALLSONGINFO", songs.toString())
+                Log.d("SINGLE PLAYLIST INFO", songs.toString())
             }
 
             holder.cardViewForSong.setOnClickListener {
@@ -82,11 +63,9 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
 
                 //TODO add to recent, maybe using a callback
-
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
                 val currentLocalTime = cal.time
-                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
-                // you can get seconds by adding  "...:ss" to it
+                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")                // you can get seconds by adding  "...:ss" to it
                 // you can get seconds by adding  "...:ss" to it
                 date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
 
@@ -106,9 +85,8 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 //        songs = mSongs
 //        notifyDataSetChanged()
 //    }
-    fun
-
-            setSongs(mSongs: List<SongEntity>) {
+    fun setSongs(mSongs: List<SongEntity>) {
+        //TODO add songs taking care of list and String
         songs = mSongs
         notifyDataSetChanged()
     }

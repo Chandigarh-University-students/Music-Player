@@ -5,7 +5,7 @@ import androidx.room.*
 
 @Dao
 interface PlaylistDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun createPlaylist(playlistEntity: PlaylistEntity)
 
     @Delete

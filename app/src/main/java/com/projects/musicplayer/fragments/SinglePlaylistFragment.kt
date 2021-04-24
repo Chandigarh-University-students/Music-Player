@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.SinglePlaylistAdapter
+import com.projects.musicplayer.database.FavEntity
 import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
@@ -36,6 +37,8 @@ class SinglePlaylistFragment : Fragment() {
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+    private lateinit var mFavSongsViewModel: FavSongsViewModel
+    private lateinit var mFavSongsViewModelFactory: FavSongsViewModelFactory
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
@@ -80,12 +83,22 @@ class SinglePlaylistFragment : Fragment() {
             }
         })
 
+        /**ViewModel for FavSongs*/
+        mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
+        mFavSongsViewModel =
+            ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
+
         singlePlaylistRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
             uiscope.launch {
                 //TODO add to favourites both places
                 mAllSongsViewModel.updateFav(id)
                 //TODO in fav database also
+                /*Log.e("FAV",mAllSongsViewModel.checkFav(id).toString());
+                if(mAllSongsViewModel.checkFav(id)==1)
+                    mFavSongsViewModel.insertSong(FavEntity(id))
+                else
+                    mFavSongsViewModel.removeSong(FavEntity(id))*/
             }
         }
 
@@ -95,10 +108,12 @@ class SinglePlaylistFragment : Fragment() {
                 ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
 
 
-            singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(song: RecentSongEntity) {
+            singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity,song:SongEntity) {
                 //update fav whenever fav button clicked
                 uiscope.launch {
-                    mRecentSongsViewModel.insertAfterDeleteSong(song)
+                    //TODO both play song and add to recent
+                    mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
+
                 }
             }
     }

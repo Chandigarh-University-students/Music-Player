@@ -12,7 +12,7 @@
         layout="@layout/toolbar" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/FavoritesCardView"
+        android:id="@+id/favCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
@@ -51,7 +51,7 @@
         android:id="@+id/personalization"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/FavoritesCardView"
+        android:layout_below="@id/favCardView"
         android:layout_margin="5dp"
         android:gravity="start"
         android:paddingTop="20dp"

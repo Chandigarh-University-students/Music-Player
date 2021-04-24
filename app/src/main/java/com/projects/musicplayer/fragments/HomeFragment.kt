@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.adapters.AllSongsAapter
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.RecentTracksAdapter
+import com.projects.musicplayer.database.FavEntity
 import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.viewmodel.AllSongsViewModel
-import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
-import com.projects.musicplayer.viewmodel.RecentSongsViewModel
-import com.projects.musicplayer.viewmodel.RecentSongsViewModelFactory
+import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,15 +36,24 @@ class HomeFragment : Fragment() {
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
+    private lateinit var mFavSongsViewModel: FavSongsViewModel
+    private lateinit var mFavSongsViewModelFactory: FavSongsViewModelFactory
 
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /**ViewModel for ALLSongs*/
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
+
+        /**ViewModel for FavSongs*/
+        mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
+        mFavSongsViewModel =
+            ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
+
 
         mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
             Log.i("LIVEDATA-UPDATE","Setting all songs again")
@@ -55,12 +63,39 @@ class HomeFragment : Fragment() {
         adapterAllSongs.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
             uiscope.launch {
+
+              /*  val favSongs = mFavSongsViewModel.favSongs.value
+                Log.e("FAV",favSongs.toString())
+                if(favSongs!=null){
+                    if(FavEntity(id) in favSongs)
+                        mFavSongsViewModel.removeSong(FavEntity(id))
+                    else
+                        mFavSongsViewModel.insertSong(FavEntity(id))
+                }else{
+                    mFavSongsViewModel.insertSong(FavEntity(id))
+                }
+                Log.e("FAV",mFavSongsViewModel.checkFav(id).toString())
+                if(mFavSongsViewModel.checkFav(id))
+                    mFavSongsViewModel.removeSong(FavEntity(id))
+                else
+                    mFavSongsViewModel.insertSong(FavEntity(id))*/
+
+                //TODO update both databases fav and allsongs
                 mAllSongsViewModel.updateFav(id)
+
+               /* if(!mFavSongsViewModel.checkFav(id)){
+                    Log.e("INSERT", "Insert $id")
+                      mFavSongsViewModel.insertSong(FavEntity(id))
+                }
+                else{
+                    Log.e("REMOVE", "Remove $id")
+                    mFavSongsViewModel.removeSong(FavEntity(id))
+                }*/
             }
         }
 
 
-
+        /**ViewModel for RecentSongs*/
         mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
         mRecentSongsViewModel =
             ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
@@ -70,17 +105,20 @@ class HomeFragment : Fragment() {
             adapterRecentTracks.addTracks(it!!)
         })
 
-        adapterAllSongs.onSongClickCallback = fun(song: RecentSongEntity) {
+        adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity,song: SongEntity) {
             //update recent tracks
             uiscope.launch {
-                mRecentSongsViewModel.insertAfterDeleteSong(song)
+                //TODO both play song and add to recent
+                mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
             }
         }
 
         adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
             //update recent tracks
             uiscope.launch {
+                //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
+                //TODO play here using id
             }
         }
     }
@@ -114,26 +152,7 @@ class HomeFragment : Fragment() {
                     (recyclerViewAllSongs.layoutManager as LinearLayoutManager).orientation
                 )
             )
-
-
-//            adapterAllSongs.setSongs(
-//                listOf(
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross"),
-//                    Song("In Motion", "Trent Renzor and Atticus Ross")
-//                )
-//            )
-            //adapterRecentTracks.setTotalTracks(10)
         }
-
         return view
     }
 

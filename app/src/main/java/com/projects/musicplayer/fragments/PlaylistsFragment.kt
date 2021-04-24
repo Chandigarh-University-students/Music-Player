@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +30,7 @@ import com.projects.musicplayer.viewmodel.*
 import kotlinx.android.synthetic.main.playlist_dialog.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class PlaylistsFragment : Fragment() {
@@ -38,6 +40,7 @@ class PlaylistsFragment : Fragment() {
     lateinit var toolbar: Toolbar
     lateinit var fabCreatePlaylist: FloatingActionButton
     lateinit var playlistInputDialog: CustomDialog
+    lateinit var favCardView:CardView
 
     //view model related
     private lateinit var mPlaylistViewModel: PlaylistViewModel
@@ -55,7 +58,8 @@ class PlaylistsFragment : Fragment() {
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
-            recylcerViewPlaylistadapter.setPlayLists(it!!)
+            uiscope.launch{
+                recylcerViewPlaylistadapter.setPlayLists(it!!) }
         })
 
         recylcerViewPlaylistadapter.onPlaylistClickCallback = fun (playlist:PlaylistEntity) {
@@ -81,7 +85,14 @@ class PlaylistsFragment : Fragment() {
         toolbar = view.findViewById(R.id.toolbar)
         fabCreatePlaylist = view.findViewById(R.id.fabCreatePlaylist)
         playlistInputDialog = CustomDialog(activity as Context)
+        favCardView = view.findViewById(R.id.favCardView)
         toolbar.title = "PlaylistsFragment"
+
+        favCardView.setOnClickListener {
+            activity!!.supportFragmentManager.beginTransaction()
+                .replace(R.id.frame,FavFragment())
+                .commit()
+        }
 
         fabCreatePlaylist.setOnClickListener {
             playlistInputDialog.show()
@@ -129,7 +140,5 @@ class PlaylistsFragment : Fragment() {
 
         return view
     }
-
-
 }
 

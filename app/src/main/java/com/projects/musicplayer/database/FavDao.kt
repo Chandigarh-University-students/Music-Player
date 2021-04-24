@@ -1,14 +1,11 @@
 package com.projects.musicplayer.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface FavDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToFav(favEntity: FavEntity)
 
     @Delete
@@ -17,6 +14,6 @@ interface FavDao {
     @get:Query("SELECT * from fav_table")
     val allFav: LiveData<List<FavEntity>>
 
-    @Query(value = "SELECT * FROM fav_table WHERE id = :id")
-    suspend fun checkFav(id: Int): List<FavEntity> //TODO What to return?
+    @Query(value = "SELECT COUNT(*) FROM fav_table WHERE id = :id")
+    fun checkFav(id: Int): LiveData<Int> //TODO What to return?
 }
