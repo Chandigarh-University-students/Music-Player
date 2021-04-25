@@ -537,7 +537,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    fun permissionGranted(): Boolean {
+//    fun permissionGranted(): Boolean {
     private fun openPlaylistFrag() {
         supportFragmentManager.beginTransaction()
             .replace(
