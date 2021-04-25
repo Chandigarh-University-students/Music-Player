@@ -227,9 +227,6 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-
-
-
         setUpBottomSheet()
 
 
@@ -401,10 +398,51 @@ class MainActivity : AppCompatActivity() {
                 ).commit()
 
             mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            /*if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
-                bottomNavigationView.selectedItemId =
-                    R.id.home_button
-*/
+           }
+
+        btnNextControl.setOnClickListener {
+            //TODO play next song in list
+            Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
+            if(mMediaControlViewModel.nowPlayingSong.value!=null){
+                val currSong=mMediaControlViewModel.nowPlayingSong.value
+                val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
+                var currSongPosition = currSongQueue?.indexOf(currSong)
+                val maxSongPosition = (currSongQueue?.size)?.minus(1)
+                val repeatState = mMediaControlViewModel.repeatMode.value
+                Log.i("NEXTPREV",currSong.toString())
+                Log.i("NEXTPREV",currSongPosition.toString())
+                Log.i("NEXTPREV",maxSongPosition.toString())
+                if(currSongPosition!=null && repeatState!=null)
+                {
+                    when(repeatState){
+                        RepeatTriStateButton.NO_REPEAT -> {
+                            if(currSongPosition==maxSongPosition){
+                                //TODO stop the song
+                            }else{
+
+                            }
+                        }
+                        RepeatTriStateButton.REPEAT_ONE -> {}
+                        RepeatTriStateButton.REPEAT_ALL -> {}
+                        else -> {}
+                    }
+                }else{
+                    Log.e("NEXTPREV","currSongPosition or repeatState is null")
+                }
+
+            }else{
+
+            }
+        }
+
+        btnPrevControl.setOnClickListener {
+            //TODO play prev song
+            Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
+            if(mMediaControlViewModel.nowPlayingSong.value!=null){
+
+            }else{
+
+            }
         }
 
 
