@@ -334,11 +334,9 @@ class MainActivity : AppCompatActivity() {
             mMediaControlViewModel.isFirstInit.value = false
         }
         mediaPlayer.setOnCompletionListener {
-            mMediaControlViewModel.isPlaying.value = false
-            //TODO next song
-           // btnNextControl.callOnClick()
+            Log.i("COMPLETE",it.isPlaying().toString())
         }
-    }
+}
 
     fun initializeSeekbar() {
 
@@ -389,9 +387,9 @@ class MainActivity : AppCompatActivity() {
         if (this::mediaPlayer.isInitialized) {
 
             Toast.makeText(this, "Play $play", Toast.LENGTH_SHORT).show()
-            if (pause) {
+            if ( pause) {
                 mediaPlayer.pause()
-            } else {
+            } else  {
                 mediaPlayer.start()
             }
         }
@@ -457,10 +455,14 @@ class MainActivity : AppCompatActivity() {
                         RepeatTriStateButton.NO_REPEAT -> {
                             if(currSongPosition==maxSongPosition){
                                 //TODO move to the first song and pause
-                                //mMediaControlViewModel.isPlaying.value = false
-                                //mMediaControlViewModel.isFirstInit.value = true
-                                //mMediaControlViewModel.nowPlayingSong.value=currSongQueue.first()
-
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                                /*mediaPlayer.stop()
+                                mMediaControlViewModel.isFirstInit.value = true
+                                mMediaControlViewModel.isPlaying.value = false
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue.first()*/
+                                //mediaPlayer.stop()
+                                //mediaPlayer.reset()
+                                //mediaPlayer.release()
                             }else{
                                 //TODO Move to next song
                                 mMediaControlViewModel.nowPlayingSong.value= currSongQueue?.get(currSongPosition+1)
