@@ -442,21 +442,36 @@ class MainActivity : AppCompatActivity() {
                     when(repeatState){
                         RepeatTriStateButton.NO_REPEAT -> {
                             if(currSongPosition==maxSongPosition){
-                                //TODO stop the song
-                            }else{
+                                //TODO move to the first song and pause
+                                mMediaControlViewModel.isFirstInit.value=true
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
 
+                            }else{
+                                //TODO Move to next song
+                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue?.get(currSongPosition+1)
                             }
                         }
-                        RepeatTriStateButton.REPEAT_ONE -> {}
-                        RepeatTriStateButton.REPEAT_ALL -> {}
-                        else -> {}
+                        RepeatTriStateButton.REPEAT_ONE -> {
+                                //TODO Play Again
+                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue?.get(currSongPosition)
+                        }
+                        RepeatTriStateButton.REPEAT_ALL -> {
+                            if(currSongPosition==maxSongPosition){
+                                //TODO Start first song
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                            }else{
+                                //TODO Move to next song
+                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue?.get(currSongPosition+1)
+                            }
+                        }
+                        else -> {Log.e("NEXTPREV","repeatState invalid")}
                     }
                 }else{
                     Log.e("NEXTPREV","currSongPosition or repeatState is null")
                 }
 
             }else{
-
+                Toast.makeText(this,"No song is playing",Toast.LENGTH_SHORT)
             }
         }
 
