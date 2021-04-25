@@ -101,6 +101,8 @@ class HomeFragment : Fragment() {
 
         mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
             Log.i("LIVEDATA-UPDATE", "Setting recent songs again")//TODO continue
+            toolbar.visibility=View.GONE
+            recentTrackBar.visibility=View.VISIBLE
             adapterRecentTracks.addTracks(it!!)
         })
 

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="ctx_add_to_playlist" type="id" />
+    <item name="ctx_remove_from_playlist" type="id"/>
+    <item name="ctx_remove_playlist" type="id"/>
 </resources>

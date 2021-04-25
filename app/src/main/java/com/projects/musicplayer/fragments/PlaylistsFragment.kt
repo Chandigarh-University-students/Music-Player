@@ -4,8 +4,10 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -31,6 +33,7 @@ import kotlinx.android.synthetic.main.playlist_dialog.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 
 class PlaylistsFragment : Fragment() {
@@ -45,9 +48,7 @@ class PlaylistsFragment : Fragment() {
     //view model related
     private lateinit var mPlaylistViewModel: PlaylistViewModel
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
-
-//    private lateinit var mRecentSongsViewModel: RecentSongsViewModel
-//    private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
+    var selectedPlaylist : PlaylistEntity? = null
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
@@ -139,6 +140,32 @@ class PlaylistsFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        try {
+            selectedPlaylist = recylcerViewPlaylistadapter.getSelectedPlaylist()
+            Log.e("REMOVEPLAYLIST",selectedPlaylist!!.toString())
+        } catch (e: Exception) {
+            Log.e("REMOVEPLAYLIST",e.message.toString())
+            return super.onContextItemSelected(item)
+        }
+        when (item.itemId) {
+            R.id.ctx_remove_playlist -> {
+                uiscope.launch {
+                    if(selectedPlaylist!=null)
+                        mPlaylistViewModel.deletePlaylist(selectedPlaylist!!)
+                    else
+                        Toast.makeText(activity as Context,"Failed to delete Playlist ",Toast.LENGTH_SHORT).show()
+                }
+            }
+            else -> {
+                Toast.makeText(activity as Context,"No Playlist Selected",Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 }
 
