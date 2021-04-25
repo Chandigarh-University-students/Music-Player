@@ -175,12 +175,19 @@ class MainActivity : AppCompatActivity() {
         mAllSongsViewModel.allSongs.observe(this, Observer {
             var currentQueue = mMediaControlViewModel.nowPlayingSongs.value
             var updatedCurrentQueue = mutableListOf<SongEntity>()
-            Log.d("FavInQueue",mMediaControlViewModel.nowPlayingSongs.value.toString())
-            Log.d("FavInQueue",it.toString())
-            if(currentQueue!=null){
-                for(song in currentQueue){
-                    val songComplement = SongEntity(song.songId,song.songName,song.artistName,song.duration,song.albumCover,song.isFav*(-1))
-                    if(song in it)
+            Log.d("FavInQueue", mMediaControlViewModel.nowPlayingSongs.value.toString())
+            Log.d("FavInQueue", it.toString())
+            if (currentQueue != null) {
+                for (song in currentQueue) {
+                    val songComplement = SongEntity(
+                        song.songId,
+                        song.songName,
+                        song.artistName,
+                        song.duration,
+                        song.albumCover,
+                        song.isFav * (-1)
+                    )
+                    if (song in it)
                         updatedCurrentQueue.add(song)
                     else if (songComplement in it)
                         updatedCurrentQueue.add(songComplement)
@@ -190,23 +197,30 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 mMediaControlViewModel.nowPlayingSongs.value = updatedCurrentQueue
-                Log.d("FavInQueue","Live data for nowPlayingSongs is updated due to change in fav")
-            }else{
-                Log.d("FavInQueue","Doing nothing since no songs are being played")
+                Log.d("FavInQueue", "Live data for nowPlayingSongs is updated due to change in fav")
+            } else {
+                Log.d("FavInQueue", "Doing nothing since no songs are being played")
             }
         })
 
         mMediaControlViewModel.isPlaying.observe(this, Observer {
             Log.i("PLAYBACK STATUS", it.toString())
-                    btnPlayPauseControl.isChecked = it
-                    b_sheet_CollapsedMusicControl.isChecked = it
+            btnPlayPauseControl.isChecked = it
+            b_sheet_CollapsedMusicControl.isChecked = it
 //            }
             playPauseMedia(it)
         })
 
+        mMediaControlViewModel.isShuffleMode.observe(this, Observer {
+            if (it) {
+                val currentList = mMediaControlViewModel.nowPlayingSongs.value
+                mMediaControlViewModel.nowPlayingSongs.value = currentList!!.shuffled()
+            }
+        })
+
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
             Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
-            setUpMediaPlayer(it,!mMediaControlViewModel.isFirstInit.value!!)
+            setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
             initializeSeekbar()
             uiscope.launch {
                 setUpCollapsedBottomSheetUI(it)
@@ -280,7 +294,7 @@ class MainActivity : AppCompatActivity() {
                  */
                 override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 //                    uiscope.launch {
-                        mMediaControlViewModel.isPlaying.value = isChecked
+                    mMediaControlViewModel.isPlaying.value = isChecked
 //                    }
                 }
 
@@ -293,19 +307,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        btnControlShuffle.setOnCheckedChangeListener { _, isChecked ->
+            uiscope.launch {
+                mMediaControlViewModel.isShuffleMode.value = isChecked
+            }
+        }
 
 
     }
 
-    fun setUpMediaPlayer(songEntity: SongEntity,toPlay:Boolean = true) {
+    fun setUpMediaPlayer(songEntity: SongEntity, toPlay: Boolean = true) {
         clearMediaPlayer()
         val songUri = Uri.parse(songEntity.albumCover)
         mediaPlayer = MediaPlayer.create(applicationContext, songUri)
 //        mediaPlayer.start()
-        if(toPlay)
-        uiscope.launch {
-            mMediaControlViewModel.isPlaying.value = true
-        }
+        if (toPlay)
+            uiscope.launch {
+                mMediaControlViewModel.isPlaying.value = true
+            }
         else {
             mMediaControlViewModel.isFirstInit.value = false
         }
