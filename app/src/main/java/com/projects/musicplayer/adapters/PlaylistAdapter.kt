@@ -6,6 +6,7 @@ import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +37,7 @@ class PlaylistAdapter(context: Context) :
     class AllPlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view),
         View.OnCreateContextMenuListener {
         val playlistName: TextView = view.findViewById(R.id.playlistName)
-        val playlistCardView: CardView = view.findViewById(R.id.PlaylistsCardView)
+        val playlistCardView: LinearLayout = view.findViewById(R.id.PlaylistsCardView)
 
         init {
             view.setOnCreateContextMenuListener(this)
