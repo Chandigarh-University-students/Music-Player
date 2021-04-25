@@ -5,14 +5,13 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
+import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
-import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -30,7 +29,10 @@ import com.projects.musicplayer.R
 import com.projects.musicplayer.database.SongEntity
 import com.projects.musicplayer.fragments.*
 import com.projects.musicplayer.rest.Song
+import com.projects.musicplayer.fragments.FavFragment
+import com.projects.musicplayer.fragments.SinglePlaylistFragment
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
+import com.projects.musicplayer.utils.Utility
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import com.projects.musicplayer.viewmodel.MediaControlViewModel
@@ -39,10 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.lang.Long.parseLong
-import java.time.Duration
-import java.util.Arrays.equals
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -67,8 +66,18 @@ class MainActivity : AppCompatActivity() {
     lateinit var txtCurrPlaying: TextView
     lateinit var btnSongList: ImageButton
 
+    /**Collapsed Bottom sheet**/
+    lateinit var b_sheet_CollapsedMusicCover: ImageView
+    lateinit var b_sheet_Collapsed_Song: TextView
+    lateinit var b_sheet_Collapsed_Artist: TextView
+    lateinit var b_sheet_CollapsedMusicControl: ToggleButton
+
+    /**Collapsed Bottom sheet**/
+
+
     //current song in now playing
     lateinit var songNowPlaying: CardView
+    lateinit var musicCoverPic:ImageView
     lateinit var txtSongName: TextView
     lateinit var txtSongArtistName: TextView
     lateinit var btnFav: ToggleButton
@@ -124,11 +133,18 @@ class MainActivity : AppCompatActivity() {
         b_sheet_Collapsed = findViewById(R.id.b_sheet_Collapsed)
         b_sheet_Expanded = findViewById(R.id.b_sheet_Expanded)
 
+
+        b_sheet_CollapsedMusicCover = findViewById(R.id.b_sheet_CollapsedMusicCover)
+        b_sheet_Collapsed_Song = findViewById(R.id.b_sheet_Collapsed_Song)
+        b_sheet_Collapsed_Artist = findViewById(R.id.b_sheet_Collapsed_Artist)
+        b_sheet_CollapsedMusicControl = findViewById(R.id.b_sheet_CollapsedMusicControl)
+
         btnMinimizeToolbar = findViewById(R.id.btnMinimizeToolbar)
         txtCurrPlaying = findViewById(R.id.txtCurrPlaying)
         btnSongList = findViewById(R.id.btnSongList)
 
         songNowPlaying = findViewById(R.id.songNowPlaying)
+        musicCoverPic = findViewById(R.id.musicCoverPic)
         txtSongName = findViewById(R.id.txtSongName)
         txtSongArtistName = findViewById(R.id.txtSongArtistName)
         btnFav = findViewById(R.id.btnFav)
@@ -184,6 +200,12 @@ class MainActivity : AppCompatActivity() {
             Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
             setUpMediaPlayer(it)
             initializeSeekbar()
+            uiscope.launch {
+                setUpCollapsedBottomSheetUI(it)
+            }
+            uiscope.launch {
+                setUpExpandedBottomSheetUI(it)
+            }
         })
 
         mMediaControlViewModel.nowPlayingSongs.observe(this, Observer {
@@ -195,6 +217,10 @@ class MainActivity : AppCompatActivity() {
             Log.i("PLAYLISTNAME", "New playlist added ${it}")
             //TODO to use this playlist name to display
         })
+
+
+
+
 
         setUpBottomSheet()
 
@@ -269,6 +295,49 @@ class MainActivity : AppCompatActivity() {
         return time
     }
 
+    private suspend fun setUpCollapsedBottomSheetUI(songEntity: SongEntity) {
+        withContext(Dispatchers.Main) {
+            b_sheet_Collapsed_Song.text = songEntity.songName
+            b_sheet_Collapsed_Artist.text = songEntity.artistName
+            val image = Utility.getAlbumCover(songEntity.albumCover)
+            if (image != null) {
+                b_sheet_CollapsedMusicCover.setImageBitmap(
+                    BitmapFactory.decodeByteArray(
+                        image,
+                        0,
+                        image.size
+                    )
+                )
+            } else {
+                b_sheet_CollapsedMusicCover.setImageResource(R.drawable.drawable_cover)
+            }
+        }
+    }
+
+     private suspend fun setUpExpandedBottomSheetUI(songEntity: SongEntity) {
+        withContext(Dispatchers.Main) {
+            txtSongName.text = songEntity.songName
+            txtSongArtistName.text = songEntity.artistName
+            val image = Utility.getAlbumCover(songEntity.albumCover)
+            if (image != null) {
+                musicCoverPic.setImageBitmap(
+                    BitmapFactory.decodeByteArray(
+                        image,
+                        0,
+                        image.size
+                    )
+                )
+            } else {
+                musicCoverPic.setImageResource(R.drawable.drawable_cover)
+            }
+        }
+    }
+
+
+
+
+
+
     fun setUpExpandedNowPlaying() {
         btnMinimizeToolbar.setOnClickListener {
             mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -294,6 +363,9 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+//        controlSeekBar.max = 50
+//        txtCurrentDuration.text = controlSeekBar.progress.toString()
+//        txtTotalDuration.text = controlSeekBar.max.toString()
         /*controlSeekBar.max = 50
         txtCurrentDuration.text = controlSeekBar.progress.toString()
         txtTotalDuration.text = controlSeekBar.max.toString()*/
