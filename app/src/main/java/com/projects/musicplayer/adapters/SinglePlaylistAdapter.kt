@@ -2,6 +2,7 @@ package com.projects.musicplayer.adapters
 
 import android.content.Context
 import android.util.Log
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,15 +26,38 @@ class SinglePlaylistAdapter(
     val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var songs: List<SongEntity>? = null
 
+    private var selectedsongId: Int = -1
+
+
+    private fun setSelectedSongId(p: Int) {
+        selectedsongId = p
+    }
+
+    fun getSelectedSongId():Int = selectedsongId
+
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
     var onSongClickCallback: ((recentSong: RecentSongEntity,song :SongEntity) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
 
-    class SinglePlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class SinglePlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view),
+        View.OnCreateContextMenuListener {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
         val txtSongArtistName: TextView = view.findViewById(R.id.txtSongArtistName)
         val btnFav: ToggleButton = view.findViewById(R.id.btnFav)
         val cardViewForSong: CardView = view.findViewById(R.id.cardViewForSong)
+
+        init {
+            view.setOnCreateContextMenuListener(this)
+        }
+
+
+        override fun onCreateContextMenu(
+            menu: ContextMenu?,
+            v: View?,
+            menuInfo: ContextMenu.ContextMenuInfo?
+        ) {
+            menu!!.add(0, R.id.ctx_remove_from_playlist, 0, "Remove from Playlist")
+        }
 
     }
 
@@ -59,6 +83,12 @@ class SinglePlaylistAdapter(
                 favClickCallback?.invoke(currentSong.songId)
 //                notifyDataSetChanged()
                 Log.d("SINGLE PLAYLIST INFO", songs.toString())
+            }
+
+            holder.cardViewForSong.setOnLongClickListener {
+                setSelectedSongId(currentSong.songId)
+                Log.i("SELECTEDPLAYLIST",currentSong.toString())
+                false
             }
 
             holder.cardViewForSong.setOnClickListener {

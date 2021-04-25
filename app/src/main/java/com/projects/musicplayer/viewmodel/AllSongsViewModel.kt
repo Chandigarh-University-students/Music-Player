@@ -39,6 +39,10 @@ class AllSongsViewModel(application: Application) : ViewModel() {
         }
     }
 
+    suspend fun getSongByIdSuspend(id: Int):SongEntity{
+        return mAllSongsRepository.getSongById(id)
+    }
+
     fun getSongById(id: Int): SongEntity {
         var mSongEntity: SongEntity? = null
 

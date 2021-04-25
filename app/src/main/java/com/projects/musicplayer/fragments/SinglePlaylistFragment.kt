@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,10 +20,14 @@ import com.projects.musicplayer.adapters.SinglePlaylistAdapter
 import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.rest.FavSongsViewModel
+import com.projects.musicplayer.rest.FavSongsViewModelFactory
 import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.lang.Exception
 
 
 class SinglePlaylistFragment : Fragment() {
@@ -47,6 +53,7 @@ class SinglePlaylistFragment : Fragment() {
     private var playlistName="Playlist"
     private var playListSongs = "songs "
 
+    var selectedSongId=-1
 
     //TODO ViewModel for single playlist
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,27 +70,28 @@ class SinglePlaylistFragment : Fragment() {
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
-            Log.i("LIVEDATAPLAYLISTUPDATE","Setting all songs again in playlist")
-                uiscope.launch {
-                val songIDs = PlaylistConverter.toList(mPlaylistViewModel.getPlaylistSongsById(playlistId).value)
-                val songList : MutableList<SongEntity> = mutableListOf<SongEntity>()
-                if (songIDs != null) {
-                    for(id in songIDs) {
-                        songList.add(mAllSongsViewModel.getSongById(id))
+            mPlaylistViewModel.getPlaylistSongsByIdLive(playlistId).observe(viewLifecycleOwner,Observer{
+                var mSongs = mutableListOf<SongEntity>()
+                runBlocking {
+                    val listSongIds=PlaylistConverter.toList(it)
+                    if(listSongIds!=null){
+                        for (id in listSongIds){
+                            mSongs.add(mAllSongsViewModel.getSongByIdSuspend(id))
+                        }
                     }
-                    Log.i("SONGID"," List<Int> songIds "+songIDs.size.toString())
-                    Log.i("SONGLIST"," List<SongEntity> songs "+songList.size.toString())
-                    singlePlaylistRecyclerViewAdapter.setSongs(songList)
+                    else{
+                        //TODO print no songs, add some
+                    }
                 }
-                else {
-                    Log.e("ERRORPLAYLIST","No songs")
+                Log.i("LIVEDATAPLAYLISTUPDATE",mSongs.toString())
+                singlePlaylistRecyclerViewAdapter.setSongs(mSongs)
+            })
 
-                }
-            }
         })
 
         /**ViewModel for FavSongs*/
-        mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
+        mFavSongsViewModelFactory =
+            FavSongsViewModelFactory(activity!!.application)
         mFavSongsViewModel =
             ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
 
@@ -150,5 +158,40 @@ class SinglePlaylistFragment : Fragment() {
             )
         }
         return view
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        try {
+            selectedSongId = singlePlaylistRecyclerViewAdapter.getSelectedSongId()
+            Log.e("REMOVESONG", selectedSongId.toString())
+        } catch (e: Exception) {
+            Log.e("REMOVESONG",e.message.toString())
+            return super.onContextItemSelected(item)
+        }
+        when (item.itemId) {
+            R.id.ctx_remove_from_playlist -> {
+                var songs:String? = "Sample"
+                runBlocking {
+                    songs = mPlaylistViewModel.getPlaylistSongsById(playlistId)
+                }
+                uiscope.launch {
+                    val listOfSongs : List<Int>? = PlaylistConverter.toList(songs)
+                    if(listOfSongs==null)
+                        Log.e("NOSONG","No song to delete which is not possible")
+                    else{
+                        val mutableSongs = (listOfSongs as MutableList<Int>)
+                        mutableSongs.remove(selectedSongId)
+                        Log.i("PLAYLISTSONGS", songs.toString())
+                        mPlaylistViewModel.updatePlaylist(playlistId,mutableSongs)
+                    }
+                }
+            }
+            else -> {
+                Toast.makeText(activity as Context,"No Playlist Selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 }
