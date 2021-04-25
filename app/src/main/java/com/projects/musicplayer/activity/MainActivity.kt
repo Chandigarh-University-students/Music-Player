@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     //current song in now playing
     lateinit var songNowPlaying: CardView
-    lateinit var musicCoverPic:ImageView
+    lateinit var musicCoverPic: ImageView
     lateinit var txtSongName: TextView
     lateinit var txtSongArtistName: TextView
     lateinit var btnFav: ToggleButton
@@ -172,6 +172,14 @@ class MainActivity : AppCompatActivity() {
         mMediaControlViewModel =
             ViewModelProvider(this).get(MediaControlViewModel::class.java)
 
+        mMediaControlViewModel.isPlaying.observe(this, Observer {
+            Log.i("PLAYBACK STATUS", it.toString())
+                    btnPlayPauseControl.isChecked = it
+                    b_sheet_CollapsedMusicControl.isChecked = it
+//            }
+            playPauseMedia(it)
+        })
+
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
             Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
             setUpMediaPlayer(it)
@@ -215,17 +223,6 @@ class MainActivity : AppCompatActivity() {
             getAudioFiles()
         }
         initUI()
-//        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
-//            if (this::mediaPlayer.isInitialized) {
-//                mediaPlayer.stop()
-//                mediaPlayer.reset()
-//                mediaPlayer.release()
-//            }
-//            val songUri = Uri.parse(songEntity.albumCover)
-//            mediaPlayer = MediaPlayer.create(applicationContext, songUri)
-//            mediaPlayer.start()
-
-//        }
 
         setUpBottomNav()
 
@@ -238,13 +235,39 @@ class MainActivity : AppCompatActivity() {
                          ).commit()*/
 
 
+        b_sheet_CollapsedMusicControl.setOnCheckedChangeListener(
+            object : CompoundButton.OnCheckedChangeListener {
+                /**
+                 * Called when the checked state of a compound button has changed.
+                 *
+                 * @param buttonView The compound button view whose state has changed.
+                 * @param isChecked  The new checked state of buttonView.
+                 */
+                override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+//                    uiscope.launch {
+                        mMediaControlViewModel.isPlaying.value = isChecked
+//                    }
+                }
+
+            }
+        )
+
+        btnPlayPauseControl.setOnCheckedChangeListener { _, isChecked ->
+            uiscope.launch {
+                mMediaControlViewModel.isPlaying.value = isChecked
+            }
+        }
+
     }
 
     fun setUpMediaPlayer(songEntity: SongEntity) {
         clearMediaPlayer()
         val songUri = Uri.parse(songEntity.albumCover)
         mediaPlayer = MediaPlayer.create(applicationContext, songUri)
-        mediaPlayer.start()
+//        mediaPlayer.start()
+        uiscope.launch {
+            mMediaControlViewModel.isPlaying.value = true
+        }
     }
 
     fun initializeSeekbar() {
@@ -290,7 +313,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-     private suspend fun setUpExpandedBottomSheetUI(songEntity: SongEntity) {
+
+    private fun playPauseMedia(play: Boolean) {
+        val pause = !play
+        if (this::mediaPlayer.isInitialized) {
+
+            Toast.makeText(this, "Play $play", Toast.LENGTH_SHORT).show()
+            if (pause) {
+                mediaPlayer.pause()
+            } else {
+                mediaPlayer.start()
+            }
+        }
+    }
+
+    private suspend fun setUpExpandedBottomSheetUI(songEntity: SongEntity) {
         withContext(Dispatchers.Main) {
             txtSongName.text = songEntity.songName
             txtSongArtistName.text = songEntity.artistName
@@ -307,11 +344,8 @@ class MainActivity : AppCompatActivity() {
                 musicCoverPic.setImageResource(R.drawable.drawable_cover)
             }
         }
+
     }
-
-
-
-
 
 
     fun setUpExpandedNowPlaying() {
@@ -613,7 +647,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-//    fun permissionGranted(): Boolean {
+    //    fun permissionGranted(): Boolean {
     private fun openPlaylistFrag() {
         supportFragmentManager.beginTransaction()
             .replace(
@@ -622,7 +656,7 @@ class MainActivity : AppCompatActivity() {
             ).commit()
     }
 
-    fun permissionGranted() : Boolean{
+    fun permissionGranted(): Boolean {
         val permission = ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.READ_EXTERNAL_STORAGE
