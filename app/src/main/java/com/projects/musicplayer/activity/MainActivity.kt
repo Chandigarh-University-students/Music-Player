@@ -313,6 +313,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        btnRepeatControl.addCheckedStateCallback(object :
+            RepeatTriStateButton.CheckedStateCallback() {
+            override fun onStateChanged(newState: Int) {
+                uiscope.launch {
+                    mMediaControlViewModel.repeatMode.value = newState
+                }
+            }
+
+        })
+
 
     }
 
