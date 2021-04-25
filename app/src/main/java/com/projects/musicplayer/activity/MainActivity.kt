@@ -24,6 +24,8 @@ import com.projects.musicplayer.fragments.HomeFragment
 import com.projects.musicplayer.fragments.PlaylistsFragment
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.fragments.FavFragment
+import com.projects.musicplayer.fragments.SinglePlaylistFragment
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
@@ -403,9 +405,19 @@ class MainActivity : AppCompatActivity() {
 
         } else
             when (supportFragmentManager.findFragmentById(R.id.frame)) {
+                is SinglePlaylistFragment -> openPlaylistFrag()
+                is FavFragment -> openPlaylistFrag()
                 !is HomeFragment -> initUI()
                 else -> super.onBackPressed()
             }
+    }
+
+    private fun openPlaylistFrag() {
+        supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.frame,
+                PlaylistsFragment()
+            ).commit()
     }
 
     fun permissionGranted() : Boolean{
