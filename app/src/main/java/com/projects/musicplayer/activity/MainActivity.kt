@@ -293,6 +293,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+
     }
 
     fun setUpMediaPlayer(songEntity: SongEntity,toPlay:Boolean = true) {
@@ -303,6 +305,9 @@ class MainActivity : AppCompatActivity() {
         if(toPlay)
         uiscope.launch {
             mMediaControlViewModel.isPlaying.value = true
+        }
+        else {
+            mMediaControlViewModel.isFirstInit.value = false
         }
     }
 

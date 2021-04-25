@@ -103,9 +103,9 @@ class HomeFragment : Fragment() {
                 mMediaControlViewModel.nowPlayingSong.value = it.random()
                 mMediaControlViewModel.nowPlayingSongs.value = it
             }
-            else {
-                mMediaControlViewModel.isFirstInit.value = false
-            }
+//            else {
+//                mMediaControlViewModel.isFirstInit.value = false
+//            }
         })
 
         adapterAllSongs.favClickCallback = fun(id: Int) {
