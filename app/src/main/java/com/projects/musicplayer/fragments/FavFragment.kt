@@ -81,9 +81,6 @@ class FavFragment : Fragment() {
                Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
             }
         }
-
-
-
     }
 
     override fun onCreateView(

@@ -25,10 +25,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.projects.musicplayer.fragments.HomeFragment
-import com.projects.musicplayer.fragments.PlaylistsFragment
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.fragments.*
+import com.projects.musicplayer.rest.Song
 import com.projects.musicplayer.fragments.FavFragment
 import com.projects.musicplayer.fragments.SinglePlaylistFragment
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
@@ -172,6 +172,30 @@ class MainActivity : AppCompatActivity() {
         mMediaControlViewModel =
             ViewModelProvider(this).get(MediaControlViewModel::class.java)
 
+        mAllSongsViewModel.allSongs.observe(this, Observer {
+            var currentQueue = mMediaControlViewModel.nowPlayingSongs.value
+            var updatedCurrentQueue = mutableListOf<SongEntity>()
+            Log.d("FavInQueue",mMediaControlViewModel.nowPlayingSongs.value.toString())
+            Log.d("FavInQueue",it.toString())
+            if(currentQueue!=null){
+                for(song in currentQueue){
+                    val songComplement = SongEntity(song.songId,song.songName,song.artistName,song.duration,song.albumCover,song.isFav*(-1))
+                    if(song in it)
+                        updatedCurrentQueue.add(song)
+                    else if (songComplement in it)
+                        updatedCurrentQueue.add(songComplement)
+                    else {
+                        Log.d("FavInQueue", "Weird behaviour")
+                        updatedCurrentQueue.add(song)
+                    }
+                }
+                mMediaControlViewModel.nowPlayingSongs.value = updatedCurrentQueue
+                Log.d("FavInQueue","Live data for nowPlayingSongs is updated due to change in fav")
+            }else{
+                Log.d("FavInQueue","Doing nothing since no songs are being played")
+            }
+        })
+
         mMediaControlViewModel.isPlaying.observe(this, Observer {
             Log.i("PLAYBACK STATUS", it.toString())
                     btnPlayPauseControl.isChecked = it
@@ -223,6 +247,17 @@ class MainActivity : AppCompatActivity() {
             getAudioFiles()
         }
         initUI()
+//        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
+//            if (this::mediaPlayer.isInitialized) {
+//                mediaPlayer.stop()
+//                mediaPlayer.reset()
+//                mediaPlayer.release()
+//            }
+//            val songUri = Uri.parse(songEntity.albumCover)
+//            mediaPlayer = MediaPlayer.create(applicationContext, songUri)
+//            mediaPlayer.start()
+
+//        }
 
         setUpBottomNav()
 
@@ -355,6 +390,23 @@ class MainActivity : AppCompatActivity() {
                 bottomNavigationView.selectedItemId =
                     R.id.home_button
         }
+
+        btnSongList.setOnClickListener {
+            //TODO testing how to collapse now playing and show queue
+
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.frame,
+                    SongsQueueFragment()
+                ).commit()
+
+            mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            /*if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
+                bottomNavigationView.selectedItemId =
+                    R.id.home_button
+*/
+        }
+
 
 //        controlSeekBar.max = 50
 //        txtCurrentDuration.text = controlSeekBar.progress.toString()
