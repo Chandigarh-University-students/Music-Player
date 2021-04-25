@@ -12,6 +12,8 @@ class MediaControlViewModel() : ViewModel() {
 
     var nowPlayingSongs: MutableLiveData<List<SongEntity>> = MutableLiveData()
 
+    var nowPlaylist: MutableLiveData<String> = MutableLiveData()
+
     var nowPlayingSong: MutableLiveData<SongEntity> = MutableLiveData()
 
     var isShuffleMode: MutableLiveData<Boolean> = MutableLiveData(false)

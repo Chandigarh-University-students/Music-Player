@@ -26,6 +26,7 @@ import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.uicomponents.CustomDialog
 import com.projects.musicplayer.viewmodel.*
 import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.rest.Song
 //import com.projects.musicplayer.rest.FavSongsViewModel
 //import com.projects.musicplayer.rest.FavSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -126,44 +127,53 @@ class HomeFragment : Fragment() {
             adapterRecentTracks.addTracks(it!!)
         })
 
-        adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity) {
+        adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity,allSongs:List<SongEntity>) {
             //update recent tracks
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                 toolbar.visibility = View.GONE
                 recentTrackBar.visibility = View.VISIBLE
-
                 //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
                 mMediaControlViewModel.nowPlayingSong.value = song
-                val selectedPlaylist:List<SongEntity> = mAllSongsViewModel.getAllSongs()
-                Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
-                Log.d("NOWPLAYING-PLAYLIST", "Current Playlist set to ${selectedPlaylist.toString()}")
-                mMediaControlViewModel.nowPlayingSongs.value = selectedPlaylist
-
+                mMediaControlViewModel.nowPlayingSongs.value=allSongs
+                mMediaControlViewModel.nowPlaylist.value = "All Songs"
             }
+          /*  runBlocking {
+                val selectedPlaylist: List<SongEntity> = mAllSongsViewModel.getAllSongs()
+                Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
+                Log.d(
+                    "NOWPLAYING-PLAYLIST",
+                    "Current Playlist set to ${selectedPlaylist.toString()}"
+                )}
+            uiscope.launch {
+                mMediaControlViewModel.nowPlayingSongs.value = selectedPlaylist
+                mMediaControlViewModel.nowPlaylist.value = "All Songs"
+            }*/
+        }
 //            if (song == mMediaControlViewModel.nowPlayingSong!!.value) {
 //                mMediaControlViewModel.togglePlayPause()
 //            }
 //            else {
 
 //            }
-        }
+
 
         adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
             //update recent tracks
+            //TODO play here using id
+            var songPlayed:SongEntity
+            runBlocking {
+                songPlayed=mAllSongsViewModel.getSongByIdSuspend(song.songId)
+                mMediaControlViewModel.nowPlaylist.value="Recent Tracks"
+                mMediaControlViewModel.nowPlayingSong.value = songPlayed
+            }
+
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
             }
-            //TODO play here using id
-                var songPlayed:SongEntity
-                runBlocking {
-                    songPlayed=mAllSongsViewModel.getSongByIdSuspend(song.songId)
-                }
-            uiscope.launch {
-                mMediaControlViewModel.nowPlayingSong.value = songPlayed
-            }
+
         }
 
 

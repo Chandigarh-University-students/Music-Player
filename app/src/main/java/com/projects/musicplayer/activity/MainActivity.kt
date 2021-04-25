@@ -173,6 +173,13 @@ class MainActivity : AppCompatActivity() {
             //TODO to use this playlist to switch to next songs
         })
 
+        mMediaControlViewModel.nowPlaylist.observe(this, Observer {
+            Log.i("PLAYLISTNAME", "New playlist added ${it}")
+            //TODO to use this playlist name to display
+        })
+
+
+
 
 
         setUpBottomSheet()
