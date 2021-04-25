@@ -32,6 +32,7 @@ class FavFragment : Fragment() {
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+    private lateinit var mMediaControlViewModel: MediaControlViewModel
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
@@ -64,15 +65,22 @@ class FavFragment : Fragment() {
         mRecentSongsViewModel =
             ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
 
+        /** Viewmodel for MediaControl*/
+        mMediaControlViewModel = ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
 
         favRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity) {
             //update fav whenever fav button clicked
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
+                mMediaControlViewModel.nowPlayingSong.value = song
+               Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
 
             }
         }
+
+
+
     }
 
     override fun onCreateView(
