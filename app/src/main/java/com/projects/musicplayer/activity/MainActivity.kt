@@ -37,11 +37,9 @@ import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import com.projects.musicplayer.viewmodel.MediaControlViewModel
 import com.projects.musicplayer.viewmodel.MediaControlViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.lang.Long.parseLong
+import java.lang.Runnable
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -325,6 +323,11 @@ class MainActivity : AppCompatActivity() {
         else {
             mMediaControlViewModel.isFirstInit.value = false
         }
+        mediaPlayer.setOnCompletionListener {
+            mMediaControlViewModel.isPlaying.value = false
+            //TODO next song
+           // btnNextControl.callOnClick()
+        }
     }
 
     fun initializeSeekbar() {
@@ -383,6 +386,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private suspend fun setUpExpandedBottomSheetUI(songEntity: SongEntity) {
         withContext(Dispatchers.Main) {
@@ -443,8 +447,9 @@ class MainActivity : AppCompatActivity() {
                         RepeatTriStateButton.NO_REPEAT -> {
                             if(currSongPosition==maxSongPosition){
                                 //TODO move to the first song and pause
-                                mMediaControlViewModel.isFirstInit.value=true
-                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                                //mMediaControlViewModel.isPlaying.value = false
+                                //mMediaControlViewModel.isFirstInit.value = true
+                                //mMediaControlViewModel.nowPlayingSong.value=currSongQueue.first()
 
                             }else{
                                 //TODO Move to next song
