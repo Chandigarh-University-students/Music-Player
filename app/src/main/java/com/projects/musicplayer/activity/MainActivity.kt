@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
             ViewModelProvider(this).get(MediaControlViewModel::class.java)
 
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
-            Log.i("MAINACTIVITY", "New Song Clicked ${it.songName}")
+            Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
             setUpMediaPlayer(it)
             initializeSeekbar()
             uiscope.launch {
@@ -183,6 +183,18 @@ class MainActivity : AppCompatActivity() {
                 setUpExpandedBottomSheetUI(it)
             }
         })
+
+        mMediaControlViewModel.nowPlayingSongs.observe(this, Observer {
+            Log.i("PLAYLIST", "New playlist added ${it.toString()}")
+            //TODO to use this playlist to switch to next songs
+        })
+
+        mMediaControlViewModel.nowPlaylist.observe(this, Observer {
+            Log.i("PLAYLISTNAME", "New playlist added ${it}")
+            //TODO to use this playlist name to display
+        })
+
+
 
 
 
@@ -203,8 +215,7 @@ class MainActivity : AppCompatActivity() {
             getAudioFiles()
         }
         initUI()
-
-        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
+//        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
 //            if (this::mediaPlayer.isInitialized) {
 //                mediaPlayer.stop()
 //                mediaPlayer.reset()
@@ -214,7 +225,7 @@ class MainActivity : AppCompatActivity() {
 //            mediaPlayer = MediaPlayer.create(applicationContext, songUri)
 //            mediaPlayer.start()
 
-        }
+//        }
 
         setUpBottomNav()
 
@@ -314,6 +325,9 @@ class MainActivity : AppCompatActivity() {
 //        controlSeekBar.max = 50
 //        txtCurrentDuration.text = controlSeekBar.progress.toString()
 //        txtTotalDuration.text = controlSeekBar.max.toString()
+        /*controlSeekBar.max = 50
+        txtCurrentDuration.text = controlSeekBar.progress.toString()
+        txtTotalDuration.text = controlSeekBar.max.toString()*/
 
 
         controlSeekBar.setOnSeekBarChangeListener(
@@ -324,7 +338,6 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     if (fromUser) {
                         mediaPlayer.seekTo(progresValue * 1000)
-
                     }
                 }
 
@@ -600,7 +613,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    //    fun permissionGranted(): Boolean {
+//    fun permissionGranted(): Boolean {
     private fun openPlaylistFrag() {
         supportFragmentManager.beginTransaction()
             .replace(
@@ -609,7 +622,7 @@ class MainActivity : AppCompatActivity() {
             ).commit()
     }
 
-    fun permissionGranted(): Boolean {
+    fun permissionGranted() : Boolean{
         val permission = ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.READ_EXTERNAL_STORAGE

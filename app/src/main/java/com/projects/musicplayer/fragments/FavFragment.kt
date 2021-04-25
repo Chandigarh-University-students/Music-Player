@@ -32,11 +32,15 @@ class FavFragment : Fragment() {
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+    private lateinit var mMediaControlViewModel: MediaControlViewModel
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        /** Viewmodel for MediaControl*/
+        mMediaControlViewModel = ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
 
         /** Viewmodel for ALLSongs*/
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
@@ -47,7 +51,7 @@ class FavFragment : Fragment() {
             Log.i("LIVEDATAPLAYLISTUPDATE","Setting all songs again in Favorites")
             uiscope.launch {
                 favRecyclerViewAdapter.setSongs(it!!)
-            }
+               }
         })
 
 
@@ -65,14 +69,21 @@ class FavFragment : Fragment() {
             ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
 
 
-        favRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity) {
+
+        favRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity,allFavSongs:List<SongEntity>) {
             //update fav whenever fav button clicked
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
-
+                mMediaControlViewModel.nowPlayingSong.value = song
+                mMediaControlViewModel.nowPlayingSongs.value=allFavSongs
+                mMediaControlViewModel.nowPlaylist.value = "Favorites"
+               Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
             }
         }
+
+
+
     }
 
     override fun onCreateView(

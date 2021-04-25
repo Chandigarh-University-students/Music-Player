@@ -37,7 +37,7 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((recentSong: RecentSongEntity, song: SongEntity) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity, song: SongEntity,allSongs:List<SongEntity>) -> Unit)? = null
 
 
     class AllSongsViewHolder(view: View) : RecyclerView.ViewHolder(view),
@@ -117,7 +117,7 @@ class AllSongsAapter(context: Context) : RecyclerView.Adapter<AllSongsAapter.All
                         currentSong.songId,
                         currentSong.albumCover,
                         localTime
-                    ), currentSong
+                    ), currentSong, songs!!
                 )
                 Log.d(
                     "RECENTSONGupdated",

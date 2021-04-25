@@ -17,4 +17,6 @@ interface RecentSongsDao {
     //Retrieve all recent songs in order from the database
     @get:Query("SELECT * from recent_songs_table order by lastPlayed desc")
     val allSongs: LiveData<List<RecentSongEntity>>
+
+
 }
