@@ -39,8 +39,8 @@ class HomeFragment : Fragment() {
     lateinit var recyclerViewRecentTracks: RecyclerView
     lateinit var adapterRecentTracks: RecentTracksAdapter
 
-    lateinit var recentTrackBar:TextView
-    lateinit var toolbar:androidx.appcompat.widget.Toolbar
+    lateinit var recentTrackBar: TextView
+    lateinit var toolbar: androidx.appcompat.widget.Toolbar
 
     //view model related
     private lateinit var mAllSongsViewModel: AllSongsViewModel
@@ -53,12 +53,17 @@ class HomeFragment : Fragment() {
     private lateinit var mPlaylistViewModel: PlaylistViewModel
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
 
+    private lateinit var mMediaControlViewModel: MediaControlViewModel
+    private lateinit var mMediaControlViewModelFactory: MediaControlViewModelFactory
+
     lateinit var createPlaylistDialog: AddToPlaylist
     lateinit var playlistInputDialog: CustomDialog
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
     var selectedSongId = -1
+
+    var onPlaySongClickCallback: ((song: SongEntity) -> Unit)? = null
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,6 +73,15 @@ class HomeFragment : Fragment() {
         mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
+
+        /**ViewModel for now playing songs**/
+//        mMediaControlViewModelFactory = MediaControlViewModelFactory()
+        mMediaControlViewModel =
+            ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
+//            ViewModelProvider(
+//                this,
+//                mMediaControlViewModelFactory
+//            ).get(MediaControlViewModel::class.java)
 
         /**ViewModel for FavSongs*/
         mFavSongsViewModelFactory = FavSongsViewModelFactory(activity!!.application)
@@ -107,14 +121,26 @@ class HomeFragment : Fragment() {
             adapterRecentTracks.addTracks(it!!)
         })
 
-        adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity,song: SongEntity) {
+        adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity) {
             //update recent tracks
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
-                toolbar.visibility=View.GONE
-                recentTrackBar.visibility=View.VISIBLE
+                toolbar.visibility = View.GONE
+                recentTrackBar.visibility = View.VISIBLE
+
+                //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
+                mMediaControlViewModel.nowPlayingSong.value = song
+                onPlaySongClickCallback?.invoke(song)
+                Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
+
             }
+//            if (song == mMediaControlViewModel.nowPlayingSong!!.value) {
+//                mMediaControlViewModel.togglePlayPause()
+//            }
+//            else {
+
+//            }
         }
 
         adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
@@ -136,8 +162,8 @@ class HomeFragment : Fragment() {
         createPlaylistDialog = AddToPlaylist(activity as Context)
         recyclerViewAllSongs = view.findViewById(R.id.recyclerAllSongs)
         recyclerViewRecentTracks = view.findViewById(R.id.recyclerRecentTrack)
-        recentTrackBar=view.findViewById(R.id.recentTrackBar)
-        toolbar=view.findViewById(R.id.homeToolbar)
+        recentTrackBar = view.findViewById(R.id.recentTrackBar)
+        toolbar = view.findViewById(R.id.homeToolbar)
 
 
         createPlaylistDialog.setOnDismissListener {

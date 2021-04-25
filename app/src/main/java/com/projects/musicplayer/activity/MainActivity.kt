@@ -5,9 +5,14 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
+import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -15,6 +20,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -24,14 +30,21 @@ import com.projects.musicplayer.fragments.HomeFragment
 import com.projects.musicplayer.fragments.PlaylistsFragment
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.rest.Song
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
 import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.MediaControlViewModel
+import com.projects.musicplayer.viewmodel.MediaControlViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.Long.parseLong
+import java.time.Duration
 import java.util.Arrays.equals
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     lateinit var bottomNavigationView: BottomNavigationView
@@ -72,6 +85,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var btnPlayPauseControl: ToggleButton
     lateinit var btnNextControl: ImageButton
 
+
     private val READ_STORAGE_PERMISSION_REQUEST_CODE = 1
     private val TAG = "PermissionDemo"
 
@@ -80,11 +94,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
 
+    private lateinit var mMediaControlViewModel: MediaControlViewModel
+    private lateinit var mMediaControlViewModelFactory: MediaControlViewModelFactory
+
+    lateinit var mediaPlayer: MediaPlayer
+    lateinit var runnable: Runnable
+
+    val MediaPlayer.seconds: Int
+        get() = this.duration / 1000
+    val MediaPlayer.currentSeconds: Int
+        get() = this.currentPosition / 1000
+    var homeFragment: HomeFragment = HomeFragment()
+    var handler: Handler = Handler()
+
+
     //coroutine scopes
     val uiscope = CoroutineScope(Dispatchers.Main)
     val dbScope = CoroutineScope(Dispatchers.IO)
 
     /*EXPANDED BOTTOM SHEET ELEMENTS*/
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +124,7 @@ class MainActivity : AppCompatActivity() {
         flFragment = findViewById(R.id.frame)
         b_sheet_Collapsed = findViewById(R.id.b_sheet_Collapsed)
         b_sheet_Expanded = findViewById(R.id.b_sheet_Expanded)
+
 
 
 
@@ -127,9 +157,19 @@ class MainActivity : AppCompatActivity() {
         mAllSongsViewModelFactory = AllSongsViewModelFactory(application)
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
+        mMediaControlViewModel =
+            ViewModelProvider(this).get(MediaControlViewModel::class.java)
+
+        mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
+            Log.i("MAINACTIVITY", "New Song Clicked ${it.songName}")
+            setUpMediaPlayer(it)
+            initializeSeekbar()
+        })
+
 
 
         setUpBottomSheet()
+
 
         //TODO: CHECK SYNC AUDIO FETCH AND LOADING OF HOME_FRAGMENT
 
@@ -140,11 +180,23 @@ class MainActivity : AppCompatActivity() {
                 "Fetching Songs from MediaStore for first time",
                 Toast.LENGTH_SHORT
             ).show()
-            if(!permissionGranted())
-            setupPermissions()
+            if (!permissionGranted())
+                setupPermissions()
             getAudioFiles()
         }
         initUI()
+
+        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
+//            if (this::mediaPlayer.isInitialized) {
+//                mediaPlayer.stop()
+//                mediaPlayer.reset()
+//                mediaPlayer.release()
+//            }
+//            val songUri = Uri.parse(songEntity.albumCover)
+//            mediaPlayer = MediaPlayer.create(applicationContext, songUri)
+//            mediaPlayer.start()
+
+        }
 
         setUpBottomNav()
 
@@ -157,6 +209,37 @@ class MainActivity : AppCompatActivity() {
                          ).commit()*/
 
 
+    }
+
+    fun setUpMediaPlayer(songEntity: SongEntity) {
+        clearMediaPlayer()
+        val songUri = Uri.parse(songEntity.albumCover)
+        mediaPlayer = MediaPlayer.create(applicationContext, songUri)
+        mediaPlayer.start()
+    }
+
+    fun initializeSeekbar() {
+
+        controlSeekBar.max = mediaPlayer.seconds
+        txtTotalDuration.text = getDuration(mediaPlayer.seconds.toLong())
+        runnable = Runnable {
+            controlSeekBar.progress = mediaPlayer.currentSeconds
+            txtCurrentDuration.text = getDuration(mediaPlayer.currentSeconds.toLong())
+            handler.postDelayed(runnable, 1000)
+        }
+        handler.postDelayed(runnable, 1000)
+    }
+
+    fun getDuration(seconds: Long): String {
+        val time = String.format(
+            "%02d : %02d",
+            TimeUnit.SECONDS.toMinutes(seconds),
+            seconds - TimeUnit.MINUTES.toSeconds(
+                TimeUnit.SECONDS.toMinutes(seconds)
+            )
+
+        )
+        return time
     }
 
     fun setUpExpandedNowPlaying() {
@@ -174,20 +257,22 @@ class MainActivity : AppCompatActivity() {
 
         controlSeekBar.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
-                var progress = 0
                 override fun onProgressChanged(
                     seekBar: SeekBar,
                     progresValue: Int, fromUser: Boolean
                 ) {
-                    progress = progresValue
+                    if (fromUser) {
+                        mediaPlayer.seekTo(progresValue * 1000)
+
+                    }
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {
-                    //implement if starting touch
+
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
-                    txtCurrentDuration.text = progress.toString()
+
                 }
             })
 
@@ -231,15 +316,55 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private suspend fun updateMediaPlayer(mUri: Uri) {
+////    private fun updateMediaPlayer(songPath: String) {
+//        Log.d("Setting URI", "Inside Update Media Player")
+//
+//        withContext(Dispatchers.IO) {
+//            mediaPlayer?.apply {
+//                setDataSource(applicationContext, mUri)
+//                prepare()
+//                setVolume(0.5f, 0.5f)
+//                isLooping = false
+//                start()
+//            }
+//        }
+
+//        mediaPlayer?.setDataSource(songPath)
+//        mediaPlayer?.prepare()
+//        mediaPlayer?.setVolume(0.5f,0.5f)
+//        mediaPlayer?.isLooping = false
+//        mediaPlayer?.start()
+//            mediaPlayer.apply {
+//                setDataSource(applicationContext, mUri)
+//                prepare()
+//                start()
+//            }
+    }
+
     fun initUI() {
         //initially load home_fragment into frame layout...
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.frame,
-                HomeFragment()
+                homeFragment
+//                HomeFragment()
             ).commit()
         //set initial state of bottom sheet
         mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    fun clearMediaPlayer() {
+        if (this::mediaPlayer.isInitialized) {
+            mediaPlayer.stop()
+            mediaPlayer.reset()
+            mediaPlayer.release()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clearMediaPlayer()
     }
 
     fun setUpBottomNav() {
@@ -408,7 +533,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    fun permissionGranted() : Boolean{
+    fun permissionGranted(): Boolean {
         val permission = ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -437,7 +562,11 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    override fun  onRequestPermissionsResult(requestCode:Int,permissions: Array<String>, grantResults:IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
@@ -480,16 +609,25 @@ class MainActivity : AppCompatActivity() {
         //looping through all rows and adding to list
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                val songName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+                val songName =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 val artistName =
                     cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val duration =
                     cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                val url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))//.replace("\","\\\"")
+                val url =
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))//.replace("\","\\\"")
                 //val url = File(resolver.openFileDescriptor(uri, "r"))
 
                 val songEntity =
-                    SongEntity(songs.size + 1, songName, artistName, parseLong(duration), url, -1)
+                    SongEntity(
+                        songs.size + 1,
+                        songName,
+                        artistName,
+                        parseLong(duration),
+                        url,
+                        -1
+                    )
                 Log.i("FetchCheck", songEntity.toString())
                 songs.add(songEntity)
 
@@ -510,6 +648,7 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences.edit().putBoolean("songLoaded", true).apply()
     }
 
-    private fun isDatabaseInitialized(): Boolean = sharedPreferences.getBoolean("songLoaded", false)
+    private fun isDatabaseInitialized(): Boolean =
+        sharedPreferences.getBoolean("songLoaded", false)
 
 }
