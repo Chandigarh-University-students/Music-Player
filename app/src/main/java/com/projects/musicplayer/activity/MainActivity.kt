@@ -780,5 +780,4 @@ class MainActivity : AppCompatActivity() {
 
     private fun isDatabaseInitialized(): Boolean =
         sharedPreferences.getBoolean("songLoaded", false)
-
 }
