@@ -148,11 +148,6 @@ class HomeFragment : Fragment() {
                     })
                 })*/
 
-                Toast.makeText(
-                    activity as Context,
-                    "$selectedSongId added to $playlistId",
-                    Toast.LENGTH_SHORT
-                ).show()
                 //TODO: ADD selectedSongId to playlistId
                 runBlocking{
                         songs = mPlaylistViewModel.getPlaylistSongsById(playlistId)
@@ -164,6 +159,20 @@ class HomeFragment : Fragment() {
                         mPlaylistViewModel.updatePlaylist(playlistId,listOf(selectedSongId))
                     else{
                         val songs = (listOfSongs as MutableList<Int>)
+                        if(!songs.remove(selectedSongId)){
+                            Toast.makeText(
+                                activity as Context,
+                                "$selectedSongId added to $playlistId",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        else{
+                            Toast.makeText(
+                                activity as Context,
+                                "$selectedSongId already in $playlistId",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                         songs.add(selectedSongId)
                         Log.i("PLAYLISTSONGS", songs.toString())
                         mPlaylistViewModel.updatePlaylist(playlistId,songs)
