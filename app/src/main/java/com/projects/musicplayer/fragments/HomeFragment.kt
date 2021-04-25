@@ -136,7 +136,7 @@ class HomeFragment : Fragment() {
 
                 //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
                 mMediaControlViewModel.nowPlayingSong.value = song
-                onPlaySongClickCallback?.invoke(song)
+                //onPlaySongClickCallback?.invoke(song)
                 Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
 
             }
@@ -153,7 +153,14 @@ class HomeFragment : Fragment() {
             uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
-                //TODO play here using id
+            }
+            //TODO play here using id
+                var songPlayed:SongEntity
+                runBlocking {
+                    songPlayed=mAllSongsViewModel.getSongByIdSuspend(song.songId)
+                }
+            uiscope.launch {
+                mMediaControlViewModel.nowPlayingSong.value = songPlayed
             }
         }
 

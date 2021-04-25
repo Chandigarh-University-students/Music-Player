@@ -187,8 +187,7 @@ class MainActivity : AppCompatActivity() {
             getAudioFiles()
         }
         initUI()
-
-        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
+//        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
 //            if (this::mediaPlayer.isInitialized) {
 //                mediaPlayer.stop()
 //                mediaPlayer.reset()
@@ -198,7 +197,7 @@ class MainActivity : AppCompatActivity() {
 //            mediaPlayer = MediaPlayer.create(applicationContext, songUri)
 //            mediaPlayer.start()
 
-        }
+//        }
 
         setUpBottomNav()
 
@@ -252,9 +251,9 @@ class MainActivity : AppCompatActivity() {
                     R.id.home_button
         }
 
-        controlSeekBar.max = 50
+        /*controlSeekBar.max = 50
         txtCurrentDuration.text = controlSeekBar.progress.toString()
-        txtTotalDuration.text = controlSeekBar.max.toString()
+        txtTotalDuration.text = controlSeekBar.max.toString()*/
 
 
         controlSeekBar.setOnSeekBarChangeListener(
@@ -265,7 +264,6 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     if (fromUser) {
                         mediaPlayer.seekTo(progresValue * 1000)
-
                     }
                 }
 
