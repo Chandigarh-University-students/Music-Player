@@ -118,12 +118,14 @@ class SinglePlaylistFragment : Fragment() {
         mMediaControlViewModel = ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
 
 
-            singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity,song:SongEntity) {
+            singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity,song:SongEntity,allSongs:List<SongEntity>) {
                 //update fav whenever fav button clicked
                 uiscope.launch {
                     //TODO both play song and add to recent
                     mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                     mMediaControlViewModel.nowPlayingSong.value = song
+                    mMediaControlViewModel.nowPlayingSongs.value=allSongs
+                    mMediaControlViewModel.nowPlaylist.value = playlistName
                     Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
 
                 }

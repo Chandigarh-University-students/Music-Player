@@ -37,7 +37,7 @@ class SinglePlaylistAdapter(
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((recentSong: RecentSongEntity,song :SongEntity) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity,song :SongEntity,allSongs:List<SongEntity>) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
 
     class SinglePlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view),
         View.OnCreateContextMenuListener {
@@ -104,7 +104,9 @@ class SinglePlaylistAdapter(
 
                 val localTime: String = date.format(currentLocalTime)
 
-                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime),currentSong)
+                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime),
+                    currentSong,
+                songs!!)
                 Log.d("RECENTSONGupdated", RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime).toString())
 
             }

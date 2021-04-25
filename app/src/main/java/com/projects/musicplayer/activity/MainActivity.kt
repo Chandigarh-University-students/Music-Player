@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             ViewModelProvider(this).get(MediaControlViewModel::class.java)
 
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
-            Log.i("MAINACTIVITY", "New Song Clicked ${it.songName}")
+            Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
             setUpMediaPlayer(it)
             initializeSeekbar()
         })

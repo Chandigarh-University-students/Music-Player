@@ -125,6 +125,9 @@ class HomeFragment : Fragment() {
             toolbar.visibility = View.GONE
             recentTrackBar.visibility = View.VISIBLE
             adapterRecentTracks.addTracks(it!!)
+            uiscope.launch {
+                mMediaControlViewModel.nowPlayingSongs.value=mAllSongsViewModel.getAllSongs()
+            }
         })
 
         adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity,allSongs:List<SongEntity>) {
@@ -136,20 +139,9 @@ class HomeFragment : Fragment() {
                 recentTrackBar.visibility = View.VISIBLE
                 //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
                 mMediaControlViewModel.nowPlayingSong.value = song
-                mMediaControlViewModel.nowPlayingSongs.value=allSongs
+                //mMediaControlViewModel.nowPlayingSongs.value=allSongs
                 mMediaControlViewModel.nowPlaylist.value = "All Songs"
             }
-          /*  runBlocking {
-                val selectedPlaylist: List<SongEntity> = mAllSongsViewModel.getAllSongs()
-                Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
-                Log.d(
-                    "NOWPLAYING-PLAYLIST",
-                    "Current Playlist set to ${selectedPlaylist.toString()}"
-                )}
-            uiscope.launch {
-                mMediaControlViewModel.nowPlayingSongs.value = selectedPlaylist
-                mMediaControlViewModel.nowPlaylist.value = "All Songs"
-            }*/
         }
 //            if (song == mMediaControlViewModel.nowPlayingSong!!.value) {
 //                mMediaControlViewModel.togglePlayPause()
@@ -161,19 +153,17 @@ class HomeFragment : Fragment() {
 
         adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
             //update recent tracks
-            //TODO play here using id
             var songPlayed:SongEntity
             runBlocking {
                 songPlayed=mAllSongsViewModel.getSongByIdSuspend(song.songId)
+            }
+            uiscope.launch {
+                //TODO play here using id
                 mMediaControlViewModel.nowPlaylist.value="Recent Tracks"
                 mMediaControlViewModel.nowPlayingSong.value = songPlayed
-            }
-
-            uiscope.launch {
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
             }
-
         }
 
 
