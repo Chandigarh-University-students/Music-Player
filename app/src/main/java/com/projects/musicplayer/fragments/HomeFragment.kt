@@ -125,9 +125,9 @@ class HomeFragment : Fragment() {
             toolbar.visibility = View.GONE
             recentTrackBar.visibility = View.VISIBLE
             adapterRecentTracks.addTracks(it!!)
-            uiscope.launch {
+         /*   uiscope.launch {
                 mMediaControlViewModel.nowPlayingSongs.value=mAllSongsViewModel.getAllSongs()
-            }
+            }*/
         })
 
         adapterAllSongs.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity,allSongs:List<SongEntity>) {
@@ -139,7 +139,7 @@ class HomeFragment : Fragment() {
                 recentTrackBar.visibility = View.VISIBLE
                 //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
                 mMediaControlViewModel.nowPlayingSong.value = song
-                //mMediaControlViewModel.nowPlayingSongs.value=allSongs
+                mMediaControlViewModel.nowPlayingSongs.value=allSongs
                 mMediaControlViewModel.nowPlaylist.value = "All Songs"
             }
         }
@@ -161,6 +161,7 @@ class HomeFragment : Fragment() {
                 //TODO play here using id
                 mMediaControlViewModel.nowPlaylist.value="Recent Tracks"
                 mMediaControlViewModel.nowPlayingSong.value = songPlayed
+                mMediaControlViewModel.nowPlayingSongs.value=mAllSongsViewModel.getAllSongs()
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
             }
