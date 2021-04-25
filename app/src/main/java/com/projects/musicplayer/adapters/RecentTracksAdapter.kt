@@ -13,7 +13,8 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.RecentSongEntity
-import com.squareup.picasso.Picasso
+import com.projects.musicplayer.utils.Utility
+//import com.squareup.picasso.Picasso
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -49,7 +50,7 @@ class RecentTracksAdapter(val context: Context) :
 
     override fun onBindViewHolder(holder: RecentTrackViewHolder, position: Int) {
         if (songs != null) {
-            val image=getAlbumCover(songs!![position].albumCover)
+            val image= Utility.getAlbumCover(songs!![position].albumCover)
             if (image != null) {
                 holder.imgSingleRecentTrack.setImageBitmap(BitmapFactory.decodeByteArray(image,0,image.size))
             }
@@ -92,7 +93,7 @@ class RecentTracksAdapter(val context: Context) :
             songs!!.size;
         else 0;
     }
-
+    /*
     private fun getAlbumCover(url:String?): ByteArray?  {
         if(url==null)
             return null
@@ -101,7 +102,7 @@ class RecentTracksAdapter(val context: Context) :
         try {
             mmr.setDataSource(url);
             Log.e("IMAGE","path OBTAINED for this song")
-            return mmr.getEmbeddedPicture();
+            return mmr.embeddedPicture;
         }
         catch(e:Exception) {
 
@@ -110,4 +111,8 @@ class RecentTracksAdapter(val context: Context) :
             return null
         }
     }
+
+
+     */
+
 }
