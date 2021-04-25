@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
 
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
             Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
-            setUpMediaPlayer(it)
+            setUpMediaPlayer(it,!mMediaControlViewModel.isFirstInit.value!!)
             initializeSeekbar()
             uiscope.launch {
                 setUpCollapsedBottomSheetUI(it)
@@ -290,15 +290,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+
     }
 
-    fun setUpMediaPlayer(songEntity: SongEntity) {
+    fun setUpMediaPlayer(songEntity: SongEntity,toPlay:Boolean = true) {
         clearMediaPlayer()
         val songUri = Uri.parse(songEntity.albumCover)
         mediaPlayer = MediaPlayer.create(applicationContext, songUri)
 //        mediaPlayer.start()
+        if(toPlay)
         uiscope.launch {
             mMediaControlViewModel.isPlaying.value = true
+        }
+        else {
+            mMediaControlViewModel.isFirstInit.value = false
         }
     }
 
