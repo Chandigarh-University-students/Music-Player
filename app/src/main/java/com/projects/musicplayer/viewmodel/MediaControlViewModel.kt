@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 
 class MediaControlViewModel() : ViewModel() {
 
-    var nowPlayingSongs: MutableLiveData<List<SongEntity>>? = null
+    var nowPlayingSongs: MutableLiveData<List<SongEntity>> = MutableLiveData()
 
     var nowPlayingSong: MutableLiveData<SongEntity> = MutableLiveData()
 

@@ -37,5 +37,8 @@ interface AllSongsDao {
     @Query(value = "Update all_songs_table set isFav=isFav*(-1) WHERE songId=:id")
     suspend fun updateFav(id: Int)
 
+    @Query(value = "Select * from all_songs_table")
+    suspend fun getAllSongs():List<SongEntity>
+
 }
 

@@ -31,6 +31,8 @@ class AllSongsRepository(application: Application) {
 
     suspend fun updateFav(id: Int) = mAllSongsDao.updateFav(id)
 
+    suspend fun getAllSongs() = mAllSongsDao.getAllSongs()
+
 
     val mAllSongs: LiveData<List<SongEntity>>
         get() {

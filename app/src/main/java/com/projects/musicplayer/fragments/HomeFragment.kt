@@ -136,8 +136,10 @@ class HomeFragment : Fragment() {
 
                 //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
                 mMediaControlViewModel.nowPlayingSong.value = song
-                //onPlaySongClickCallback?.invoke(song)
+                val selectedPlaylist:List<SongEntity> = mAllSongsViewModel.getAllSongs()
                 Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
+                Log.d("NOWPLAYING-PLAYLIST", "Current Playlist set to ${selectedPlaylist.toString()}")
+                mMediaControlViewModel.nowPlayingSongs.value = selectedPlaylist
 
             }
 //            if (song == mMediaControlViewModel.nowPlayingSong!!.value) {

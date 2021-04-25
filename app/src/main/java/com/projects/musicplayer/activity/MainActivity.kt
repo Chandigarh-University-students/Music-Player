@@ -168,6 +168,11 @@ class MainActivity : AppCompatActivity() {
             initializeSeekbar()
         })
 
+        mMediaControlViewModel.nowPlayingSongs.observe(this, Observer {
+            Log.i("PLAYLIST", "New playlist added ${it.toString()}")
+            //TODO to use this playlist to switch to next songs
+        })
+
 
 
         setUpBottomSheet()
