@@ -346,6 +346,10 @@ class MainActivity : AppCompatActivity() {
 
     fun initUI() {
         //initially load home_fragment into frame layout...
+
+        bottomNavigationView.selectedItemId =
+            R.id.home_button
+
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.frame,
