@@ -252,7 +252,7 @@ class HomeFragment : Fragment() {
 
 class AddToPlaylist(
     context: Context
-) : Dialog(context) {
+) : Dialog(context){
 
     private var playlists: List<PlaylistEntity>? = null
 
@@ -284,8 +284,6 @@ class AddToPlaylist(
         }
 
         adapter?.setPlayLists(playlists!!)
-
     }
-
 }
 

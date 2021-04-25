@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.lang.Exception
 
 
 class SinglePlaylistFragment : Fragment() {
@@ -50,6 +53,7 @@ class SinglePlaylistFragment : Fragment() {
     private var playlistName="Playlist"
     private var playListSongs = "songs "
 
+    var selectedSongId=-1
 
     //TODO ViewModel for single playlist
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -154,5 +158,40 @@ class SinglePlaylistFragment : Fragment() {
             )
         }
         return view
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        try {
+            selectedSongId = singlePlaylistRecyclerViewAdapter.getSelectedSongId()
+            Log.e("REMOVESONG", selectedSongId.toString())
+        } catch (e: Exception) {
+            Log.e("REMOVESONG",e.message.toString())
+            return super.onContextItemSelected(item)
+        }
+        when (item.itemId) {
+            R.id.ctx_remove_from_playlist -> {
+                var songs:String? = "Sample"
+                runBlocking {
+                    songs = mPlaylistViewModel.getPlaylistSongsById(playlistId)
+                }
+                uiscope.launch {
+                    val listOfSongs : List<Int>? = PlaylistConverter.toList(songs)
+                    if(listOfSongs==null)
+                        Log.e("NOSONG","No song to delete which is not possible")
+                    else{
+                        val mutableSongs = (listOfSongs as MutableList<Int>)
+                        mutableSongs.remove(selectedSongId)
+                        Log.i("PLAYLISTSONGS", songs.toString())
+                        mPlaylistViewModel.updatePlaylist(playlistId,mutableSongs)
+                    }
+                }
+            }
+            else -> {
+                Toast.makeText(activity as Context,"No Playlist Selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 }
