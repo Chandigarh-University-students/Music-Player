@@ -132,8 +132,8 @@ class HomeFragment : Fragment() {
 
         mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
             Log.i("LIVEDATA-UPDATE", "Setting recent songs again")//TODO continue
-            toolbar.visibility = View.GONE
-            recentTrackBar.visibility = View.VISIBLE
+            toolbar.title = "Recent Tracks"
+            //recentTrackBar.visibility = View.VISIBLE
             adapterRecentTracks.addTracks(it!!)
             /*   uiscope.launch {
                    mMediaControlViewModel.nowPlayingSongs.value=mAllSongsViewModel.getAllSongs()
@@ -234,7 +234,7 @@ class HomeFragment : Fragment() {
         createPlaylistDialog = AddToPlaylist(activity as Context)
         recyclerViewAllSongs = view.findViewById(R.id.recyclerAllSongs)
         recyclerViewRecentTracks = view.findViewById(R.id.recyclerRecentTrack)
-        recentTrackBar = view.findViewById(R.id.recentTrackBar)
+        //recentTrackBar = view.findViewById(R.id.recentTrackBar)
         toolbar = view.findViewById(R.id.homeToolbar)
         /**ViewModel for playlists*/
         mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)

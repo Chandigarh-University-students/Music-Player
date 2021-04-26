@@ -507,6 +507,12 @@ class MainActivity : AppCompatActivity() {
             if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
                 bottomNavigationView.selectedItemId =
                     R.id.home_button
+
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.frame,
+                    HomeFragment()
+                ).commit()
         }
 
         btnSongList.setOnClickListener {

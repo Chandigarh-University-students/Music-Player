@@ -66,7 +66,7 @@ class SongsQueueFragment : Fragment() {
         })
 
         mMediaControlViewModel.nowPlaylist.observe(viewLifecycleOwner, Observer {
-            toolbar.title=it
+            //toolbar.title=it
             Log.i("SONGQUEUETITLE","Songs title $it set in queue")
         })
 
@@ -128,7 +128,7 @@ class SongsQueueFragment : Fragment() {
         if (activity != null){
             // set this playlist according to which fragment called it
             //TODO set from viewmodel
-            //toolbar.title = playlistName
+            toolbar.title = "Play Queue"
 
             songQueueRecyclerViewAdapter= SongQueueAdapter(activity as Context)
             songQueueRecyclerView.adapter= songQueueRecyclerViewAdapter
