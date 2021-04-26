@@ -37,11 +37,9 @@ import com.projects.musicplayer.viewmodel.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
 import com.projects.musicplayer.viewmodel.MediaControlViewModel
 import com.projects.musicplayer.viewmodel.MediaControlViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.lang.Long.parseLong
+import java.lang.Runnable
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -203,6 +201,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+       /* mMediaControlViewModel.isFirstInit.observe(this,Observer{
+            mMediaControlViewModel.isPlaying.value = false
+        })*/
+
         mMediaControlViewModel.isPlaying.observe(this, Observer {
             Log.i("PLAYBACK STATUS", it.toString())
             btnPlayPauseControl.isChecked = it
@@ -220,6 +222,7 @@ class MainActivity : AppCompatActivity() {
 
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
             Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
+            Log.i("NEXTPREV", mMediaControlViewModel.isFirstInit.value!!.toString())
             setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
             initializeSeekbar()
             uiscope.launch {
@@ -239,9 +242,6 @@ class MainActivity : AppCompatActivity() {
             Log.i("PLAYLISTNAME", "New playlist added ${it}")
             //TODO to use this playlist name to display
         })
-
-
-
 
 
         setUpBottomSheet()
@@ -338,7 +338,55 @@ class MainActivity : AppCompatActivity() {
         else {
             mMediaControlViewModel.isFirstInit.value = false
         }
-    }
+        mediaPlayer.setOnCompletionListener {
+            Log.i("COMPLETE",it.isPlaying().toString())
+            val currSong=mMediaControlViewModel.nowPlayingSong.value
+            val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
+            val currSongPosition = currSongQueue?.indexOf(currSong)
+            val maxSongPosition = (currSongQueue?.size)?.minus(1)
+            val repeatState = mMediaControlViewModel.repeatMode.value
+            Log.i("NEXTPREV",currSong.toString())
+            Log.i("NEXTPREV",currSongPosition.toString())
+            Log.i("NEXTPREV",maxSongPosition.toString())
+
+            if(currSongPosition!=null && repeatState!=null) {
+                when(repeatState){
+                    RepeatTriStateButton.NO_REPEAT -> {
+                        if(currSongPosition==maxSongPosition){
+                            //TODO move to the first song and pause
+                            runBlocking {
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                            }
+                            uiscope.launch {
+                                mMediaControlViewModel.isPlaying.value = false
+                            }
+
+                        }else{
+                            //TODO Move to next song
+                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
+                        }
+                    }
+                    RepeatTriStateButton.REPEAT_ONE -> {
+                        //TODO Play Again
+                        mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition]
+                    }
+                    RepeatTriStateButton.REPEAT_ALL -> {
+                        if(currSongPosition==maxSongPosition){
+                            //TODO Start first song
+                            mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                        }else{
+                            //TODO Move to next song
+                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
+                        }
+                    }
+                    else -> {Log.e("NEXTPREV","repeatState invalid")}
+                }
+            }else{
+                Log.e("NEXTPREV","currSongPosition or repeatState is null")
+            }
+
+        }
+}
 
     fun initializeSeekbar() {
 
@@ -391,11 +439,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Play $play", Toast.LENGTH_SHORT).show()
             if (pause) {
                 mediaPlayer.pause()
-            } else {
+            } else  {
                 mediaPlayer.start()
             }
         }
     }
+
 
     private suspend fun setUpExpandedBottomSheetUI(songEntity: SongEntity) {
         withContext(Dispatchers.Main) {
@@ -436,10 +485,110 @@ class MainActivity : AppCompatActivity() {
                 ).commit()
 
             mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            /*if (bottomNavigationView.selectedItemId == R.id.nowPlaying)
-                bottomNavigationView.selectedItemId =
-                    R.id.home_button
-*/
+           }
+
+        btnNextControl.setOnClickListener {
+            //TODO play next song in list
+            Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
+            if(true){
+                val currSong=mMediaControlViewModel.nowPlayingSong.value
+                val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
+                val currSongPosition = currSongQueue?.indexOf(currSong)
+                val maxSongPosition = (currSongQueue?.size)?.minus(1)
+                val repeatState = mMediaControlViewModel.repeatMode.value
+                Log.i("NEXTPREV",currSong.toString())
+                Log.i("NEXTPREV",currSongPosition.toString())
+                Log.i("NEXTPREV",maxSongPosition.toString())
+                if(currSongPosition!=null && repeatState!=null) {
+                    when(repeatState){
+                        RepeatTriStateButton.NO_REPEAT -> {
+                            if(currSongPosition==maxSongPosition){
+                                //TODO move to the first song and pause
+                                runBlocking {
+                                    mMediaControlViewModel.isPlaying.value = true
+                                }
+                                runBlocking {
+                                    mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                                }
+                                uiscope.launch {
+                                    mMediaControlViewModel.isPlaying.value = false
+                                }
+                            }else{
+                                //TODO Move to next song
+                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
+                            }
+                        }
+                        RepeatTriStateButton.REPEAT_ONE -> {
+                                //TODO Play Again
+                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition]
+                        }
+                        RepeatTriStateButton.REPEAT_ALL -> {
+                            if(currSongPosition==maxSongPosition){
+                                //TODO Start first song
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                            }else{
+                                //TODO Move to next song
+                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
+                            }
+                        }
+                        else -> {Log.e("NEXTPREV","repeatState invalid")}
+                    }
+                }else{
+                    Log.e("NEXTPREV","currSongPosition or repeatState is null")
+                }
+
+            }else{
+                Toast.makeText(this,"No song is playing",Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnPrevControl.setOnClickListener {
+            //TODO play prev song
+            Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
+            if(true){
+                val currSong=mMediaControlViewModel.nowPlayingSong.value
+                val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
+                val currSongPosition = currSongQueue?.indexOf(currSong)
+                val maxSongPosition = (currSongQueue?.size)?.minus(1)
+                val repeatState = mMediaControlViewModel.repeatMode.value
+                Log.i("NEXTPREV",currSong.toString())
+                Log.i("NEXTPREV",currSongPosition.toString())
+                Log.i("NEXTPREV",maxSongPosition.toString())
+                if(currSongPosition!=null && repeatState!=null) {
+                    when(repeatState){
+                        RepeatTriStateButton.NO_REPEAT -> {
+                            if(currSongPosition==0){
+                                //TODO move to the first song again
+                                runBlocking {
+                                    mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
+                                }
+                            }else{
+                                //TODO Move to prev song
+                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition-1]
+                            }
+                        }
+                        RepeatTriStateButton.REPEAT_ONE -> {
+                            //TODO Play Again
+                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition]
+                        }
+                        RepeatTriStateButton.REPEAT_ALL -> {
+                            if(currSongPosition==0){
+                                //TODO Start last song
+                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[maxSongPosition!!]
+                            }else{
+                                //TODO Move to prev song
+                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition-1]
+                            }
+                        }
+                        else -> {Log.e("NEXTPREV","repeatState invalid")}
+                    }
+                }else{
+                    Log.e("NEXTPREV","currSongPosition or repeatState is null")
+                }
+
+            }else{
+                Toast.makeText(this,"No song is playing",Toast.LENGTH_SHORT).show()
+            }
         }
 
 
@@ -860,5 +1009,4 @@ class MainActivity : AppCompatActivity() {
 
     private fun isDatabaseInitialized(): Boolean =
         sharedPreferences.getBoolean("songLoaded", false)
-
 }
