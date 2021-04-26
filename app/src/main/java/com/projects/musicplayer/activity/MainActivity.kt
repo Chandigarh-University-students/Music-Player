@@ -26,6 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.projects.musicplayer.R
+import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
 import com.projects.musicplayer.fragments.*
 import com.projects.musicplayer.rest.Song
@@ -33,13 +34,13 @@ import com.projects.musicplayer.fragments.FavFragment
 import com.projects.musicplayer.fragments.SinglePlaylistFragment
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
 import com.projects.musicplayer.utils.Utility
-import com.projects.musicplayer.viewmodel.AllSongsViewModel
-import com.projects.musicplayer.viewmodel.AllSongsViewModelFactory
-import com.projects.musicplayer.viewmodel.MediaControlViewModel
-import com.projects.musicplayer.viewmodel.MediaControlViewModelFactory
+import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.*
 import java.lang.Long.parseLong
 import java.lang.Runnable
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -99,6 +100,9 @@ class MainActivity : AppCompatActivity() {
     //view model related
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
+
+    private lateinit var mRecentSongsViewModel: RecentSongsViewModel
+    private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
 
     private lateinit var mMediaControlViewModel: MediaControlViewModel
     private lateinit var mMediaControlViewModelFactory: MediaControlViewModelFactory
@@ -169,6 +173,12 @@ class MainActivity : AppCompatActivity() {
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
         mMediaControlViewModel =
             ViewModelProvider(this).get(MediaControlViewModel::class.java)
+
+        /** Viewmodel for RecentSongs*/
+        mRecentSongsViewModelFactory = RecentSongsViewModelFactory(application)
+        mRecentSongsViewModel =
+            ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+
 
         mAllSongsViewModel.allSongs.observe(this, Observer {
             var currentQueue = mMediaControlViewModel.nowPlayingSongs.value
@@ -303,7 +313,21 @@ class MainActivity : AppCompatActivity() {
 
         btnPlayPauseControl.setOnCheckedChangeListener { _, isChecked ->
             uiscope.launch {
+                //TODO add to recent from here also actually best place to add
+                Log.i("PlayPause","PlayPause Button has changed its state = $isChecked")
+                Log.i("PlayPause","PlayPause Button has changed its state for = ${mMediaControlViewModel.nowPlayingSong.value?.songName}")
                 mMediaControlViewModel.isPlaying.value = isChecked
+                if(isChecked) {
+                    val songPlayed = mMediaControlViewModel.nowPlayingSong.value
+                    val localTime = getLocalTime()
+                   // ViewModelProvider(this).get(MediaControlViewModel::class.java)
+                    if (songPlayed != null) {
+                        mRecentSongsViewModel.insertAfterDeleteSong(RecentSongEntity(songPlayed.songId,songPlayed.albumCover,localTime))
+                    }else
+                        Log.i("PlayPause","Not Possible Error")
+
+                }
+
             }
         }
 
@@ -324,6 +348,16 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+    }
+
+    fun getLocalTime():String
+    {
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
+        val currentLocalTime = cal.time
+        val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
+        date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
+        val localTime: String = date.format(currentLocalTime)
+        return localTime
     }
 
     fun setUpMediaPlayer(songEntity: SongEntity, toPlay: Boolean = true) {
