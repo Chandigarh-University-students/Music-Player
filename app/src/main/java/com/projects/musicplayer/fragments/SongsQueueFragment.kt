@@ -79,7 +79,7 @@ class SongsQueueFragment : Fragment() {
             mMediaControlViewModel.nowPlayingSongs.value=it
         })*/
 
-        songQueueRecyclerViewAdapter.currentPlayingSetSelected = fun(currentSong:SongEntity,cardViewForSong:RelativeLayout){
+        songQueueRecyclerViewAdapter.currentPlayingSetSelected = fun(currentSong:SongEntity,cardViewForSong:RelativeLayout,cardView:CardView){
             Log.i("PLAYING","Value of current Song = ${currentSong.songId}")
             Log.i("PLAYING","Value of nowPlayingSong = ${mMediaControlViewModel.nowPlayingSong.value?.songId}")
             Log.i("PLAYING","Value of boolean = ${currentSong.songId==mMediaControlViewModel.nowPlayingSong.value?.songId}")
@@ -87,7 +87,7 @@ class SongsQueueFragment : Fragment() {
                 Log.i("PLAYING","Change color for ${currentSong.songName}")
                 val color = resources.getColor(R.color.secondaryColor)
                 cardViewForSong.setBackgroundColor(color)
-                //cardViewForSong.cardElevation= 80F
+                cardView.cardElevation= 100F
             }
             else{
                 val color = resources.getColor(R.color.backgroundColor)

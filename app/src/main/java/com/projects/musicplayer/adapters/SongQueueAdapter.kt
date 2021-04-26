@@ -28,7 +28,7 @@ class SongQueueAdapter (context: Context
     var favClickCallback: ((id: Int) -> Unit)? = null
     var onSongClickCallback: ((recentSong: RecentSongEntity,song: SongEntity, allFavSongs: List<SongEntity>) -> Unit)? =
         null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
-    var currentPlayingSetSelected: ((currentSOng:SongEntity,cardViewOfSong:RelativeLayout) -> Unit)? = null
+    var currentPlayingSetSelected: ((currentSong:SongEntity,cardViewOfSong:RelativeLayout,cardView:CardView) -> Unit)? = null
 
     class SongQueueViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
@@ -54,7 +54,7 @@ class SongQueueAdapter (context: Context
             holder.txtSongArtistName.text = currentSong.artistName
             holder.btnFav.isChecked = songs!![position].isFav > 0
 
-            currentPlayingSetSelected?.invoke(currentSong,holder.relativeLayoutCard)
+            currentPlayingSetSelected?.invoke(currentSong,holder.relativeLayoutCard,holder.cardViewForSong)
 //            holder.btnFav.isChecked = songs!![position].isFav
 
             holder.btnFav.setOnClickListener {
