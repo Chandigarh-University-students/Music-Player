@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var bottomSheet: LinearLayoutCompat
 
     lateinit var b_sheet_Collapsed: LinearLayout
-    lateinit var b_sheet_Expanded: RelativeLayout
+    lateinit var b_sheet_Expanded: ConstraintLayout
     lateinit var sharedPreferences: SharedPreferences
 
 
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
 
     //current song in now playing
-    lateinit var songNowPlaying: CardView
+    //lateinit var songNowPlaying: CardView
     lateinit var musicCoverPic: ImageView
     lateinit var txtSongName: TextView
     lateinit var txtSongArtistName: TextView
@@ -145,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         txtCurrPlaying = findViewById(R.id.txtCurrPlaying)
         btnSongList = findViewById(R.id.btnSongList)
 
-        songNowPlaying = findViewById(R.id.songNowPlaying)
+        //songNowPlaying = findViewById(R.id.songNowPlaying)
         musicCoverPic = findViewById(R.id.musicCoverPic)
         txtSongName = findViewById(R.id.txtSongName)
         txtSongArtistName = findViewById(R.id.txtSongArtistName)
@@ -518,7 +519,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             } else {
-                musicCoverPic.setImageResource(R.drawable.drawable_cover)
+                musicCoverPic.setImageResource(R.mipmap.default_cover)
             }
         }
 
