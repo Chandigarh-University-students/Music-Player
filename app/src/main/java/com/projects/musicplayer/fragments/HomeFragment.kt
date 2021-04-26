@@ -109,6 +109,13 @@ class HomeFragment : Fragment() {
 
         adapterAllSongs.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
+            runBlocking {
+                if(id==mMediaControlViewModel.nowPlayingSong.value?.songId){
+                    /**This does not call any observer*/
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                    Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
+                }
+            }
             uiscope.launch {
                 mAllSongsViewModel.updateFav(id)
             }
@@ -167,14 +174,16 @@ class HomeFragment : Fragment() {
         adapterRecentTracks.onSongClickCallback = fun(song: RecentSongEntity) {
             //update recent tracks
             var songPlayed: SongEntity
+            var allSongs: List<SongEntity>
             runBlocking {
                 songPlayed = mAllSongsViewModel.getSongByIdSuspend(song.songId)
+                allSongs = mAllSongsViewModel.getAllSongs()
             }
             uiscope.launch {
                 //TODO play here using id
                 mMediaControlViewModel.nowPlaylist.value = "Recent Tracks"
                 mMediaControlViewModel.nowPlayingSong.value = songPlayed
-                mMediaControlViewModel.nowPlayingSongs.value = mAllSongsViewModel.getAllSongs()
+                mMediaControlViewModel.nowPlayingSongs.value = allSongs
                 //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(song)
             }

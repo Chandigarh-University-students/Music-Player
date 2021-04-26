@@ -11,6 +11,6 @@ data class SongEntity(
     @field:ColumnInfo(name = "artistName") val artistName: String,
     @field:ColumnInfo(name = "duration") val duration: Long, //check -> [Set to long as milliseconds]
     @field:ColumnInfo(name = "albumCover") val albumCover: String, //check
-    @field:ColumnInfo(name = "isFav") val isFav: Int
+    @field:ColumnInfo(name = "isFav") var isFav: Int
 )
 

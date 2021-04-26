@@ -22,6 +22,7 @@ import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class FavFragment : Fragment() {
     lateinit var toolbar: Toolbar
@@ -65,8 +66,15 @@ class FavFragment : Fragment() {
 
         favRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
+            runBlocking {
+                if(id==mMediaControlViewModel.nowPlayingSong.value?.songId){
+                    /**This does not call any observer*/
+                    /**This does not call any observer*/
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                    Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
+                }
+            }
             uiscope.launch {
-                //TODO add to favourites both places
                 mAllSongsViewModel.updateFav(id)
             }
         }

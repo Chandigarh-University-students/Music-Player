@@ -80,7 +80,10 @@ class SongsQueueFragment : Fragment() {
         })*/
 
         songQueueRecyclerViewAdapter.currentPlayingSetSelected = fun(currentSong:SongEntity,cardViewForSong:RelativeLayout){
-            if(currentSong==mMediaControlViewModel.nowPlayingSong.value){
+            Log.i("PLAYING","Value of current Song = ${currentSong.songId}")
+            Log.i("PLAYING","Value of nowPlayingSong = ${mMediaControlViewModel.nowPlayingSong.value?.songId}")
+            Log.i("PLAYING","Value of boolean = ${currentSong.songId==mMediaControlViewModel.nowPlayingSong.value?.songId}")
+            if(currentSong.songId==mMediaControlViewModel.nowPlayingSong.value?.songId){
                 Log.i("PLAYING","Change color for ${currentSong.songName}")
                 val color = resources.getColor(R.color.secondaryColor)
                 cardViewForSong.setBackgroundColor(color)
@@ -94,10 +97,15 @@ class SongsQueueFragment : Fragment() {
 
         songQueueRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
+            runBlocking {
+                if(id==mMediaControlViewModel.nowPlayingSong.value?.songId){
+                    /**This does not call any observer*/
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                    Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
+                }
+            }
             uiscope.launch {
-                //TODO add to favourites both places
                 mAllSongsViewModel.updateFav(id)
-                //TODO use observer to update in MediaViewModel too
             }
         }
 

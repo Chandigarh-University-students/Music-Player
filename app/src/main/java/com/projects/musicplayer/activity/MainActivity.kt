@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                         song.albumCover,
                         song.isFav * (-1)
                     )
-                    if (song in it)
+                    if(song in it)
                         updatedCurrentQueue.add(song)
                     else if (songComplement in it)
                         updatedCurrentQueue.add(songComplement)
@@ -246,6 +246,11 @@ class MainActivity : AppCompatActivity() {
         mMediaControlViewModel.nowPlayingSongs.observe(this, Observer {
             Log.i("PLAYLIST", "New playlist added ${it.toString()}")
             //TODO to use this playlist to switch to next songs
+            uiscope.launch {
+                /**This will set NowPlaying UI to latest nowPlayingSong with correct isFav*/
+                setUpExpandedBottomSheetUI(mMediaControlViewModel.nowPlayingSong.value!!)
+                setUpCollapsedBottomSheetUI(mMediaControlViewModel.nowPlayingSong.value!!)
+            }
         })
 
         mMediaControlViewModel.nowPlaylist.observe(this, Observer {
@@ -270,6 +275,8 @@ class MainActivity : AppCompatActivity() {
                 setupPermissions()
             getAudioFiles()
         }
+
+        //TODO show progress bar till UI is set
         initUI()
 //        homeFragment.onPlaySongClickCallback = fun(songEntity: SongEntity) {
 //            if (this::mediaPlayer.isInitialized) {
@@ -325,7 +332,6 @@ class MainActivity : AppCompatActivity() {
                         mRecentSongsViewModel.insertAfterDeleteSong(RecentSongEntity(songPlayed.songId,songPlayed.albumCover,localTime))
                     }else
                         Log.i("PlayPause","Not Possible Error")
-
                 }
 
             }
@@ -347,7 +353,19 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+        btnFav.setOnCheckedChangeListener{_, isChecked ->
+            Log.i("PLAYINGFAV","btnFav state changed")/*
+            runBlocking {
+                    /**This does not call any observer*/
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                    Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
 
+            }
+            uiscope.launch {
+                    //mAllSongsViewModel.updateFav(mMediaControlViewModel.nowPlayingSong.value?.songId!!)
+                //Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
+            }*/
+        }
     }
 
     fun getLocalTime():String
@@ -484,6 +502,12 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Main) {
             txtSongName.text = songEntity.songName
             txtSongArtistName.text = songEntity.artistName
+            btnFav.isChecked = songEntity.isFav?.let{
+                when(it){
+                    -1 -> false
+                    else -> true
+                }
+            }
             val image = Utility.getAlbumCover(songEntity.albumCover)
             if (image != null) {
                 musicCoverPic.setImageBitmap(
@@ -499,6 +523,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
 
 
     fun setUpExpandedNowPlaying() {
@@ -631,6 +656,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //TODO
+      /* btnFav.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
+           *//**
+            * Called when the checked state of a compound button has changed.
+            *
+            * @param buttonView The compound button view whose state has changed.
+            * @param isChecked  The new checked state of buttonView.
+            *//*
+           override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+               *//**Change in both database as well nowPlayingSong.isfav*//*
+               mMediaControlViewModel.nowPlayingSong.value?.songId?.let {
+                   mAllSongsViewModel.updateFav(
+                       it
+                   )
+                   mMediaControlViewModel.nowPlayingSong.value!!.isFav= when(isChecked){true -> 1 else ->-1}
+                   Log.i("PLAYINGFAV","nowPlaying changed due to toggle to" +
+                           " ${mMediaControlViewModel.nowPlayingSong.value!!.isFav}")
+               }
+           }
+
+       })
+*/
 
 //        controlSeekBar.max = 50
 //        txtCurrentDuration.text = controlSeekBar.progress.toString()

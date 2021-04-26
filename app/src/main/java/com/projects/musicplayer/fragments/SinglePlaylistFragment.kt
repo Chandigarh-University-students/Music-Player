@@ -110,15 +110,15 @@ class SinglePlaylistFragment : Fragment() {
 
         singlePlaylistRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
+            runBlocking {
+                if(id==mMediaControlViewModel.nowPlayingSong.value?.songId){
+                    /**This does not call any observer*/
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                    Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
+                }
+            }
             uiscope.launch {
-                //TODO add to favourites both places
                 mAllSongsViewModel.updateFav(id)
-                //TODO in fav database also
-                /*Log.e("FAV",mAllSongsViewModel.checkFav(id).toString());
-                if(mAllSongsViewModel.checkFav(id)==1)
-                    mFavSongsViewModel.insertSong(FavEntity(id))
-                else
-                    mFavSongsViewModel.removeSong(FavEntity(id))*/
             }
         }
 
