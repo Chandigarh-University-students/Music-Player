@@ -7,7 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -70,11 +72,25 @@ class SongsQueueFragment : Fragment() {
 
         mMediaControlViewModel.nowPlayingSong.observe(viewLifecycleOwner, Observer {
             //TODO to show current playing song as selected
+            songQueueRecyclerViewAdapter.setSongs(mMediaControlViewModel.nowPlayingSongs.value!!)
         })
 
        /* mAllSongsViewModel.allSongs.observe(viewLifecycleOwner, Observer {
             mMediaControlViewModel.nowPlayingSongs.value=it
         })*/
+
+        songQueueRecyclerViewAdapter.currentPlayingSetSelected = fun(currentSong:SongEntity,cardViewForSong:RelativeLayout){
+            if(currentSong==mMediaControlViewModel.nowPlayingSong.value){
+                Log.i("PLAYING","Change color for ${currentSong.songName}")
+                val color = resources.getColor(R.color.secondaryColor)
+                cardViewForSong.setBackgroundColor(color)
+                //cardViewForSong.cardElevation= 80F
+            }
+            else{
+                val color = resources.getColor(R.color.backgroundColor)
+                cardViewForSong.setBackgroundColor(color)
+            }
+        }
 
         songQueueRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked

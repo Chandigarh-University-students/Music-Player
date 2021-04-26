@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.cardview.widget.CardView
@@ -27,12 +28,14 @@ class SongQueueAdapter (context: Context
     var favClickCallback: ((id: Int) -> Unit)? = null
     var onSongClickCallback: ((recentSong: RecentSongEntity,song: SongEntity, allFavSongs: List<SongEntity>) -> Unit)? =
         null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
+    var currentPlayingSetSelected: ((currentSOng:SongEntity,cardViewOfSong:RelativeLayout) -> Unit)? = null
 
     class SongQueueViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
         val txtSongArtistName: TextView = view.findViewById(R.id.txtSongArtistName)
         val btnFav: ToggleButton = view.findViewById(R.id.btnFav)
-        val cardViewForSong: CardView = view.findViewById(R.id.cardViewForSong)
+        var cardViewForSong: CardView = view.findViewById(R.id.cardViewForSong)
+        var relativeLayoutCard:RelativeLayout = view.findViewById(R.id.relativeLayoutCard)
 
     }
 
@@ -50,6 +53,8 @@ class SongQueueAdapter (context: Context
             holder.txtSongName.text = currentSong.songName
             holder.txtSongArtistName.text = currentSong.artistName
             holder.btnFav.isChecked = songs!![position].isFav > 0
+
+            currentPlayingSetSelected?.invoke(currentSong,holder.relativeLayoutCard)
 //            holder.btnFav.isChecked = songs!![position].isFav
 
             holder.btnFav.setOnClickListener {

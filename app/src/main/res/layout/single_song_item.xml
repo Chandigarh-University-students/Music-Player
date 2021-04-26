@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cardViewForSong"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recent_song_track"
-    android:background="@color/backgroundColor">
+    app:background="@color/backgroundColor">
 
     <RelativeLayout
+        android:id="@+id/relativeLayoutCard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/backgroundColor">
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp">
 
         <TextView
             android:id="@+id/txtSongName"
@@ -51,7 +59,7 @@
             android:textOff=""
             android:textOn="" />
 
-
+        </RelativeLayout>
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>
