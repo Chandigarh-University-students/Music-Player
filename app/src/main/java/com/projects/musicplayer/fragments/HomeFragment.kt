@@ -43,7 +43,6 @@ class HomeFragment : Fragment() {
     lateinit var recyclerViewRecentTracks: RecyclerView
     lateinit var adapterRecentTracks: RecentTracksAdapter
 
-    lateinit var recentTrackBar: TextView
     lateinit var toolbar: androidx.appcompat.widget.Toolbar
 
     //view model related
@@ -132,7 +131,10 @@ class HomeFragment : Fragment() {
 
         mRecentSongsViewModel.recentSongs.observe(viewLifecycleOwner, Observer {
             Log.i("LIVEDATA-UPDATE", "Setting recent songs again")//TODO continue
-            toolbar.title = "Recent Tracks"
+            if(!it.isEmpty())
+                toolbar.title = "Recent Tracks"
+            else
+                toolbar.title = "Home"
             //recentTrackBar.visibility = View.VISIBLE
             adapterRecentTracks.addTracks(it!!)
             /*   uiscope.launch {
