@@ -201,6 +201,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+       /* mMediaControlViewModel.isFirstInit.observe(this,Observer{
+            mMediaControlViewModel.isPlaying.value = false
+        })*/
+
         mMediaControlViewModel.isPlaying.observe(this, Observer {
             Log.i("PLAYBACK STATUS", it.toString())
             btnPlayPauseControl.isChecked = it
@@ -218,6 +222,7 @@ class MainActivity : AppCompatActivity() {
 
         mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
             Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
+            Log.i("NEXTPREV", mMediaControlViewModel.isFirstInit.value!!.toString())
             setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
             initializeSeekbar()
             uiscope.launch {
@@ -432,7 +437,7 @@ class MainActivity : AppCompatActivity() {
         if (this::mediaPlayer.isInitialized) {
 
             Toast.makeText(this, "Play $play", Toast.LENGTH_SHORT).show()
-            if ( pause) {
+            if (pause) {
                 mediaPlayer.pause()
             } else  {
                 mediaPlayer.start()
@@ -485,7 +490,7 @@ class MainActivity : AppCompatActivity() {
         btnNextControl.setOnClickListener {
             //TODO play next song in list
             Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
-            if(mMediaControlViewModel.nowPlayingSong.value!=null){
+            if(true){
                 val currSong=mMediaControlViewModel.nowPlayingSong.value
                 val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
                 val currSongPosition = currSongQueue?.indexOf(currSong)
@@ -500,12 +505,14 @@ class MainActivity : AppCompatActivity() {
                             if(currSongPosition==maxSongPosition){
                                 //TODO move to the first song and pause
                                 runBlocking {
+                                    mMediaControlViewModel.isPlaying.value = true
+                                }
+                                runBlocking {
                                     mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
                                 }
                                 uiscope.launch {
                                     mMediaControlViewModel.isPlaying.value = false
                                 }
-
                             }else{
                                 //TODO Move to next song
                                 mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
@@ -538,7 +545,7 @@ class MainActivity : AppCompatActivity() {
         btnPrevControl.setOnClickListener {
             //TODO play prev song
             Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
-            if(mMediaControlViewModel.nowPlayingSong.value!=null){
+            if(true){
                 val currSong=mMediaControlViewModel.nowPlayingSong.value
                 val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
                 val currSongPosition = currSongQueue?.indexOf(currSong)
