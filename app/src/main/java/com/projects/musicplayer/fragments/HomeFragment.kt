@@ -67,7 +67,7 @@ class HomeFragment : Fragment() {
 
     var selectedSongId = -1
 
-    var onPlaySongClickCallback: ((song: SongEntity) -> Unit)? = null
+    //var onPlaySongClickCallback: ((song: SongEntity) -> Unit)? = null
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -146,8 +146,8 @@ class HomeFragment : Fragment() {
                 uiscope.launch {
                     //TODO both play song and add to recent
                     mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
-                    toolbar.visibility = View.GONE
-                    recentTrackBar.visibility = View.VISIBLE
+                    //toolbar.visibility = View.GONE
+                    //recentTrackBar.visibility = View.VISIBLE
                     //TODO:LIVE DATA NOT OBSERVING IN MAINACTIVITY
                     mMediaControlViewModel.nowPlayingSong.value = song
                     mMediaControlViewModel.nowPlayingSongs.value = allSongs

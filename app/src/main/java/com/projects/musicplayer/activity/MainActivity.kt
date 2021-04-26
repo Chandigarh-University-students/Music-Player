@@ -1045,6 +1045,7 @@ class MainActivity : AppCompatActivity() {
         mAllSongsViewModel.insertSongs(songs)
         //finally set shared pref
         sharedPreferences.edit().putBoolean("songLoaded", true).apply()
+        //cursor?.close()
     }
 
     private fun isDatabaseInitialized(): Boolean =
