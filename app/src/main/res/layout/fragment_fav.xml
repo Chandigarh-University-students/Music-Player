@@ -1,24 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/backgroundColor"
     tools:context=".fragments.SinglePlaylistFragment">
 
     <include
         android:id="@+id/favToolbar"
-        layout="@layout/toolbar"/>
+        layout="@layout/toolbar" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerFavPlaylist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dp"
         android:layout_below="@+id/favToolbar"
+        android:padding="5dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/single_song_item"
-        />
+        tools:listitem="@layout/single_song_item" />
+
+    <RelativeLayout
+        android:id="@+id/emptyFavLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/favToolbar"
+        android:background="@color/backgroundColor">
+
+
+
+        <ImageView
+            android:id="@+id/favIcon"
+            android:layout_width="116dp"
+            android:layout_height="116dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_round_favorite_selected" />
+
+
+            <TextView
+                android:id="@+id/txtEmptyFav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:text=" No Favorite Songs \nShow Some Heart "
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_thin"
+                android:layout_below="@id/favIcon"
+                android:layout_centerHorizontal="true"
+                android:textStyle="bold" />
+
+    </RelativeLayout>
+
 </RelativeLayout>
