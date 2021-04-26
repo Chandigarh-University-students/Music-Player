@@ -55,7 +55,7 @@ class RecentTracksAdapter(val context: Context) :
                 holder.imgSingleRecentTrack.setImageBitmap(BitmapFactory.decodeByteArray(image,0,image.size))
             }
             else{
-                holder.imgSingleRecentTrack.setImageResource(R.drawable.drawable_cover)
+                holder.imgSingleRecentTrack.setImageResource(R.mipmap.default_cover)
             }
 
 

@@ -479,7 +479,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             } else {
-                b_sheet_CollapsedMusicCover.setImageResource(R.drawable.drawable_cover)
+                b_sheet_CollapsedMusicCover.setImageResource(R.mipmap.default_cover)
             }
         }
     }
