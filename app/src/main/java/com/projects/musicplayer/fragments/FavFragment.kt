@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,7 @@ class FavFragment : Fragment() {
     lateinit var toolbar: Toolbar
     lateinit var favRecyclerView: RecyclerView
     lateinit var favRecyclerViewAdapter: FavAdapter
+    lateinit var emptyFavLayout: RelativeLayout
 
     //view model related //TODO Check
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
@@ -48,10 +50,16 @@ class FavFragment : Fragment() {
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
         mAllSongsViewModel.favSongs.observe(viewLifecycleOwner, Observer {
-            Log.i("LIVEDATAPLAYLISTUPDATE","Setting all songs again in Favorites")
+            Log.i("LIVEDATAPLAYLISTUPDATE", "Setting all songs again in Favorites")
+
+            if(it.isNullOrEmpty())
+                emptyFavLayout.visibility = View.VISIBLE
+            else
+                emptyFavLayout.visibility = View.GONE
+
             uiscope.launch {
-                favRecyclerViewAdapter.setSongs(it!!)
-               }
+                    favRecyclerViewAdapter.setSongs(it)
+            }
         })
 
 
@@ -92,9 +100,12 @@ class FavFragment : Fragment() {
 
         toolbar=view.findViewById(R.id.favToolbar)
         favRecyclerView=view.findViewById(R.id.recyclerFavPlaylist)
+        emptyFavLayout=view.findViewById(R.id.emptyFavLayout)
 
         if (activity != null){
            toolbar.title = "Favorites"
+
+            emptyFavLayout.visibility = View.GONE
 
             favRecyclerViewAdapter= FavAdapter(activity as Context)
             favRecyclerView.adapter=favRecyclerViewAdapter

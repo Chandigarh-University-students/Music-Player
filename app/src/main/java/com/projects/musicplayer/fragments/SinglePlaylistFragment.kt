@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -31,9 +33,11 @@ import java.lang.Exception
 
 
 class SinglePlaylistFragment : Fragment() {
-    lateinit var toolbar:Toolbar
-    lateinit var singlePlaylistRecyclerView:RecyclerView
+    lateinit var toolbar: Toolbar
+    lateinit var singlePlaylistRecyclerView: RecyclerView
     lateinit var singlePlaylistRecyclerViewAdapter: SinglePlaylistAdapter
+    lateinit var emptyPlaylistLayout: RelativeLayout
+    lateinit var txtEmptyPlaylist: TextView
 
     //view model related //TODO Check
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
@@ -50,11 +54,11 @@ class SinglePlaylistFragment : Fragment() {
 
     //playlist info
     //TODO for obtaining info for this playlist
-    private var playlistId=0
-    private var playlistName="Playlist"
+    private var playlistId = 0
+    private var playlistName = "Playlist"
     private var playListSongs = "songs "
 
-    var selectedSongId=-1
+    var selectedSongId = -1
 
     //TODO ViewModel for single playlist
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,22 +75,30 @@ class SinglePlaylistFragment : Fragment() {
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
-            mPlaylistViewModel.getPlaylistSongsByIdLive(playlistId).observe(viewLifecycleOwner,Observer{
-                var mSongs = mutableListOf<SongEntity>()
-                runBlocking {
-                    val listSongIds=PlaylistConverter.toList(it)
-                    if(listSongIds!=null){
-                        for (id in listSongIds){
-                            mSongs.add(mAllSongsViewModel.getSongByIdSuspend(id))
+
+            mPlaylistViewModel.getPlaylistSongsByIdLive(playlistId)
+                .observe(viewLifecycleOwner, Observer {
+                    var mSongs = mutableListOf<SongEntity>()
+                    runBlocking {
+                        val listSongIds = PlaylistConverter.toList(it)
+                        if (listSongIds != null) {
+//                            emptyPlaylistLayout.visibility = View.GONE
+                            for (id in listSongIds) {
+                                mSongs.add(mAllSongsViewModel.getSongByIdSuspend(id))
+                            }
+                        } else {
+                            //TODO print no songs, add some
+//                            emptyPlaylistLayout.visibility = View.VISIBLE
+
                         }
                     }
-                    else{
-                        //TODO print no songs, add some
-                    }
-                }
-                Log.i("LIVEDATAPLAYLISTUPDATE",mSongs.toString())
-                singlePlaylistRecyclerViewAdapter.setSongs(mSongs)
-            })
+                    Log.i("LIVEDATAPLAYLISTUPDATE", mSongs.toString())
+                    if (mSongs.isNullOrEmpty())
+                        emptyPlaylistLayout.visibility = View.VISIBLE
+                    else
+                        emptyPlaylistLayout.visibility = View.GONE
+                    singlePlaylistRecyclerViewAdapter.setSongs(mSongs)
+                })
 
         })
 
@@ -112,19 +124,24 @@ class SinglePlaylistFragment : Fragment() {
 
         /** Viewmodel for RecentSongs*/
         mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
-        mRecentSongsViewModel = ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+        mRecentSongsViewModel = ViewModelProvider(
+            this,
+            mRecentSongsViewModelFactory
+        ).get(RecentSongsViewModel::class.java)
 
         /** Viewmodel for MediaControl*/
-        mMediaControlViewModel = ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
+        mMediaControlViewModel =
+            ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
 
 
-            singlePlaylistRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity,song:SongEntity,allSongs:List<SongEntity>) {
+        singlePlaylistRecyclerViewAdapter.onSongClickCallback =
+            fun(recentSong: RecentSongEntity, song: SongEntity, allSongs: List<SongEntity>) {
                 //update fav whenever fav button clicked
                 uiscope.launch {
                     //TODO both play song and add to recent
                     mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                     mMediaControlViewModel.nowPlayingSong.value = song
-                    mMediaControlViewModel.nowPlayingSongs.value=allSongs
+                    mMediaControlViewModel.nowPlayingSongs.value = allSongs
                     mMediaControlViewModel.nowPlaylist.value = playlistName
                     Log.d("NOWPLAYING-VIEWMODEL", "Now Playing from HOME FRAGMENT $song updated")
 
@@ -137,31 +154,35 @@ class SinglePlaylistFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view=inflater.inflate(R.layout.fragment_single_playlist, container, false)
+        val view = inflater.inflate(R.layout.fragment_single_playlist, container, false)
 
-        toolbar=view.findViewById(R.id.SinglePlaylistToolbar)
-        singlePlaylistRecyclerView=view.findViewById(R.id.recyclerViewSinglePlaylist)
+        toolbar = view.findViewById(R.id.SinglePlaylistToolbar)
+        singlePlaylistRecyclerView = view.findViewById(R.id.recyclerViewSinglePlaylist)
 
+        emptyPlaylistLayout = view.findViewById(R.id.emptyPlaylistLayout)
+        txtEmptyPlaylist = view.findViewById(R.id.txtEmptyPlaylist)
 
-        if (activity != null){
+        if (activity != null) {
+
+            emptyPlaylistLayout.visibility = View.GONE
             // set this playlist according to which fragment called it
             playlistId = arguments?.get("ID") as Int
             playlistName = arguments?.get("NAME") as String
             //TODO Only for debugging purposes, otherwise this argument will be deleted from Bundle
             playListSongs = arguments?.get("SONGS") as String
-            Log.i("PLAYLISTINFO",playlistName)
-            Log.i("PLAYLISSONGTINFO",playListSongs.length.toString())
+            Log.i("PLAYLISTINFO", playlistName)
+            Log.i("PLAYLISSONGTINFO", playListSongs.length.toString())
 
             toolbar.title = playlistName
 
-            singlePlaylistRecyclerViewAdapter= SinglePlaylistAdapter(activity as Context)
-            singlePlaylistRecyclerView.adapter=singlePlaylistRecyclerViewAdapter
-            singlePlaylistRecyclerView.layoutManager= LinearLayoutManager(activity)
+            singlePlaylistRecyclerViewAdapter = SinglePlaylistAdapter(activity as Context)
+            singlePlaylistRecyclerView.adapter = singlePlaylistRecyclerViewAdapter
+            singlePlaylistRecyclerView.layoutManager = LinearLayoutManager(activity)
             singlePlaylistRecyclerView.addItemDecoration(
                 DividerItemDecoration(
-                singlePlaylistRecyclerView.context,
-                (singlePlaylistRecyclerView.layoutManager as LinearLayoutManager).orientation
-            )
+                    singlePlaylistRecyclerView.context,
+                    (singlePlaylistRecyclerView.layoutManager as LinearLayoutManager).orientation
+                )
             )
         }
         return view
@@ -173,29 +194,30 @@ class SinglePlaylistFragment : Fragment() {
             selectedSongId = singlePlaylistRecyclerViewAdapter.getSelectedSongId()
             Log.e("REMOVESONG", selectedSongId.toString())
         } catch (e: Exception) {
-            Log.e("REMOVESONG",e.message.toString())
+            Log.e("REMOVESONG", e.message.toString())
             return super.onContextItemSelected(item)
         }
         when (item.itemId) {
             R.id.ctx_remove_from_playlist -> {
-                var songs:String? = "Sample"
+                var songs: String? = "Sample"
                 runBlocking {
                     songs = mPlaylistViewModel.getPlaylistSongsById(playlistId)
                 }
                 uiscope.launch {
-                    val listOfSongs : List<Int>? = PlaylistConverter.toList(songs)
-                    if(listOfSongs==null)
-                        Log.e("NOSONG","No song to delete which is not possible")
-                    else{
+                    val listOfSongs: List<Int>? = PlaylistConverter.toList(songs)
+                    if (listOfSongs == null)
+                        Log.e("NOSONG", "No song to delete which is not possible")
+                    else {
                         val mutableSongs = (listOfSongs as MutableList<Int>)
                         mutableSongs.remove(selectedSongId)
                         Log.i("PLAYLISTSONGS", songs.toString())
-                        mPlaylistViewModel.updatePlaylist(playlistId,mutableSongs)
+                        mPlaylistViewModel.updatePlaylist(playlistId, mutableSongs)
                     }
                 }
             }
             else -> {
-                Toast.makeText(activity as Context,"No Playlist Selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity as Context, "No Playlist Selected", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
