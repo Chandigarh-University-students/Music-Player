@@ -38,7 +38,7 @@
             android:text="No Songs in this Playlist\n    Add some songs :)"
             android:textColor="@color/textPrimary"
             android:textSize="@dimen/text_thin"
-            android:textStyle="bold" />
+            android:textStyle="normal" />
     </RelativeLayout>
 
 </RelativeLayout>

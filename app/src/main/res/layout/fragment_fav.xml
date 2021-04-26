@@ -43,12 +43,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="3"
-                android:text=" No Favorite Songs \nShow Some Heart "
+                android:text=" No Favorite Songs \n Show Some Heart "
                 android:textColor="@color/textPrimary"
                 android:textSize="@dimen/text_thin"
                 android:layout_below="@id/favIcon"
                 android:layout_centerHorizontal="true"
-                android:textStyle="bold" />
+                android:textStyle="normal" />
 
     </RelativeLayout>
 
