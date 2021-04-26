@@ -353,8 +353,8 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        btnFav.setOnCheckedChangeListener{_, isChecked ->
-            Log.i("PLAYINGFAV","btnFav state changed")/*
+        /*btnFav.setOnCheckedChangeListener{_, isChecked ->
+            Log.i("PLAYINGFAV","btnFav state changed")
             runBlocking {
                     /**This does not call any observer*/
                     mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
@@ -364,8 +364,8 @@ class MainActivity : AppCompatActivity() {
             uiscope.launch {
                     //mAllSongsViewModel.updateFav(mMediaControlViewModel.nowPlayingSong.value?.songId!!)
                 //Log.i("PLAYINGFAV","Value of nowPlaying is fav = ${mMediaControlViewModel.nowPlayingSong.value}")
-            }*/
-        }
+            }
+        }*/
     }
 
     fun getLocalTime():String
@@ -657,27 +657,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         //TODO
-      /* btnFav.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
-           *//**
-            * Called when the checked state of a compound button has changed.
-            *
-            * @param buttonView The compound button view whose state has changed.
-            * @param isChecked  The new checked state of buttonView.
-            *//*
-           override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-               *//**Change in both database as well nowPlayingSong.isfav*//*
-               mMediaControlViewModel.nowPlayingSong.value?.songId?.let {
-                   mAllSongsViewModel.updateFav(
-                       it
-                   )
-                   mMediaControlViewModel.nowPlayingSong.value!!.isFav= when(isChecked){true -> 1 else ->-1}
-                   Log.i("PLAYINGFAV","nowPlaying changed due to toggle to" +
-                           " ${mMediaControlViewModel.nowPlayingSong.value!!.isFav}")
-               }
-           }
+        btnFav.setOnClickListener{
+            Log.i("PLAYINGFAV","btnFav is clicked and value = ${btnFav.isChecked}")
+            runBlocking {
+                    /**This does not call any observer*/
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                    Log.i("PLAYINGFAV","Value of nowPlaying is fav from clickListener= ${mMediaControlViewModel.nowPlayingSong.value}")
 
-       })
-*/
+            }
+            uiscope.launch {
+                mAllSongsViewModel.updateFav(mMediaControlViewModel.nowPlayingSong.value?.songId!!)
+            }
+
+        }
 
 //        controlSeekBar.max = 50
 //        txtCurrentDuration.text = controlSeekBar.progress.toString()
