@@ -10,10 +10,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.widget.doOnTextChanged
@@ -43,12 +40,13 @@ class PlaylistsFragment : Fragment() {
     lateinit var toolbar: Toolbar
     lateinit var fabCreatePlaylist: FloatingActionButton
     lateinit var playlistInputDialog: CustomDialog
-    lateinit var favCardView:CardView
+    lateinit var favCardView: CardView
+    lateinit var emptyPlaylistLayout: RelativeLayout
 
     //view model related
     private lateinit var mPlaylistViewModel: PlaylistViewModel
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
-    var selectedPlaylist : PlaylistEntity? = null
+    var selectedPlaylist: PlaylistEntity? = null
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
@@ -59,19 +57,26 @@ class PlaylistsFragment : Fragment() {
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
-            uiscope.launch{
-                recylcerViewPlaylistadapter.setPlayLists(it!!) }
+            if (it.isNullOrEmpty())
+                emptyPlaylistLayout.visibility = View.VISIBLE
+            else
+                emptyPlaylistLayout.visibility = View.GONE
+
+            uiscope.launch {
+                recylcerViewPlaylistadapter.setPlayLists(it!!)
+            }
+
         })
 
-        recylcerViewPlaylistadapter.onPlaylistClickCallback = fun (playlist:PlaylistEntity) {
+        recylcerViewPlaylistadapter.onPlaylistClickCallback = fun(playlist: PlaylistEntity) {
             //load singlePlaylist fragment into frame layout...
             // always open SInglePlaylist with a Bundle except when adding a song to playlist
-            val bundle=Bundle()
-            bundle.putInt("ID",playlist.id)
-            bundle.putString("NAME",playlist.name)
-            bundle.putString("SONGS",playlist.songs)
+            val bundle = Bundle()
+            bundle.putInt("ID", playlist.id)
+            bundle.putString("NAME", playlist.name)
+            bundle.putString("SONGS", playlist.songs)
             activity!!.supportFragmentManager.beginTransaction()
-                .add(R.id.frame,SinglePlaylistFragment::class.java,bundle)
+                .add(R.id.frame, SinglePlaylistFragment::class.java, bundle)
                 .commit()
         }
     }
@@ -87,11 +92,12 @@ class PlaylistsFragment : Fragment() {
         fabCreatePlaylist = view.findViewById(R.id.fabCreatePlaylist)
         playlistInputDialog = CustomDialog(activity as Context)
         favCardView = view.findViewById(R.id.favCardView)
+        emptyPlaylistLayout = view.findViewById(R.id.emptyPlaylistLayout)
         toolbar.title = "Playlists"
 
         favCardView.setOnClickListener {
             activity!!.supportFragmentManager.beginTransaction()
-                .replace(R.id.frame,FavFragment())
+                .replace(R.id.frame, FavFragment())
                 .commit()
         }
 
@@ -123,7 +129,7 @@ class PlaylistsFragment : Fragment() {
         }
 
         if (activity != null) {
-
+            emptyPlaylistLayout.visibility = View.GONE
             recylcerViewPlaylistadapter =
                 PlaylistAdapter(
                     activity as Context
@@ -146,22 +152,27 @@ class PlaylistsFragment : Fragment() {
 
         try {
             selectedPlaylist = recylcerViewPlaylistadapter.getSelectedPlaylist()
-            Log.e("REMOVEPLAYLIST",selectedPlaylist!!.toString())
+            Log.e("REMOVEPLAYLIST", selectedPlaylist!!.toString())
         } catch (e: Exception) {
-            Log.e("REMOVEPLAYLIST",e.message.toString())
+            Log.e("REMOVEPLAYLIST", e.message.toString())
             return super.onContextItemSelected(item)
         }
         when (item.itemId) {
             R.id.ctx_remove_playlist -> {
                 uiscope.launch {
-                    if(selectedPlaylist!=null)
+                    if (selectedPlaylist != null)
                         mPlaylistViewModel.deletePlaylist(selectedPlaylist!!)
                     else
-                        Toast.makeText(activity as Context,"Failed to delete Playlist ",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            activity as Context,
+                            "Failed to delete Playlist ",
+                            Toast.LENGTH_SHORT
+                        ).show()
                 }
             }
             else -> {
-                Toast.makeText(activity as Context,"No Playlist Selected",Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity as Context, "No Playlist Selected", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 

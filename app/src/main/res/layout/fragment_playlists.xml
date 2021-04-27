@@ -101,4 +101,32 @@
         tools:listitem="@layout/single_playlist_item" />
 
 
+    <RelativeLayout
+        android:id="@+id/emptyPlaylistLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/horizontalLine"
+        android:layout_above="@id/fabCreatePlaylist"
+        android:background="@color/backgroundColor">
+
+        <ImageView
+            android:id="@+id/icNoPlaylist"
+            android:layout_width="116dp"
+            android:layout_height="116dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_playlist_empty" />
+
+        <TextView
+            android:id="@+id/txtEmptyPlaylist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/icNoPlaylist"
+            android:gravity="center_horizontal"
+            android:maxLines="3"
+            android:text="No Playlist Created \n  Tap + to create"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_thin"
+            android:textStyle="normal" />
+    </RelativeLayout>
+
 </RelativeLayout>
