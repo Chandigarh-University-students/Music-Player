@@ -9,10 +9,12 @@
 
     <ImageView
         android:id="@+id/name"
-        android:layout_width="402dp"
-        android:layout_height="342dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@color/backgroundColor"
-        android:src="@mipmap/sangeet_round"
+        android:src="@drawable/icon_ss"
+        app:layout_constraintWidth_percent="0.7"
+        app:layout_constraintHeight_percent="0.4"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

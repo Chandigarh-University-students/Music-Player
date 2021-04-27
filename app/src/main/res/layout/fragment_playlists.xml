@@ -18,7 +18,7 @@
         android:layout_below="@id/toolbar"
         android:layout_margin="5dp"
         android:background="@color/backgroundColor"
-        android:padding="5dp">
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,18 +47,34 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <View
+        android:id="@+id/horizontalLine2"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/favCardView"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+
     <TextView
         android:id="@+id/personalization"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/favCardView"
-        android:layout_margin="5dp"
+        android:layout_below="@id/horizontalLine2"
+        android:background="@color/backgroundColor"
         android:gravity="start"
+        android:layout_marginHorizontal="5dp"
         android:paddingTop="20dp"
-        android:paddingBottom="10dp"
         android:text="@string/personalization"
-        android:textColor="@color/black"
+        android:textColor="@color/whiteText"
         android:textSize="@dimen/big_text" />
+
+    <View
+        android:id="@+id/horizontalLine"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/personalization"
+        android:background="@color/white" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -78,7 +94,7 @@
         android:id="@+id/recyclerViewPlaylists"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/personalization"
+        android:layout_below="@+id/horizontalLine"
         android:padding="5dp"
         android:scrollbarStyle="outsideOverlay"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
