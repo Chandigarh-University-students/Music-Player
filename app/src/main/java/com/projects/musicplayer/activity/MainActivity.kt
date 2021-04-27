@@ -11,6 +11,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -116,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     val MediaPlayer.currentSeconds: Int
         get() = this.currentPosition / 1000
     var homeFragment: HomeFragment = HomeFragment()
-    var handler: Handler = Handler()
+    var handler: Handler = Handler((Looper.getMainLooper()))
 
 
     //coroutine scopes
