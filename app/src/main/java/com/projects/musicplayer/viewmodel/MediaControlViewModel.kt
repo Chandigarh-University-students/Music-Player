@@ -22,22 +22,7 @@ class MediaControlViewModel() : ViewModel() {
 
     var repeatMode: MutableLiveData<Int> = MutableLiveData(RepeatTriStateButton.NO_REPEAT)
 
-    //may not be used
-    var currentDuration: MutableLiveData<Long> = MutableLiveData(0)
 
     var isPlaying: MutableLiveData<Boolean> = MutableLiveData(false)
         private set
-
-    //TODO is a logical error
-    fun togglePlayPause(): Unit {
-        isPlaying.value = isPlaying.value == true
-    }
-
-
-    fun shuffleList(): Unit = runBlocking {
-        if (nowPlayingSongs != null)
-            nowPlayingSongs!!.value = nowPlayingSongs!!.value!!.shuffled()
-    }
-
-
 }

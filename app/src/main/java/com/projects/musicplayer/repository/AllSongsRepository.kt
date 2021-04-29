@@ -33,7 +33,6 @@ class AllSongsRepository(application: Application) {
 
     suspend fun getAllSongs() = mAllSongsDao.getAllSongs()
 
-
     val mAllSongs: LiveData<List<SongEntity>>
         get() {
             return mAllSongsDao.allSongs
@@ -43,5 +42,6 @@ class AllSongsRepository(application: Application) {
         get() {
             return mAllSongsDao.favSongs
         }
+
 
 }

@@ -11,8 +11,6 @@ import android.widget.ToggleButton
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.PlaylistConverter
-import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
 import java.text.DateFormat
@@ -37,7 +35,7 @@ class SinglePlaylistAdapter(
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((recentSong: RecentSongEntity,song :SongEntity,allSongs:List<SongEntity>) -> Unit)? = null    //private var onSongClickCallback: ((id: Int) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity,song :SongEntity,allSongs:List<SongEntity>) -> Unit)? = null
 
     class SinglePlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view),
         View.OnCreateContextMenuListener {
@@ -75,13 +73,9 @@ class SinglePlaylistAdapter(
             holder.txtSongName.text = currentSong.songName
             holder.txtSongArtistName.text = currentSong.artistName
             holder.btnFav.isChecked = songs!![position].isFav > 0
-//            holder.btnFav.isChecked = songs!![position].isFav
 
             holder.btnFav.setOnClickListener {
-//                songs!![position].isFav = !songs!![position].isFav
-//                notifyItemChanged(position)
                 favClickCallback?.invoke(currentSong.songId)
-//                notifyDataSetChanged()
                 Log.d("SINGLE PLAYLIST INFO", songs.toString())
             }
 
@@ -92,22 +86,17 @@ class SinglePlaylistAdapter(
             }
 
             holder.cardViewForSong.setOnClickListener {
-                //TODO play the song
-
-
-                //TODO add to recent, maybe using a callback
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
                 val currentLocalTime = cal.time
-                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")                // you can get seconds by adding  "...:ss" to it
-                // you can get seconds by adding  "...:ss" to it
+                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
                 date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
 
                 val localTime: String = date.format(currentLocalTime)
 
-                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime),
+                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumId,localTime),
                     currentSong,
                 songs!!)
-                Log.d("RECENTSONGupdated", RecentSongEntity(currentSong.songId,currentSong.albumCover,localTime).toString())
+                Log.d("RECENTSONGupdated", RecentSongEntity(currentSong.songId,currentSong.albumId,localTime).toString())
 
             }
         } else {
@@ -115,13 +104,7 @@ class SinglePlaylistAdapter(
         }
     }
 
-
-    //    fun setSongs(mSongs: List<Song>) {
-//        songs = mSongs
-//        notifyDataSetChanged()
-//    }
     fun setSongs(mSongs: List<SongEntity>) {
-        //TODO add songs taking care of list and String
         songs = mSongs
         notifyDataSetChanged()
     }

@@ -30,7 +30,7 @@ class FavFragment : Fragment() {
     lateinit var favRecyclerViewAdapter: FavAdapter
     lateinit var emptyFavLayout: RelativeLayout
 
-    //view model related //TODO Check
+    //view model related
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
     private lateinit var mAllSongsViewModel: AllSongsViewModel
@@ -89,7 +89,6 @@ class FavFragment : Fragment() {
         favRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity,allFavSongs:List<SongEntity>) {
             //update fav whenever fav button clicked
             uiscope.launch {
-                //TODO both play song and add to recent
                 mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                 mMediaControlViewModel.nowPlayingSong.value = song
                 mMediaControlViewModel.nowPlayingSongs.value=allFavSongs

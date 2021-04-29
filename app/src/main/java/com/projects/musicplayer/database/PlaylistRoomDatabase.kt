@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.projects.musicplayer.rest.FavRoomDatabase
 
-
-//@TypeConverters(PlaylistConverter::class)
 
 
 @Database(entities = [PlaylistEntity::class], version = 1, exportSchema = false)
@@ -20,7 +17,7 @@ abstract class PlaylistRoomDatabase : RoomDatabase() {
 
         //To return Singleton INSTANCE of Database
         fun getPlaylistDatabase(context: Context): PlaylistRoomDatabase {
-            synchronized(FavRoomDatabase::class.java) {
+            synchronized(PlaylistRoomDatabase::class.java) {
                 if (!::PLAYLIST_INSTANCE.isInitialized) {
 
                     PLAYLIST_INSTANCE = Room.databaseBuilder(

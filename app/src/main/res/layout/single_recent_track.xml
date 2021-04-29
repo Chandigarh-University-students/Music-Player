@@ -14,6 +14,6 @@
         android:layout_width="@dimen/recent_song_track"
         android:layout_height="@dimen/recent_song_track"
         android:adjustViewBounds="true"
-        android:src="@drawable/drawable_cover" />
+        android:src="@mipmap/default_cover" />
 
 </androidx.cardview.widget.CardView>

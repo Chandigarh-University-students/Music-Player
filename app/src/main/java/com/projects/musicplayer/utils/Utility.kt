@@ -1,26 +1,23 @@
 package com.projects.musicplayer.utils
 
-import android.media.MediaMetadataRetriever
-import android.util.Log
+import com.projects.musicplayer.database.SongEntity
 
 class Utility {
     companion object {
-        fun getAlbumCover(url:String?): ByteArray?  {
-            if(url==null)
-                return null
-            val mmr = MediaMetadataRetriever()
+        var songComparator = Comparator<SongEntity> { song1, song2 ->
 
-            try {
-                mmr.setDataSource(url);
-                Log.e("IMAGE","path OBTAINED for this song")
-                return mmr.embeddedPicture;
+            val song1Name = song1.songName
+            val song2Name = song2.songName
+            if(song1Name[0].isLetter() && song2Name[0].isLetter()){
+                song1Name.compareTo(song2Name,true)
+            }else if(song1Name[0].isLetter()){
+                -1
             }
-            catch(e:Exception) {
-
-
-                Log.e("IMAGE", e.message+e.stackTrace.toString()+" for path "+url)
-                return null
+            else if(song2Name[0].isLetter()){
+                1
             }
+            else
+            song1Name.compareTo(song2Name,true)
         }
     }
 }

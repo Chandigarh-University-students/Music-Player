@@ -22,8 +22,6 @@ import com.projects.musicplayer.adapters.SinglePlaylistAdapter
 import com.projects.musicplayer.database.PlaylistConverter
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
-import com.projects.musicplayer.rest.FavSongsViewModel
-import com.projects.musicplayer.rest.FavSongsViewModelFactory
 import com.projects.musicplayer.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,28 +37,26 @@ class SinglePlaylistFragment : Fragment() {
     lateinit var emptyPlaylistLayout: RelativeLayout
     lateinit var txtEmptyPlaylist: TextView
 
-    //view model related //TODO Check
+    //view model related
     private lateinit var mRecentSongsViewModel: RecentSongsViewModel
     private lateinit var mRecentSongsViewModelFactory: RecentSongsViewModelFactory
     private lateinit var mPlaylistViewModel: PlaylistViewModel
     private lateinit var mPlaylistViewModelFactory: PlaylistViewModelFactory
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
-    private lateinit var mFavSongsViewModel: FavSongsViewModel
-    private lateinit var mFavSongsViewModelFactory: FavSongsViewModelFactory
     private lateinit var mMediaControlViewModel: MediaControlViewModel
 
     private val uiscope = CoroutineScope(Dispatchers.Main)
 
     //playlist info
-    //TODO for obtaining info for this playlist
+    //for obtaining info for this playlist
     private var playlistId = 0
     private var playlistName = "Playlist"
     private var playListSongs = "songs "
 
     var selectedSongId = -1
 
-    //TODO ViewModel for single playlist
+    //ViewModel for single playlist
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -82,14 +78,9 @@ class SinglePlaylistFragment : Fragment() {
                     runBlocking {
                         val listSongIds = PlaylistConverter.toList(it)
                         if (listSongIds != null) {
-//                            emptyPlaylistLayout.visibility = View.GONE
                             for (id in listSongIds) {
                                 mSongs.add(mAllSongsViewModel.getSongByIdSuspend(id))
                             }
-                        } else {
-                            //TODO print no songs, add some
-//                            emptyPlaylistLayout.visibility = View.VISIBLE
-
                         }
                     }
                     Log.i("LIVEDATAPLAYLISTUPDATE", mSongs.toString())
@@ -102,11 +93,6 @@ class SinglePlaylistFragment : Fragment() {
 
         })
 
-        /**ViewModel for FavSongs*/
-        mFavSongsViewModelFactory =
-            FavSongsViewModelFactory(activity!!.application)
-        mFavSongsViewModel =
-            ViewModelProvider(this, mFavSongsViewModelFactory).get(FavSongsViewModel::class.java)
 
         singlePlaylistRecyclerViewAdapter.favClickCallback = fun(id: Int) {
             //update fav whenever fav button clicked
@@ -138,7 +124,6 @@ class SinglePlaylistFragment : Fragment() {
             fun(recentSong: RecentSongEntity, song: SongEntity, allSongs: List<SongEntity>) {
                 //update fav whenever fav button clicked
                 uiscope.launch {
-                    //TODO both play song and add to recent
                     mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                     mMediaControlViewModel.nowPlayingSong.value = song
                     mMediaControlViewModel.nowPlayingSongs.value = allSongs
@@ -168,7 +153,6 @@ class SinglePlaylistFragment : Fragment() {
             // set this playlist according to which fragment called it
             playlistId = arguments?.get("ID") as Int
             playlistName = arguments?.get("NAME") as String
-            //TODO Only for debugging purposes, otherwise this argument will be deleted from Bundle
             playListSongs = arguments?.get("SONGS") as String
             Log.i("PLAYLISTINFO", playlistName)
             Log.i("PLAYLISSONGTINFO", playListSongs.length.toString())

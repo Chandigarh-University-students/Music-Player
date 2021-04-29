@@ -60,4 +60,28 @@
         app:itemIconTint="@color/color_bottom_nav"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_navigation_menu" />
+
+    <RelativeLayout
+        android:id="@+id/progressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/txtProgressMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/progressBar"
+            android:gravity="center_horizontal"
+            android:text="Fetching Songs..."
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_thin" />
+
+    </RelativeLayout>
+
 </RelativeLayout>

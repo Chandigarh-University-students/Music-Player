@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="12dp"
     android:background="@color/backgroundColor"
     android:orientation="vertical">
 
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/choose_playlist"
-        android:textColor="@color/secondaryColor"
+        android:textColor="@color/textPrimary"
         android:textSize="@dimen/small_text" />
 
 

@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.projects.musicplayer.adapters.PlaylistAdapter
-import com.projects.musicplayer.rest.PlaylistModel
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.uicomponents.CustomDialog

@@ -10,13 +10,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.projects.musicplayer.rest.PlaylistModel
 import com.projects.musicplayer.R
 import com.projects.musicplayer.database.PlaylistEntity
 import com.projects.musicplayer.database.RecentSongEntity
 import com.projects.musicplayer.database.SongEntity
 
-//class PlaylistAdapter (context: Context,var playlists: List<PlaylistModel>) : RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
 class PlaylistAdapter(context: Context) :
     RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
 
@@ -71,18 +69,12 @@ class PlaylistAdapter(context: Context) :
         }
 
         holder.playlistCardView.setOnClickListener {
-            //TODO open singlePlaylist for this particular playlist
             onPlaylistClickCallback?.invoke(currentPlaylist)
         }
 
 
     }
 
-
-    //    fun setPlayLists(mplaylists: List<PlaylistModel>) {
-//        playlists = mplaylists
-//        notifyDataSetChanged()
-//    }
     fun setPlayLists(mplaylists: List<PlaylistEntity>) {
         playlists = mplaylists
         notifyDataSetChanged()
