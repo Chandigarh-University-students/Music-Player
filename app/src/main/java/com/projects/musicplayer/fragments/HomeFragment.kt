@@ -26,6 +26,7 @@ import com.projects.musicplayer.uicomponents.CustomDialog
 import com.projects.musicplayer.viewmodel.*
 import com.projects.musicplayer.database.SongEntity
 import com.projects.musicplayer.uicomponents.AddToPlaylist
+import com.projects.musicplayer.uicomponents.BounceEdgeEffectFactory
 import com.projects.musicplayer.utils.Utility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -244,6 +245,9 @@ class HomeFragment : Fragment() {
                 RecentTracksAdapter(activity as Context)
 
             recyclerViewAllSongs.adapter = adapterAllSongs
+
+            recyclerViewAllSongs.edgeEffectFactory = BounceEdgeEffectFactory()
+
             recyclerViewRecentTracks.adapter = adapterRecentTracks
 
             recyclerViewAllSongs.layoutManager = LinearLayoutManager(activity)
