@@ -192,10 +192,16 @@ class MainActivity : AppCompatActivity() {
             }
             else {
                 progressLayout.visibility = View.GONE
-                bottomNavigationView.visibility=View.VISIBLE
                 emptyAllSongs.visibility=View.GONE
-                mBottomSheetBehavior.isHideable = false
-                mBottomSheetBehavior.state=BottomSheetBehavior.STATE_COLLAPSED
+                if(mBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                    mBottomSheetBehavior.isHideable = false
+                    when (supportFragmentManager.findFragmentById(R.id.frame)) {
+                        is SinglePlaylistFragment ->  bottomNavigationView.visibility=View.VISIBLE
+                        is HomeFragment ->  bottomNavigationView.visibility=View.VISIBLE
+                        else ->  bottomNavigationView.visibility=View.GONE
+                    }
+                    mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
             }
 
             var currentQueue = mMediaControlViewModel.nowPlayingSongs.value
