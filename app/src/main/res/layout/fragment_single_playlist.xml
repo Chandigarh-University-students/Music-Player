@@ -18,6 +18,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/SinglePlaylistToolbar"
+        android:scrollbars="vertical"
+        android:scrollbarSize="@dimen/scroll_bar_size"
+        android:scrollbarStyle="insideOverlay"
         android:padding="5dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/single_song_item" />

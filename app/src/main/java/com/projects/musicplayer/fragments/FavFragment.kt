@@ -16,9 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.FavAdapter
-import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.database.SongEntity
-import com.projects.musicplayer.viewmodel.*
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
+import com.projects.musicplayer.database.allSongs.SongEntity
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModel
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.mediaControl.MediaControlViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +50,10 @@ class FavFragment : Fragment() {
         mMediaControlViewModel = ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
 
         /** Viewmodel for ALLSongs*/
-        mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
+        mAllSongsViewModelFactory =
+            AllSongsViewModelFactory(
+                activity!!.application
+            )
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
@@ -80,16 +87,18 @@ class FavFragment : Fragment() {
         }
 
         /** Viewmodel for RecentSongs*/
-        mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
+        mRecentSongsViewModelFactory =
+            RecentSongsViewModelFactory(
+                activity!!.application
+            )
         mRecentSongsViewModel =
             ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
 
 
 
-        favRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity, song: SongEntity,allFavSongs:List<SongEntity>) {
+        favRecyclerViewAdapter.onSongClickCallback = fun(song: SongEntity, allFavSongs:List<SongEntity>) {
             //update fav whenever fav button clicked
             uiscope.launch {
-                mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                 mMediaControlViewModel.nowPlayingSong.value = song
                 mMediaControlViewModel.nowPlayingSongs.value=allFavSongs
                 mMediaControlViewModel.nowPlaylist.value = "Favorites"

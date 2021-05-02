@@ -7,10 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.PlaylistEntity
+import com.projects.musicplayer.database.playlists.PlaylistEntity
 
 class PlaylistDialogAdapter(context: Context) :
     RecyclerView.Adapter<PlaylistDialogAdapter.AllPlaylistViewHolder>() {

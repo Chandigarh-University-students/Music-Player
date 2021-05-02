@@ -1,6 +1,6 @@
 package com.projects.musicplayer.utils
 
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.database.allSongs.SongEntity
 
 class Utility {
     companion object {

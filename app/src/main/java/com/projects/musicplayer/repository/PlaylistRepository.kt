@@ -2,13 +2,10 @@ package com.projects.musicplayer.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import com.projects.musicplayer.database.PlaylistConverter
-import com.projects.musicplayer.database.PlaylistDao
-import com.projects.musicplayer.database.PlaylistEntity
-import com.projects.musicplayer.database.PlaylistRoomDatabase
+import com.projects.musicplayer.database.playlists.PlaylistConverter
+import com.projects.musicplayer.database.playlists.PlaylistDao
+import com.projects.musicplayer.database.playlists.PlaylistEntity
+import com.projects.musicplayer.database.playlists.PlaylistRoomDatabase
 
 class PlaylistRepository(application: Application) {
 

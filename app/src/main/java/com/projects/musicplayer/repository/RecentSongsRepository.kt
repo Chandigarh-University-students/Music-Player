@@ -2,7 +2,9 @@ package com.projects.musicplayer.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import com.projects.musicplayer.database.*
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
+import com.projects.musicplayer.database.recentSongs.RecentSongsDao
+import com.projects.musicplayer.database.recentSongs.RecentSongsDatabase
 
 class RecentSongsRepository (application: Application) {
 
@@ -17,8 +19,6 @@ class RecentSongsRepository (application: Application) {
         }
 
         suspend fun insertSong(recentSongEntity: RecentSongEntity) = mRecentSongsDao.addRecentSong(recentSongEntity)
-
-        suspend fun removeSong(recentSongEntity: RecentSongEntity) = mRecentSongsDao.removeRecentSong(recentSongEntity)
 
         val mRecentSongs: LiveData<List<RecentSongEntity>>
         get() {

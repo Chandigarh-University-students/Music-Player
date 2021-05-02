@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
 import com.projects.musicplayer.adapters.PlaylistDialogAdapter
-import com.projects.musicplayer.database.PlaylistEntity
+import com.projects.musicplayer.database.playlists.PlaylistEntity
 
 class AddToPlaylist(
     context: Context

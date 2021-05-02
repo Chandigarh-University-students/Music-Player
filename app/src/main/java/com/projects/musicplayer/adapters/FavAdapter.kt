@@ -10,8 +10,8 @@ import android.widget.ToggleButton
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
+import com.projects.musicplayer.database.allSongs.SongEntity
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,7 +24,7 @@ class FavAdapter (context: Context
 
     //callbacks for item click listeners fro updating live data
     var favClickCallback: ((id: Int) -> Unit)? = null
-    var onSongClickCallback: ((recentSong: RecentSongEntity, song : SongEntity,allFavSongs : List<SongEntity>) -> Unit)? = null
+    var onSongClickCallback: (( song : SongEntity, allFavSongs : List<SongEntity>) -> Unit)? = null
 
     class FavViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtSongName: TextView = view.findViewById(R.id.txtSongName)
@@ -55,21 +55,13 @@ class FavAdapter (context: Context
             }
 
             holder.cardViewForSong.setOnClickListener {
-                val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
-                val currentLocalTime = cal.time
-                val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
-                date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"))
-
-                val localTime: String = date.format(currentLocalTime)
-
-                onSongClickCallback?.invoke(RecentSongEntity(currentSong.songId,currentSong.albumId,localTime),
+                onSongClickCallback?.invoke(
                     currentSong,
                     songs!!
                 )
-                Log.d("RECENTSONGupdated", RecentSongEntity(currentSong.songId,currentSong.albumId,localTime).toString())
-
             }
         } else {
+            //TODO error toast required
             holder.txtSongName.setText(R.string.NoSong)
         }
     }

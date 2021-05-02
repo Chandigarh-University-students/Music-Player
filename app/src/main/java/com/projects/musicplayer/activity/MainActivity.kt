@@ -1,10 +1,7 @@
 package com.projects.musicplayer.activity
 
-import android.Manifest
 import android.content.*
-import android.content.pm.PackageManager
 import android.database.Cursor
-import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -17,8 +14,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -26,15 +21,19 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
+import com.projects.musicplayer.database.allSongs.SongEntity
 import com.projects.musicplayer.fragments.*
 import com.projects.musicplayer.fragments.FavFragment
 import com.projects.musicplayer.fragments.SinglePlaylistFragment
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
-import com.projects.musicplayer.utils.Utility
-import com.projects.musicplayer.viewmodel.*
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModel
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.mediaControl.MediaControlViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModelFactory
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.lang.Long.parseLong
 import java.lang.Runnable
@@ -117,6 +116,7 @@ class MainActivity : AppCompatActivity() {
     val uiscope = CoroutineScope(Dispatchers.Main)
 
     lateinit var progressLayout: RelativeLayout
+    lateinit var emptyAllSongs : RelativeLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         btnPrevControl = findViewById(R.id.btnPrevControl)
         btnPlayPauseControl = findViewById(R.id.btnPlayPauseControl)
         btnNextControl = findViewById(R.id.btnNextControl)
-
+        emptyAllSongs = findViewById(R.id.emptyAllSongs)
 
         sharedPreferences = getSharedPreferences(
             "Audio DB Preferences",
@@ -163,23 +163,40 @@ class MainActivity : AppCompatActivity() {
 
         //init View Model obejct
         //use of view model factory to pass parameter to view model
-        mAllSongsViewModelFactory = AllSongsViewModelFactory(application)
+        mAllSongsViewModelFactory =
+            AllSongsViewModelFactory(
+                application
+            )
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
         mMediaControlViewModel =
             ViewModelProvider(this).get(MediaControlViewModel::class.java)
 
         /** Viewmodel for RecentSongs*/
-        mRecentSongsViewModelFactory = RecentSongsViewModelFactory(application)
+        mRecentSongsViewModelFactory =
+            RecentSongsViewModelFactory(
+                application
+            )
         mRecentSongsViewModel =
             ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
 
 
         mAllSongsViewModel.allSongs.observe(this, Observer {
-            if (it.isNullOrEmpty())
-                progressLayout.visibility = View.VISIBLE
-            else
+            //TODO Aman
+            if (it.isNullOrEmpty()) {
+                bottomNavigationView.visibility=View.GONE
                 progressLayout.visibility = View.GONE
+                emptyAllSongs.visibility=View.VISIBLE
+                mBottomSheetBehavior.isHideable = true
+                mBottomSheetBehavior.state=BottomSheetBehavior.STATE_HIDDEN
+            }
+            else {
+                progressLayout.visibility = View.GONE
+                bottomNavigationView.visibility=View.VISIBLE
+                emptyAllSongs.visibility=View.GONE
+                mBottomSheetBehavior.isHideable = false
+                mBottomSheetBehavior.state=BottomSheetBehavior.STATE_COLLAPSED
+            }
 
             var currentQueue = mMediaControlViewModel.nowPlayingSongs.value
             var updatedCurrentQueue = mutableListOf<SongEntity>()
@@ -187,14 +204,15 @@ class MainActivity : AppCompatActivity() {
             Log.d("FavInQueue", it.toString())
             if (currentQueue != null) {
                 for (song in currentQueue) {
-                    val songComplement = SongEntity(
-                        song.songId,
-                        song.songName,
-                        song.artistName,
-                        song.duration,
-                        song.albumId,
-                        song.isFav * (-1)
-                    )
+                    val songComplement =
+                        SongEntity(
+                            song.songId,
+                            song.songName,
+                            song.artistName,
+                            song.duration,
+                            song.albumId,
+                            song.isFav * (-1)
+                        )
                     if(song in it)
                         updatedCurrentQueue.add(song)
                     else if (songComplement in it)
@@ -230,6 +248,13 @@ class MainActivity : AppCompatActivity() {
             Log.i("NEXTPREV", mMediaControlViewModel.isFirstInit.value!!.toString())
             setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
             initializeSeekbar()
+            mRecentSongsViewModel.insertAfterDeleteSong(
+                RecentSongEntity(
+                    it.songId,
+                    it.albumId,
+                    getLocalTime()
+                )
+            )
             uiscope.launch {
                 setUpCollapsedBottomSheetUI(it)
             }
@@ -250,6 +275,8 @@ class MainActivity : AppCompatActivity() {
         mMediaControlViewModel.nowPlaylist.observe(this, Observer {
             Log.i("PLAYLISTNAME", "New playlist added ${it}")
         })
+
+
 
         Log.i("Req",isDatabaseInitialized().toString())
         if (!isDatabaseInitialized()) {
@@ -292,7 +319,13 @@ class MainActivity : AppCompatActivity() {
                     val songPlayed = mMediaControlViewModel.nowPlayingSong.value
                     val localTime = getLocalTime()
                     if (songPlayed != null) {
-                        mRecentSongsViewModel.insertAfterDeleteSong(RecentSongEntity(songPlayed.songId,songPlayed.albumId,localTime))
+                        mRecentSongsViewModel.insertAfterDeleteSong(
+                            RecentSongEntity(
+                                songPlayed.songId,
+                                songPlayed.albumId,
+                                localTime
+                            )
+                        )
                     }else
                         Log.i("PlayPause","Not Possible Error")
                 }

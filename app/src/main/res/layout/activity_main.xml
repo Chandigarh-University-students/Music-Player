@@ -84,4 +84,39 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/emptyAllSongs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@color/backgroundColor">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarSangeet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/secondaryColor"
+            app:title="Sangeet"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+        <ImageView
+            android:id="@+id/icNoSongs"
+            android:layout_width="116dp"
+            android:layout_height="116dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_empty_allsongs" />
+
+        <TextView
+            android:id="@+id/txtEmptyPlaylist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/icNoSongs"
+            android:gravity="center_horizontal"
+            android:maxLines="3"
+            android:text="@string/no_downloaded_songs"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_thin"
+            android:textStyle="normal" />
+    </RelativeLayout>
+
 </RelativeLayout>

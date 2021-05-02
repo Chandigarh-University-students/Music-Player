@@ -1,6 +1,5 @@
 package com.projects.musicplayer.fragments
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -17,17 +16,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.adapters.AllSongsAdapter
 import com.projects.musicplayer.R
-import com.projects.musicplayer.adapters.PlaylistDialogAdapter
 import com.projects.musicplayer.adapters.RecentTracksAdapter
-import com.projects.musicplayer.database.PlaylistConverter
-import com.projects.musicplayer.database.PlaylistEntity
-import com.projects.musicplayer.database.RecentSongEntity
+import com.projects.musicplayer.database.playlists.PlaylistConverter
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
 import com.projects.musicplayer.uicomponents.CustomDialog
-import com.projects.musicplayer.viewmodel.*
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.database.allSongs.SongEntity
 import com.projects.musicplayer.uicomponents.AddToPlaylist
 import com.projects.musicplayer.uicomponents.BounceEdgeEffectFactory
 import com.projects.musicplayer.utils.Utility
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModel
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.mediaControl.MediaControlViewModel
+import com.projects.musicplayer.viewmodel.playlists.PlaylistViewModel
+import com.projects.musicplayer.viewmodel.playlists.PlaylistViewModelFactory
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,7 +72,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         /**ViewModel for ALLSongs*/
-        mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
+        mAllSongsViewModelFactory =
+            AllSongsViewModelFactory(
+                activity!!.application
+            )
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
@@ -111,7 +117,10 @@ class HomeFragment : Fragment() {
             }
         }
 
-        mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)
+        mPlaylistViewModelFactory =
+            PlaylistViewModelFactory(
+                activity!!.application
+            )
         mPlaylistViewModel =
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
         mPlaylistViewModel.allPlaylists.observe(viewLifecycleOwner, Observer {
@@ -120,7 +129,10 @@ class HomeFragment : Fragment() {
         })
 
         /**ViewModel for RecentSongs*/
-        mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
+        mRecentSongsViewModelFactory =
+            RecentSongsViewModelFactory(
+                activity!!.application
+            )
         mRecentSongsViewModel =
             ViewModelProvider(
                 this,
@@ -137,10 +149,10 @@ class HomeFragment : Fragment() {
         })
 
         adapterAllSongs.onSongClickCallback =
-            fun(recentSong: RecentSongEntity, song: SongEntity, allSongs: List<SongEntity>) {
+            fun(song: SongEntity, allSongs: List<SongEntity>) {
                 //update recent tracks
                 uiscope.launch {
-                    mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
+                    //mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                     //LIVE DATA NOT OBSERVING IN MAINACTIVITY
                     mMediaControlViewModel.nowPlayingSong.value = song
                     mMediaControlViewModel.nowPlayingSongs.value = allSongs
@@ -161,7 +173,6 @@ class HomeFragment : Fragment() {
                 mMediaControlViewModel.nowPlaylist.value = "Recent Tracks"
                 mMediaControlViewModel.nowPlayingSong.value = songPlayed
                 mMediaControlViewModel.nowPlayingSongs.value = allSongs
-                mRecentSongsViewModel.insertAfterDeleteSong(song)
             }
         }
     }
@@ -177,7 +188,10 @@ class HomeFragment : Fragment() {
         recyclerViewRecentTracks = view.findViewById(R.id.recyclerRecentTrack)
         toolbar = view.findViewById(R.id.homeToolbar)
         /**ViewModel for playlists*/
-        mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)
+        mPlaylistViewModelFactory =
+            PlaylistViewModelFactory(
+                activity!!.application
+            )
         mPlaylistViewModel =
             ViewModelProvider(
                 this,

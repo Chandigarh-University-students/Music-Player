@@ -8,12 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.PlaylistEntity
-import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.database.playlists.PlaylistEntity
 
 class PlaylistAdapter(context: Context) :
     RecyclerView.Adapter<PlaylistAdapter.AllPlaylistViewHolder>() {
@@ -25,7 +22,7 @@ class PlaylistAdapter(context: Context) :
         selectedPlaylist = p
     }
 
-    fun getSelectedPlaylist():PlaylistEntity? = selectedPlaylist
+    fun getSelectedPlaylist(): PlaylistEntity? = selectedPlaylist
 
     val mInflater: LayoutInflater = LayoutInflater.from(context)
 

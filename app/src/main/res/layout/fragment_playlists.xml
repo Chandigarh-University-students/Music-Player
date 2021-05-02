@@ -95,8 +95,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/horizontalLine"
+        android:scrollbars="vertical"
+        android:scrollbarSize="@dimen/scroll_bar_size"
+        android:scrollbarStyle="insideOverlay"
         android:padding="5dp"
-        android:scrollbarStyle="outsideOverlay"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/single_playlist_item" />
 

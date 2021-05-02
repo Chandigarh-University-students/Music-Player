@@ -2,7 +2,6 @@ package com.projects.musicplayer.adapters
 
 import android.content.ContentUris
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,8 +11,8 @@ import android.widget.ImageView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.utils.Utility
+import com.projects.musicplayer.database.allSongs.SongEntity
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
 import com.squareup.picasso.Picasso
 import java.lang.Long
 import java.text.DateFormat
@@ -28,7 +27,7 @@ class RecentTracksAdapter(val context: Context) :
 
     private var songs: List<RecentSongEntity>? = null
 
-    var onSongClickCallback: ((song: RecentSongEntity) -> Unit)? = null
+    var onSongClickCallback: ((recentSong: RecentSongEntity) -> Unit)? = null
 
     class RecentTrackViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgSingleRecentTrack: ImageView = view.findViewById(R.id.imgSingleRecentTrack)
@@ -74,7 +73,6 @@ class RecentTracksAdapter(val context: Context) :
                 val localTime: String = date.format(currentLocalTime)
                 onSongClickCallback?.invoke(RecentSongEntity(songs!![position].songId,songs!![position].albumId,localTime))
                 Log.d("RECENTSONGupdated", RecentSongEntity(songs!![position].songId,songs!![position].albumId,localTime).toString())
-
             }
         }
     }

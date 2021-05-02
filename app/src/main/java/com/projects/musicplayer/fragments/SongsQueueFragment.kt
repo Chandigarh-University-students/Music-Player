@@ -17,12 +17,14 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.projects.musicplayer.R
-import com.projects.musicplayer.adapters.SinglePlaylistAdapter
 import com.projects.musicplayer.adapters.SongQueueAdapter
-import com.projects.musicplayer.database.PlaylistConverter
-import com.projects.musicplayer.database.RecentSongEntity
-import com.projects.musicplayer.database.SongEntity
-import com.projects.musicplayer.viewmodel.*
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
+import com.projects.musicplayer.database.allSongs.SongEntity
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModel
+import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModelFactory
+import com.projects.musicplayer.viewmodel.mediaControl.MediaControlViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModel
+import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,13 +50,20 @@ class SongsQueueFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         /** Viewmodel for ALLSongs*/
-        mAllSongsViewModelFactory = AllSongsViewModelFactory(activity!!.application)
+        mAllSongsViewModelFactory =
+            AllSongsViewModelFactory(
+                activity!!.application
+            )
         mAllSongsViewModel =
             ViewModelProvider(this, mAllSongsViewModelFactory).get(AllSongsViewModel::class.java)
 
         /** Viewmodel for RecentSongs*/
-        mRecentSongsViewModelFactory = RecentSongsViewModelFactory(activity!!.application)
-        mRecentSongsViewModel = ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+        mRecentSongsViewModelFactory =
+            RecentSongsViewModelFactory(
+                activity!!.application
+            )
+        mRecentSongsViewModel = ViewModelProvider(this, mRecentSongsViewModelFactory).get(
+            RecentSongsViewModel::class.java)
 
         /** Viewmodel for MediaControl*/
         mMediaControlViewModel = ViewModelProvider(activity!!).get(MediaControlViewModel::class.java)
@@ -72,7 +81,7 @@ class SongsQueueFragment : Fragment() {
             songQueueRecyclerViewAdapter.setSongs(mMediaControlViewModel.nowPlayingSongs.value!!)
         })
 
-        songQueueRecyclerViewAdapter.currentPlayingSetSelected = fun(currentSong:SongEntity,cardViewForSong:RelativeLayout,cardView:CardView){
+        songQueueRecyclerViewAdapter.currentPlayingSetSelected = fun(currentSong: SongEntity, cardViewForSong:RelativeLayout, cardView:CardView){
             Log.i("PLAYING","Value of current Song = ${currentSong.songId}")
             Log.i("PLAYING","Value of nowPlayingSong = ${mMediaControlViewModel.nowPlayingSong.value?.songId}")
             Log.i("PLAYING","Value of boolean = ${currentSong.songId==mMediaControlViewModel.nowPlayingSong.value?.songId}")
@@ -101,10 +110,9 @@ class SongsQueueFragment : Fragment() {
         }
 
 
-        songQueueRecyclerViewAdapter.onSongClickCallback = fun(recentSong: RecentSongEntity,song:SongEntity,allSongs:List<SongEntity>) {
+        songQueueRecyclerViewAdapter.onSongClickCallback = fun(song: SongEntity, allSongs:List<SongEntity>) {
             //update fav whenever fav button clicked
             uiscope.launch {
-                mRecentSongsViewModel.insertAfterDeleteSong(recentSong)
                 mMediaControlViewModel.nowPlayingSong.value = song
             }
         }

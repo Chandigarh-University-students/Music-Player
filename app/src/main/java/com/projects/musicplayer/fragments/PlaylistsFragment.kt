@@ -1,8 +1,6 @@
 package com.projects.musicplayer.fragments
 
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -22,10 +19,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.projects.musicplayer.adapters.PlaylistAdapter
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.PlaylistEntity
+import com.projects.musicplayer.database.playlists.PlaylistEntity
 import com.projects.musicplayer.uicomponents.CustomDialog
-import com.projects.musicplayer.viewmodel.*
-import kotlinx.android.synthetic.main.playlist_dialog.*
+import com.projects.musicplayer.viewmodel.playlists.PlaylistViewModel
+import com.projects.musicplayer.viewmodel.playlists.PlaylistViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +48,10 @@ class PlaylistsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mPlaylistViewModelFactory = PlaylistViewModelFactory(activity!!.application)
+        mPlaylistViewModelFactory =
+            PlaylistViewModelFactory(
+                activity!!.application
+            )
         mPlaylistViewModel =
             ViewModelProvider(this, mPlaylistViewModelFactory).get(PlaylistViewModel::class.java)
 

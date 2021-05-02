@@ -252,7 +252,7 @@
         android:src="@drawable/ic_previous_control"
         app:layout_constraintBottom_toBottomOf="@id/guideline10"
         app:layout_constraintEnd_toStartOf="@+id/btnPlayPauseControl"
-        app:layout_constraintHeight_percent="0.045"
+        app:layout_constraintHeight_percent="0.040"
         app:layout_constraintStart_toEndOf="@+id/btnControlShuffle"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:layout_constraintWidth_percent="0.08" />
@@ -269,7 +269,7 @@
         app:layout_constraintHeight_percent="0.09"
         app:layout_constraintStart_toEndOf="@+id/btnPrevControl"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:layout_constraintWidth_percent="0.170" />
+        app:layout_constraintWidth_percent="0.175" />
 
     <ImageButton
         android:id="@+id/btnNextControl"

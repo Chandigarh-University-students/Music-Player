@@ -5,4 +5,5 @@
     <dimen name="recent_song_track">64dp</dimen>
     <dimen name="small_text">25sp</dimen>
     <dimen name="text_thin">18sp</dimen>
+    <dimen name="scroll_bar_size">13dp</dimen>
 </resources>

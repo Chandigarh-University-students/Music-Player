@@ -2,9 +2,9 @@ package com.projects.musicplayer.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import com.projects.musicplayer.database.AllSongsDao
-import com.projects.musicplayer.database.AllSongsDatabase
-import com.projects.musicplayer.database.SongEntity
+import com.projects.musicplayer.database.allSongs.AllSongsDao
+import com.projects.musicplayer.database.allSongs.AllSongsDatabase
+import com.projects.musicplayer.database.allSongs.SongEntity
 
 class AllSongsRepository(application: Application) {
     private var mAllSongsDao: AllSongsDao
