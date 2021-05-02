@@ -98,6 +98,7 @@ class HomeFragment : Fragment() {
 
             //set up data for first time
             if (!it.isNullOrEmpty() && mMediaControlViewModel.nowPlayingSong.value == null) {
+                mMediaControlViewModel.nowPlaylist.value="All Songs"
                 mMediaControlViewModel.nowPlayingSong.value = it.random()
                 mMediaControlViewModel.nowPlayingSongs.value = it
             }
@@ -170,7 +171,7 @@ class HomeFragment : Fragment() {
                 allSongs = mAllSongsViewModel.getAllSongs()
             }
             uiscope.launch {
-                mMediaControlViewModel.nowPlaylist.value = "Recent Tracks"
+                mMediaControlViewModel.nowPlaylist.value = "All Songs"
                 mMediaControlViewModel.nowPlayingSong.value = songPlayed
                 mMediaControlViewModel.nowPlayingSongs.value = allSongs
             }

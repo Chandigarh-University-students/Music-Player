@@ -203,35 +203,49 @@ class MainActivity : AppCompatActivity() {
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
-
-            var currentQueue = mMediaControlViewModel.nowPlayingSongs.value
-            var updatedCurrentQueue = mutableListOf<SongEntity>()
-            Log.d("FavInQueue", mMediaControlViewModel.nowPlayingSongs.value.toString())
-            Log.d("FavInQueue", it.toString())
-            if (currentQueue != null) {
-                for (song in currentQueue) {
-                    val songComplement =
-                        SongEntity(
-                            song.songId,
-                            song.songName,
-                            song.artistName,
-                            song.duration,
-                            song.albumId,
-                            song.isFav * (-1)
-                        )
-                    if(song in it)
-                        updatedCurrentQueue.add(song)
-                    else if (songComplement in it)
-                        updatedCurrentQueue.add(songComplement)
-                    else {
-                        Log.d("FavInQueue", "Weird behaviour")
-                        updatedCurrentQueue.add(song)
+            Log.i("FavInQueue","Current queue is ${mMediaControlViewModel.nowPlaylist.value}")
+            if(mMediaControlViewModel.nowPlaylist.value=="All Songs"){
+                Log.i("FavInQueue","Current queue is all songs - for playlist ALL Songs")
+                //TODO add the new song to queue automatically
+                mMediaControlViewModel.nowPlayingSongs.value = it
+                Log.d(
+                    "FavInQueue",
+                    "Live data for nowPlayingSongs is updated due to change in fav"
+                )
+            }
+            else{
+                val currentQueue = mMediaControlViewModel.nowPlayingSongs.value
+                val updatedCurrentQueue = mutableListOf<SongEntity>()
+                Log.d("FavInQueue", mMediaControlViewModel.nowPlayingSongs.value.toString())
+                Log.d("FavInQueue", it.toString())
+                if (currentQueue != null) {
+                    for (song in currentQueue) {
+                        val songComplement =
+                            SongEntity(
+                                song.songId,
+                                song.songName,
+                                song.artistName,
+                                song.duration,
+                                song.albumId,
+                                song.isFav * (-1)
+                            )
+                        if (song in it)
+                            updatedCurrentQueue.add(song)
+                        else if (songComplement in it)
+                            updatedCurrentQueue.add(songComplement)
+                        else {
+                            Log.d("FavInQueue", "Weird behaviour")
+                            updatedCurrentQueue.add(song)
+                        }
                     }
+                    mMediaControlViewModel.nowPlayingSongs.value = updatedCurrentQueue
+                    Log.d(
+                        "FavInQueue",
+                        "Live data for nowPlayingSongs is updated due to change in fav"
+                    )
+                } else {
+                    Log.d("FavInQueue", "Doing nothing since no songs are being played")
                 }
-                mMediaControlViewModel.nowPlayingSongs.value = updatedCurrentQueue
-                Log.d("FavInQueue", "Live data for nowPlayingSongs is updated due to change in fav")
-            } else {
-                Log.d("FavInQueue", "Doing nothing since no songs are being played")
             }
         })
 
