@@ -14,7 +14,14 @@ class RecentSongsViewModel(application: Application) : ViewModel() {
         get() = mRecentSongsRepository.mRecentSongs
 
 
-    fun insertAfterDeleteSong(song: RecentSongEntity) {
+    fun deleteRecentSong(song: RecentSongEntity) {
+        //use of coroutine scope from viewModelScope
+        viewModelScope.launch {
+            mRecentSongsRepository.deleteSong(song)
+        }
+    }
+
+    fun updateRecentSong(song: RecentSongEntity) {
         //use of coroutine scope from viewModelScope
         viewModelScope.launch {
             mRecentSongsRepository.insertSong(song)

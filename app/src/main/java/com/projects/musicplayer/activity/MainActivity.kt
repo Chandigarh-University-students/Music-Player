@@ -33,7 +33,6 @@ import com.projects.musicplayer.viewmodel.mediaControl.MediaControlViewModel
 import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModel
 import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModelFactory
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.lang.Long.parseLong
 import java.lang.Runnable
@@ -268,7 +267,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("NEXTPREV", mMediaControlViewModel.isFirstInit.value!!.toString())
             setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
             initializeSeekbar()
-            mRecentSongsViewModel.insertAfterDeleteSong(
+            mRecentSongsViewModel.updateRecentSong(
                 RecentSongEntity(
                     it.songId,
                     it.albumId,
@@ -339,7 +338,7 @@ class MainActivity : AppCompatActivity() {
                     val songPlayed = mMediaControlViewModel.nowPlayingSong.value
                     val localTime = getLocalTime()
                     if (songPlayed != null) {
-                        mRecentSongsViewModel.insertAfterDeleteSong(
+                        mRecentSongsViewModel.updateRecentSong(
                             RecentSongEntity(
                                 songPlayed.songId,
                                 songPlayed.albumId,

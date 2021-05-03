@@ -33,8 +33,11 @@ class PlaylistRepository(application: Application) {
         }
 
     suspend fun getPlaylistSongsById(id: Int): String? = mPlaylistDao.getPlaylistSongsById(id)
+    suspend fun getAllPlaylistsId(): List<Int> = mPlaylistDao.getAllPlaylistsId()
 
     fun getPlaylistSongsByIdLive(id: Int): LiveData<String> = mPlaylistDao.getPlaylistSongsByIdLive(id)
+
+
 
     //pass entire list of songs whenever a new song is added/deleted from that individual playlist
 

@@ -7,6 +7,7 @@
     android:background="@color/backgroundColor"
     tools:context=".fragments.HomeFragment">
 
+
     <include
         android:id="@+id/homeToolbar"
         layout="@layout/toolbar"
@@ -37,5 +38,25 @@
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/single_song_item" />
+
+    <ProgressBar
+        android:id="@+id/refreshProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/refresh"
+        android:src="@drawable/refresh_option"
+        app:backgroundTint="@color/primaryColor"
+        app:borderWidth="0dp"
+        app:rippleColor="@color/textPrimary" />
 
 </RelativeLayout>

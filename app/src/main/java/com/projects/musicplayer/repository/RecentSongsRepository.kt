@@ -18,6 +18,8 @@ class RecentSongsRepository (application: Application) {
             //db.close()
         }
 
+        suspend fun deleteSong(recentSongEntity: RecentSongEntity) = mRecentSongsDao.removeRecentSong(recentSongEntity)
+
         suspend fun insertSong(recentSongEntity: RecentSongEntity) = mRecentSongsDao.addRecentSong(recentSongEntity)
 
         val mRecentSongs: LiveData<List<RecentSongEntity>>

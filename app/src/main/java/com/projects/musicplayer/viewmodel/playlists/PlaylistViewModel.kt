@@ -38,4 +38,8 @@ class PlaylistViewModel(application: Application) : ViewModel() {
     suspend fun getPlaylistSongsById(id: Int): String? {
         return mPlaylistRepository.getPlaylistSongsById(id)
     }
+
+    suspend fun getAllPlaylists(): List<Int> {
+        return mPlaylistRepository.getAllPlaylistsId()
+    }
 }

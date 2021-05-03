@@ -15,6 +15,8 @@ interface PlaylistDao {
     @get:Query("SELECT * from playlist_table ORDER BY  name ASC")
     val allPlaylist: LiveData<List<PlaylistEntity>>
 
+    @Query("SELECT id from playlist_table")
+    suspend fun getAllPlaylistsId():List<Int>
 
 //get all song_id in playlist of given playlist_id
     @Query("SELECT songs from playlist_table WHERE id = :id")

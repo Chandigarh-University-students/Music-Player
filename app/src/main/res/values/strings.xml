@@ -18,4 +18,5 @@
     <string name="choose_playlist">Choose Playlist:</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="no_downloaded_songs">No downloaded songs</string>
+    <string name="refresh">Refresh</string>
 </resources>
