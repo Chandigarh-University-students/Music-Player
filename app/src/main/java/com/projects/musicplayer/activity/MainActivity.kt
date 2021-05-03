@@ -183,11 +183,17 @@ class MainActivity : AppCompatActivity() {
         mAllSongsViewModel.allSongs.observe(this, Observer {
             //TODO Aman
             if (it.isNullOrEmpty()) {
-                bottomNavigationView.visibility=View.GONE
-                progressLayout.visibility = View.GONE
-                emptyAllSongs.visibility=View.VISIBLE
-                mBottomSheetBehavior.isHideable = true
-                mBottomSheetBehavior.state=BottomSheetBehavior.STATE_HIDDEN
+                if(isDatabaseInitialized()){
+                    Log.i("FavInQueue","Database initialized")
+                    bottomNavigationView.visibility=View.GONE
+                    progressLayout.visibility = View.GONE
+                    emptyAllSongs.visibility=View.VISIBLE
+                    mBottomSheetBehavior.isHideable = true
+                    mBottomSheetBehavior.state=BottomSheetBehavior.STATE_HIDDEN
+                }
+                else{
+                    Log.i("FavInQueue","Database not initialized")
+                }
             }
             else {
                 progressLayout.visibility = View.GONE
