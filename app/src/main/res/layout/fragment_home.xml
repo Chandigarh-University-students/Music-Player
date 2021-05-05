@@ -8,11 +8,24 @@
     tools:context=".fragments.HomeFragment">
 
 
-    <include
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/homeToolbar"
-        layout="@layout/toolbar"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondaryColor"
+        app:title="Sangeet"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+        <ImageButton
+            android:id="@+id/fabRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/refresh_option"
+            android:backgroundTint="@android:color/transparent"
+            android:layout_gravity="center|right"
+            />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerRecentTrack"
@@ -45,18 +58,5 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabRefresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/refresh"
-        android:src="@drawable/refresh_option"
-        app:backgroundTint="@color/primaryColor"
-        app:borderWidth="0dp"
-        app:rippleColor="@color/textPrimary" />
 
 </RelativeLayout>

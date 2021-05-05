@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -56,7 +57,7 @@ class HomeFragment : Fragment() {
     lateinit var adapterRecentTracks: RecentTracksAdapter
 
     lateinit var toolbar: androidx.appcompat.widget.Toolbar
-    lateinit var fabRefreshButton: FloatingActionButton
+    lateinit var fabRefreshButton: ImageButton
     lateinit var refreshProgressBar: ProgressBar
 
     //view model related
