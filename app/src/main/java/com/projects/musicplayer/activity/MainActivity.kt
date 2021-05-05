@@ -968,6 +968,7 @@ class MainActivity : AppCompatActivity(), Playable {
                 is SinglePlaylistFragment -> openPlaylistFrag()
                 is FavFragment -> openPlaylistFrag()
                 !is HomeFragment -> initUI()
+                is HomeFragment -> moveTaskToBack(false)
                 else -> super.onBackPressed()
             }
     }
