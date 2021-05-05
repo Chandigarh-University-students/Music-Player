@@ -874,10 +874,13 @@ class MainActivity : AppCompatActivity(), Playable {
                 }
                 R.id.tab_playlist -> {
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.frame,
-                        PlaylistsFragment()
-                    ).commit()
+                    when(supportFragmentManager.findFragmentById(R.id.frame)){
+                        is PlaylistsFragment -> {}
+                        else -> {supportFragmentManager.beginTransaction().replace(
+                            R.id.frame,
+                            PlaylistsFragment()
+                        ).commit()}
+                    }
                     true
                 }
             }
