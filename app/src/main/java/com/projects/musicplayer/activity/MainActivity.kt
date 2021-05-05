@@ -18,6 +18,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -856,11 +857,14 @@ class MainActivity : AppCompatActivity(), Playable {
             when (item.itemId) {
                 R.id.home_button -> {
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    supportFragmentManager.beginTransaction()
-                        .replace(
-                            R.id.frame,
-                            HomeFragment()
-                        ).commit()
+                    when(supportFragmentManager.findFragmentById(R.id.frame)){
+                        is HomeFragment -> {}
+                            else -> {supportFragmentManager.beginTransaction()
+                                .replace(
+                                    R.id.frame,
+                                    HomeFragment()
+                                ).commit()}
+                    }
                     true
                 }
                 R.id.nowPlaying -> {
