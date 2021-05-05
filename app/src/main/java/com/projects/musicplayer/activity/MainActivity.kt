@@ -1,19 +1,23 @@
 package com.projects.musicplayer.activity
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.*
 import android.database.Cursor
 import android.media.MediaPlayer
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -21,11 +25,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.projects.musicplayer.R
-import com.projects.musicplayer.database.recentSongs.RecentSongEntity
 import com.projects.musicplayer.database.allSongs.SongEntity
+import com.projects.musicplayer.database.recentSongs.RecentSongEntity
 import com.projects.musicplayer.fragments.*
-import com.projects.musicplayer.fragments.FavFragment
-import com.projects.musicplayer.fragments.SinglePlaylistFragment
+import com.projects.musicplayer.interfaces.Playable
+import com.projects.musicplayer.services.OnClearFromRecentService
 import com.projects.musicplayer.uicomponents.RepeatTriStateButton
 import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModel
 import com.projects.musicplayer.viewmodel.allSongs.AllSongsViewModelFactory
@@ -35,13 +39,13 @@ import com.projects.musicplayer.viewmodel.recentSongs.RecentSongsViewModelFactor
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import java.lang.Long.parseLong
-import java.lang.Runnable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(), Playable {
     lateinit var bottomNavigationView: BottomNavigationView
     lateinit var mBottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>
     lateinit var flFragment: FrameLayout
@@ -52,6 +56,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     /**Now Playing Controls*/
+    private var cachedSongQueue: List<SongEntity>? = null
+    private var nowPlayingSongIndex: Int? = null
 
     /**EXPANDED BOTTOM SHEET ELEMENTS*/
     //toolbar elements
@@ -87,10 +93,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var btnNextControl: ImageButton
 
 
-    private val READ_STORAGE_PERMISSION_REQUEST_CODE = 1
-    private val TAG = "PermissionDemo"
-
-
     //view model related
     private lateinit var mAllSongsViewModel: AllSongsViewModel
     private lateinit var mAllSongsViewModelFactory: AllSongsViewModelFactory
@@ -115,14 +117,63 @@ class MainActivity : AppCompatActivity() {
     val uiscope = CoroutineScope(Dispatchers.Main)
 
     lateinit var progressLayout: RelativeLayout
-    lateinit var emptyAllSongs : RelativeLayout
+    lateinit var emptyAllSongs: RelativeLayout
 
 
+    //notification related
+    private var mNotifyManager: NotificationManager? = null
+    private val mReceiver = NotificationReceiver()
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private val globalIsPlayingSongObserver = androidx.lifecycle.Observer<Boolean> {
+        if (mMediaControlViewModel.nowPlayingSong.value != null)
+            sendNotification(mMediaControlViewModel.nowPlayingSong.value!!, it)
+
+        Log.i("PLAYBACK STATUS", it.toString())
+        btnPlayPauseControl.isChecked = it
+        b_sheet_CollapsedMusicControl.isChecked = it
+        playPauseMedia(it)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private val globalNowPlayingSongObserver = androidx.lifecycle.Observer<SongEntity> {
+        Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
+        Log.i("NEXTPREV", mMediaControlViewModel.isFirstInit.value!!.toString())
+        setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
+        initializeSeekbar()
+        mRecentSongsViewModel.updateRecentSong(
+            RecentSongEntity(
+                it.songId,
+                it.albumId,
+                getLocalTime()
+            )
+        )
+        uiscope.launch {
+            setUpCollapsedBottomSheetUI(it)
+        }
+        uiscope.launch {
+            setUpExpandedBottomSheetUI(it)
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        progressLayout=findViewById(R.id.progressLayout)
+        setContentView(R.layout.activity_main)
+        createNotificationChannel()
+
+        val intentFilter = IntentFilter()
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
+        intentFilter.addAction(ACTION_PREVIOUS)
+        intentFilter.addAction(ACTION_PLAY_PAUSE)
+        intentFilter.addAction(ACTION_NEXT)
+
+        registerReceiver(mReceiver, intentFilter)
+        startService(Intent(baseContext, OnClearFromRecentService::class.java))
+
+        progressLayout = findViewById(R.id.progressLayout)
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomSheet = findViewById(R.id.bottom_sheet)
         flFragment = findViewById(R.id.frame)
@@ -177,38 +228,40 @@ class MainActivity : AppCompatActivity() {
                 application
             )
         mRecentSongsViewModel =
-            ViewModelProvider(this, mRecentSongsViewModelFactory).get(RecentSongsViewModel::class.java)
+            ViewModelProvider(
+                this,
+                mRecentSongsViewModelFactory
+            ).get(RecentSongsViewModel::class.java)
+
 
 
         mAllSongsViewModel.allSongs.observe(this, Observer {
             //TODO Aman
             if (it.isNullOrEmpty()) {
-                if(isDatabaseInitialized()){
-                    Log.i("FavInQueue","Database initialized")
-                    bottomNavigationView.visibility=View.GONE
+                if (isDatabaseInitialized()) {
+                    Log.i("FavInQueue", "Database initialized")
+                    bottomNavigationView.visibility = View.GONE
                     progressLayout.visibility = View.GONE
-                    emptyAllSongs.visibility=View.VISIBLE
+                    emptyAllSongs.visibility = View.VISIBLE
                     mBottomSheetBehavior.isHideable = true
-                    mBottomSheetBehavior.state=BottomSheetBehavior.STATE_HIDDEN
+                    mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                } else {
+                    Log.i("FavInQueue", "Database not initialized")
                 }
-                else{
-                    Log.i("FavInQueue","Database not initialized")
-                }
-            }
-            else {
+            } else {
                 progressLayout.visibility = View.GONE
-                emptyAllSongs.visibility=View.GONE
-                if(mBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                emptyAllSongs.visibility = View.GONE
+                if (mBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                     mBottomSheetBehavior.isHideable = false
                     when (supportFragmentManager.findFragmentById(R.id.frame)) {
-                        is SinglePlaylistFragment ->  bottomNavigationView.visibility=View.VISIBLE
-                        is HomeFragment ->  bottomNavigationView.visibility=View.VISIBLE
-                        else ->  bottomNavigationView.visibility=View.GONE
+                        is SinglePlaylistFragment -> bottomNavigationView.visibility = View.VISIBLE
+                        is HomeFragment -> bottomNavigationView.visibility = View.VISIBLE
+                        else -> bottomNavigationView.visibility = View.GONE
                     }
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
-            Log.i("FavInQueue","Current queue is ${mMediaControlViewModel.nowPlaylist.value}")
+            Log.i("FavInQueue", "Current queue is ${mMediaControlViewModel.nowPlaylist.value}")
             val currentQueue = mMediaControlViewModel.nowPlayingSongs.value
             val updatedCurrentQueue = mutableListOf<SongEntity>()
             Log.d("FavInQueue", mMediaControlViewModel.nowPlayingSongs.value.toString())
@@ -243,12 +296,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mMediaControlViewModel.isPlaying.observe(this, Observer {
-            Log.i("PLAYBACK STATUS", it.toString())
-            btnPlayPauseControl.isChecked = it
-            b_sheet_CollapsedMusicControl.isChecked = it
-            playPauseMedia(it)
-        })
+
+        mMediaControlViewModel.isPlaying.observeForever(globalIsPlayingSongObserver)
 
         mMediaControlViewModel.isShuffleMode.observe(this, Observer {
             if (it) {
@@ -257,25 +306,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mMediaControlViewModel.nowPlayingSong.observe(this, Observer {
-            Log.i("PLAYLISTSONG", "New Song Clicked ${it.songName}")
-            Log.i("NEXTPREV", mMediaControlViewModel.isFirstInit.value!!.toString())
-            setUpMediaPlayer(it, !mMediaControlViewModel.isFirstInit.value!!)
-            initializeSeekbar()
-            mRecentSongsViewModel.updateRecentSong(
-                RecentSongEntity(
-                    it.songId,
-                    it.albumId,
-                    getLocalTime()
-                )
-            )
-            uiscope.launch {
-                setUpCollapsedBottomSheetUI(it)
-            }
-            uiscope.launch {
-                setUpExpandedBottomSheetUI(it)
-            }
-        })
+
+
+        mMediaControlViewModel.nowPlayingSong.observeForever(globalNowPlayingSongObserver)
 
         mMediaControlViewModel.nowPlayingSongs.observe(this, Observer {
             Log.i("PLAYLIST", "New playlist added ${it.toString()}")
@@ -292,10 +325,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        Log.i("Req",isDatabaseInitialized().toString())
+        Log.i("Req", isDatabaseInitialized().toString())
         if (!isDatabaseInitialized()) {
-            Log.i("Req","Preparing for fetching")
-            prepare(ContextWrapper(applicationContext).contentResolver)}
+            Log.i("Req", "Preparing for fetching")
+            prepare(ContextWrapper(applicationContext).contentResolver)
+        }
 
 
         setUpBottomSheet()
@@ -326,23 +360,13 @@ class MainActivity : AppCompatActivity() {
 
         btnPlayPauseControl.setOnCheckedChangeListener { _, isChecked ->
             uiscope.launch {
-                Log.i("PlayPause","PlayPause Button has changed its state = $isChecked")
-                Log.i("PlayPause","PlayPause Button has changed its state for = ${mMediaControlViewModel.nowPlayingSong.value?.songName}")
+                Log.i("PlayPause", "PlayPause Button has changed its state = $isChecked")
+                Log.i(
+                    "PlayPause",
+                    "PlayPause Button has changed its state for = ${mMediaControlViewModel.nowPlayingSong.value?.songName}"
+                )
                 mMediaControlViewModel.isPlaying.value = isChecked
-                if(isChecked) {
-                    val songPlayed = mMediaControlViewModel.nowPlayingSong.value
-                    val localTime = getLocalTime()
-                    if (songPlayed != null) {
-                        mRecentSongsViewModel.updateRecentSong(
-                            RecentSongEntity(
-                                songPlayed.songId,
-                                songPlayed.albumId,
-                                localTime
-                            )
-                        )
-                    }else
-                        Log.i("PlayPause","Not Possible Error")
-                }
+
 
             }
         }
@@ -363,8 +387,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun getLocalTime():String
-    {
+    private fun getLocalTime(): String {
         val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"))
         val currentLocalTime = cal.time
         val date: DateFormat = SimpleDateFormat("yyMMddHHmmssZ")
@@ -373,11 +396,90 @@ class MainActivity : AppCompatActivity() {
         return localTime
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun setUpMediaPlayer(songEntity: SongEntity, toPlay: Boolean = true) {
+
         clearMediaPlayer()
+        sendNotification(songEntity, toPlay)
+
         val songUri = ContentUris.withAppendedId(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songEntity.songId.toLong()
         )
+
+        try {
+            mediaPlayer = MediaPlayer.create(applicationContext, songUri)
+        } catch (e: Exception) {
+            //TODO delete this song from everywhere,print a toast message
+            Log.e("Refresh", "Media player was null inside setUpMediaPlayer")
+            Log.e("Refresh", "mediaPlayer intialized = ${this::mediaPlayer.isInitialized}")
+//            return false
+        }
+
+        if (toPlay) {
+            uiscope.launch {
+                mMediaControlViewModel.isPlaying.value = true
+            }
+
+        } else {
+            mMediaControlViewModel.isFirstInit.value = false
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            Log.i("COMPLETE", it.isPlaying().toString())
+            val currSong = mMediaControlViewModel.nowPlayingSong.value
+            val currSongQueue = mMediaControlViewModel.nowPlayingSongs.value
+            val currSongPosition = currSongQueue?.indexOf(currSong)
+            val maxSongPosition = (currSongQueue?.size)?.minus(1)
+            val repeatState = mMediaControlViewModel.repeatMode.value
+            Log.i("NEXTPREV", currSong.toString())
+            Log.i("NEXTPREV", currSongPosition.toString())
+            Log.i("NEXTPREV", maxSongPosition.toString())
+
+            if (currSongPosition != null && repeatState != null) {
+                when (repeatState) {
+                    RepeatTriStateButton.NO_REPEAT -> {
+                        if (currSongPosition == maxSongPosition) {
+                            // move to the first song and pause
+                            runBlocking {
+                                mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
+                            }
+                            uiscope.launch {
+                                mMediaControlViewModel.isPlaying.value = false
+                            }
+
+                        } else {
+                            // Move to next song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[currSongPosition + 1]
+                        }
+                    }
+                    RepeatTriStateButton.REPEAT_ONE -> {
+                        // Play Again
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition]
+                    }
+                    RepeatTriStateButton.REPEAT_ALL -> {
+                        if (currSongPosition == maxSongPosition) {
+                            // Start first song
+                            mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
+                        } else {
+                            // Move to next song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[currSongPosition + 1]
+                        }
+                    }
+                    else -> {
+                        Log.e("NEXTPREV", "repeatState invalid")
+                    }
+                }
+            } else {
+                Log.e("NEXTPREV", "currSongPosition or repeatState is null")
+            }
+
+        }
+
+
+        /*
         mediaPlayer = MediaPlayer.create(applicationContext, songUri)
         if (toPlay)
             uiscope.launch {
@@ -386,6 +488,7 @@ class MainActivity : AppCompatActivity() {
         else {
             mMediaControlViewModel.isFirstInit.value = false
         }
+
         mediaPlayer.setOnCompletionListener {
             Log.i("COMPLETE",it.isPlaying().toString())
             val currSong=mMediaControlViewModel.nowPlayingSong.value
@@ -434,7 +537,12 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-}
+
+
+         */
+
+
+    }
 
     fun initializeSeekbar() {
 
@@ -446,6 +554,8 @@ class MainActivity : AppCompatActivity() {
             handler.postDelayed(runnable, 1000)
         }
         handler.postDelayed(runnable, 1000)
+
+
     }
 
     fun getDuration(seconds: Long): String {
@@ -482,13 +592,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun playPauseMedia(play: Boolean) {
         val pause = !play
+
         if (this::mediaPlayer.isInitialized) {
             if (pause) {
                 mediaPlayer.pause()
-            } else  {
+            } else {
                 mediaPlayer.start()
             }
         }
+
     }
 
 
@@ -496,8 +608,8 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Main) {
             txtSongName.text = songEntity.songName
             txtSongArtistName.text = songEntity.artistName
-            btnFav.isChecked = songEntity.isFav?.let{
-                when(it){
+            btnFav.isChecked = songEntity.isFav?.let {
+                when (it) {
                     -1 -> false
                     else -> true
                 }
@@ -519,14 +631,14 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-    fun setUpExpandedNowPlaying() {
+    private fun setUpExpandedNowPlaying() {
         btnMinimizeToolbar.setOnClickListener {
             mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             when (supportFragmentManager.findFragmentById(R.id.frame)) {
                 is HomeFragment -> bottomNavigationView.selectedItemId = R.id.home_button
                 is PlaylistsFragment -> bottomNavigationView.selectedItemId = R.id.tab_playlist
-                else -> {}
+                else -> {
+                }
             }
         }
 
@@ -538,108 +650,123 @@ class MainActivity : AppCompatActivity() {
                 ).commit()
 
             mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-           }
+        }
 
         btnNextControl.setOnClickListener {
             // play next song in list
-            Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
-                val currSong=mMediaControlViewModel.nowPlayingSong.value
-                val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
-                val currSongPosition = currSongQueue?.indexOf(currSong)
-                val maxSongPosition = (currSongQueue?.size)?.minus(1)
-                val repeatState = mMediaControlViewModel.repeatMode.value
-                Log.i("NEXTPREV",currSong.toString())
-                Log.i("NEXTPREV",currSongPosition.toString())
-                Log.i("NEXTPREV",maxSongPosition.toString())
-                if(currSongPosition!=null && repeatState!=null) {
-                    when(repeatState){
-                        RepeatTriStateButton.NO_REPEAT -> {
-                            if(currSongPosition==maxSongPosition){
-                                // move to the first song and pause
-                                runBlocking {
-                                    mMediaControlViewModel.isPlaying.value = true
-                                }
-                                runBlocking {
-                                    mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
-                                }
-                                uiscope.launch {
-                                    mMediaControlViewModel.isPlaying.value = false
-                                }
-                            }else{
-                                // Move to next song
-                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
+            Log.i("NEXTPREV", mMediaControlViewModel.nowPlayingSong.value.toString())
+            val currSong = mMediaControlViewModel.nowPlayingSong.value
+            val currSongQueue = mMediaControlViewModel.nowPlayingSongs.value
+            val currSongPosition = currSongQueue?.indexOf(currSong)
+            val maxSongPosition = (currSongQueue?.size)?.minus(1)
+            val repeatState = mMediaControlViewModel.repeatMode.value
+            Log.i("NEXTPREV", currSong.toString())
+            Log.i("NEXTPREV", currSongPosition.toString())
+            Log.i("NEXTPREV", maxSongPosition.toString())
+            if (currSongPosition != null && repeatState != null) {
+                when (repeatState) {
+                    RepeatTriStateButton.NO_REPEAT -> {
+                        if (currSongPosition == maxSongPosition) {
+                            // move to the first song and pause
+                            runBlocking {
+                                mMediaControlViewModel.isPlaying.value = true
                             }
-                        }
-                        RepeatTriStateButton.REPEAT_ONE -> {
-                                // Play Again
-                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition]
-                        }
-                        RepeatTriStateButton.REPEAT_ALL -> {
-                            if(currSongPosition==maxSongPosition){
-                                // Start first song
-                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
-                            }else{
-                                // Move to next song
-                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition+1]
+                            runBlocking {
+                                mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
                             }
+                            uiscope.launch {
+                                mMediaControlViewModel.isPlaying.value = false
+                            }
+                        } else {
+                            // Move to next song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[currSongPosition + 1]
                         }
-                        else -> {Log.e("NEXTPREV","repeatState invalid")}
                     }
-                }else{
-                    Log.e("NEXTPREV","currSongPosition or repeatState is null")
+                    RepeatTriStateButton.REPEAT_ONE -> {
+                        // Play Again
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition]
+                    }
+                    RepeatTriStateButton.REPEAT_ALL -> {
+                        if (currSongPosition == maxSongPosition) {
+                            // Start first song
+                            mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
+                        } else {
+                            // Move to next song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[currSongPosition + 1]
+                        }
+                    }
+                    else -> {
+                        Log.e("NEXTPREV", "repeatState invalid")
+                    }
                 }
+            } else {
+                Log.e("NEXTPREV", "currSongPosition or repeatState is null")
+            }
         }
 
         btnPrevControl.setOnClickListener {
             // play prev song
-            Log.i("NEXTPREV",mMediaControlViewModel.nowPlayingSong.value.toString())
-                val currSong=mMediaControlViewModel.nowPlayingSong.value
-                val currSongQueue=mMediaControlViewModel.nowPlayingSongs.value
-                val currSongPosition = currSongQueue?.indexOf(currSong)
-                val maxSongPosition = (currSongQueue?.size)?.minus(1)
-                val repeatState = mMediaControlViewModel.repeatMode.value
-                Log.i("NEXTPREV",currSong.toString())
-                Log.i("NEXTPREV",currSongPosition.toString())
-                Log.i("NEXTPREV",maxSongPosition.toString())
-                if(currSongPosition!=null && repeatState!=null) {
-                    when(repeatState){
-                        RepeatTriStateButton.NO_REPEAT -> {
-                            if(currSongPosition==0){
-                                // move to the first song again
-                                runBlocking {
-                                    mMediaControlViewModel.nowPlayingSong.value=currSongQueue[0]
-                                }
-                            }else{
-                                // Move to prev song
-                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition-1]
+            Log.i("NEXTPREV", mMediaControlViewModel.nowPlayingSong.value.toString())
+            val currSong = mMediaControlViewModel.nowPlayingSong.value
+            val currSongQueue = mMediaControlViewModel.nowPlayingSongs.value
+            val currSongPosition = currSongQueue?.indexOf(currSong)
+            val maxSongPosition = (currSongQueue?.size)?.minus(1)
+            val repeatState = mMediaControlViewModel.repeatMode.value
+            Log.i("NEXTPREV", currSong.toString())
+            Log.i("NEXTPREV", currSongPosition.toString())
+            Log.i("NEXTPREV", maxSongPosition.toString())
+            if (currSongPosition != null && repeatState != null) {
+                when (repeatState) {
+                    RepeatTriStateButton.NO_REPEAT -> {
+                        if (currSongPosition == 0) {
+                            // move to the first song again
+                            runBlocking {
+                                mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
                             }
+                        } else {
+                            // Move to prev song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[currSongPosition - 1]
                         }
-                        RepeatTriStateButton.REPEAT_ONE -> {
-                            // Play Again
-                            mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition]
-                        }
-                        RepeatTriStateButton.REPEAT_ALL -> {
-                            if(currSongPosition==0){
-                                // Start last song
-                                mMediaControlViewModel.nowPlayingSong.value=currSongQueue[maxSongPosition!!]
-                            }else{
-                                // Move to prev song
-                                mMediaControlViewModel.nowPlayingSong.value= currSongQueue[currSongPosition-1]
-                            }
-                        }
-                        else -> {Log.e("NEXTPREV","repeatState invalid")}
                     }
-                }else{
-                    Log.e("NEXTPREV","currSongPosition or repeatState is null")
+                    RepeatTriStateButton.REPEAT_ONE -> {
+                        // Play Again
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition]
+                    }
+                    RepeatTriStateButton.REPEAT_ALL -> {
+                        if (currSongPosition == 0) {
+                            // Start last song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[maxSongPosition!!]
+                        } else {
+                            // Move to prev song
+                            mMediaControlViewModel.nowPlayingSong.value =
+                                currSongQueue[currSongPosition - 1]
+                        }
+                    }
+                    else -> {
+                        Log.e("NEXTPREV", "repeatState invalid")
+                    }
                 }
+            } else {
+                Log.e("NEXTPREV", "currSongPosition or repeatState is null")
+            }
         }
 
-        btnFav.setOnClickListener{
-            Log.i("PLAYINGFAV","btnFav is clicked and value = ${btnFav.isChecked}")
+        btnFav.setOnClickListener {
+            Log.i("PLAYINGFAV", "btnFav is clicked and value = ${btnFav.isChecked}")
             runBlocking {
-                    /**This does not call any observer*/
-                    mMediaControlViewModel.nowPlayingSong.value?.isFav  = mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
-                    Log.i("PLAYINGFAV","Value of nowPlaying is fav from clickListener= ${mMediaControlViewModel.nowPlayingSong.value}")
+                /**This does not call any observer*/
+                mMediaControlViewModel.nowPlayingSong.value?.isFav =
+                    mMediaControlViewModel.nowPlayingSong.value?.isFav?.times((-1))!!
+                Log.i(
+                    "PLAYINGFAV",
+                    "Value of nowPlaying is fav from clickListener= ${mMediaControlViewModel.nowPlayingSong.value}"
+                )
 
             }
             uiscope.launch {
@@ -730,9 +857,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        if (intent != null) {
+            val notificationTap = intent.getBooleanExtra("fromNotification", false)
+            if (notificationTap) {
+                Log.i("CREATE-INTENT", "onNewIntent CALLED")
+                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onDestroy() {
         super.onDestroy()
+        Log.i("DESTROY", "ACTIVITY DESTROYED")
         clearMediaPlayer()
+        // remove all notifications with created notification id when app destroyed
+        mNotifyManager!!.cancel(NOTIFICATION_ID)
+        unregisterReceiver(mReceiver)
+
+        //remove global observers
+        mMediaControlViewModel.isPlaying.removeObserver(globalIsPlayingSongObserver)
+        mMediaControlViewModel.nowPlayingSong.removeObserver(globalNowPlayingSongObserver)
     }
 
     fun setUpBottomNav() {
@@ -817,7 +965,7 @@ class MainActivity : AppCompatActivity() {
                     BottomSheetBehavior.STATE_HIDDEN -> {
                     }
                     else -> {
-                      }
+                    }
                 }
             }
 
@@ -857,7 +1005,8 @@ class MainActivity : AppCompatActivity() {
             when (supportFragmentManager.findFragmentById(R.id.frame)) {
                 is HomeFragment -> bottomNavigationView.selectedItemId = R.id.home_button
                 is PlaylistsFragment -> bottomNavigationView.selectedItemId = R.id.tab_playlist
-                else -> {}
+                else -> {
+                }
             }
 
         } else
@@ -914,11 +1063,256 @@ class MainActivity : AppCompatActivity() {
             cur.close()
 
             mAllSongsViewModel.insertSongs(mSongs)
+            cachedSongQueue = mSongs
+            nowPlayingSongIndex = 0
             sharedPreferences.edit().putBoolean("songLoaded", true).apply()
 
 
         } else {
             return
+        }
+    }
+
+    private fun createNotificationChannel() {
+        mNotifyManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.O
+        ) {
+            // Create a NotificationChannel
+            val notificationChannel = NotificationChannel(
+                PRIMARY_CHANNEL_ID,
+                "Mascot Notification", NotificationManager.IMPORTANCE_DEFAULT
+            )
+
+
+            notificationChannel.setSound(null, null)
+            notificationChannel.enableVibration(false)
+            notificationChannel.description = "Notification from Mascot"
+            mNotifyManager?.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun sendNotification(track: SongEntity, isPlaying: Boolean) {
+        val intentPrevious = Intent(ACTION_PREVIOUS)
+        val previousPendingIntent = PendingIntent.getBroadcast(
+            this,
+            0,
+            intentPrevious,
+            0
+        )
+        val drawablePrevious = R.drawable.ic_previous_control
+
+        val intentPlayPause = Intent(ACTION_PLAY_PAUSE)
+        val playPausePendingIntent = PendingIntent.getBroadcast(
+            this,
+            1,
+            intentPlayPause,
+            0
+        )
+        val drawablePlayPause =
+            if (!isPlaying) R.drawable.ic_baseline_play_arrow_24 else R.drawable.ic_baseline_pause_24
+
+        val intentNext = Intent(ACTION_NEXT)
+        val nextPendingIntent = PendingIntent.getBroadcast(
+            this,
+            2,
+            intentNext,
+            0
+        )
+        val drawableNext = R.drawable.ic_next_control
+
+
+        //get notification from notification builder
+        val notifyBuilder = getNotificationBuilder(track)
+
+        notifyBuilder.setOngoing(true)
+
+        notifyBuilder.addAction(drawablePrevious, "Previous", previousPendingIntent)
+        notifyBuilder.addAction(drawablePlayPause, "PlayPause", playPausePendingIntent)
+        notifyBuilder.addAction(drawableNext, "Next", nextPendingIntent)
+
+        notifyBuilder.setStyle(
+            androidx.media.app.NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(0, 1, 2)
+
+        )
+
+        mNotifyManager?.notify(NOTIFICATION_ID, notifyBuilder.build())
+
+    }
+
+    private fun getNotificationBuilder(track: SongEntity): NotificationCompat.Builder {
+
+        //DONE: handle open now playing expanded when notification is tapped
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        notificationIntent.putExtra("fromNotification", true)
+        val notificationPendingIntent = PendingIntent.getActivity(
+            this,
+            NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        //build initial notification
+        val notifyBuilder = NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID)
+            .setSmallIcon(R.mipmap.default_cover_foreground)
+            .setContentTitle(track.songName)
+            .setContentText(track.artistName)
+            .setShowWhen(false)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(notificationPendingIntent)
+            .setColor(ContextCompat.getColor(this, R.color.primaryColor))
+
+        //TEST DONE: FIX ICON PROPER NOT SHOWING BY setSmallIcon() in Android 11
+//            .setSmallIcon(R.mipmap.icon)
+
+
+        return notifyBuilder
+    }
+
+
+    companion object {
+        private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
+        private const val ACTION_UPDATE_NOTIFICATION =
+            "com.projects.musicplayer.ACTION_MUSIC_NOTIFICATION"
+        const val NOTIFICATION_ID = 0
+        const val ACTION_PREVIOUS = "com.projects.musicplayer.ACTION_PREVIOUS"
+        const val ACTION_PLAY_PAUSE = "com.projects.musicplayer.ACTION_PLAY"
+        const val ACTION_NEXT = "com.projects.musicplayer.ACTION_NEXT"
+    }
+
+
+    //playable interface methods implementations
+    override fun onTrackPrevious() {
+
+        Log.i("RECEIVER-callback", "onTrackPrevious() called")
+
+
+        val currSong = mMediaControlViewModel.nowPlayingSong.value
+        val currSongQueue = mMediaControlViewModel.nowPlayingSongs.value
+        val currSongPosition = currSongQueue?.indexOf(currSong)
+        val maxSongPosition = (currSongQueue?.size)?.minus(1)
+        val repeatState = mMediaControlViewModel.repeatMode.value
+        if (currSongPosition != null && repeatState != null) {
+            when (repeatState) {
+                RepeatTriStateButton.NO_REPEAT -> {
+                    if (currSongPosition == 0) {
+                        // move to the first song again
+                        runBlocking {
+                            mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
+                        }
+                    } else {
+                        // Move to prev song
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition - 1]
+                    }
+                }
+                RepeatTriStateButton.REPEAT_ONE -> {
+                    // Play Again
+                    mMediaControlViewModel.nowPlayingSong.value =
+                        currSongQueue[currSongPosition]
+                }
+                RepeatTriStateButton.REPEAT_ALL -> {
+                    if (currSongPosition == 0) {
+                        // Start last song
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[maxSongPosition!!]
+                    } else {
+                        // Move to prev song
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition - 1]
+                    }
+                }
+                else -> {
+                    Log.e("NEXTPREV", "repeatState invalid")
+                }
+            }
+        } else {
+            Log.e("NEXTPREV", "currSongPosition or repeatState is null")
+        }
+    }
+
+    override fun onTrackPlayPause() {
+        Log.i("RECEIVER-callback", "onTrackPlayPause() called")
+        uiscope.launch {
+            mMediaControlViewModel.isPlaying.value = !mMediaControlViewModel.isPlaying.value!!
+        }
+    }
+
+
+    override fun onTrackNext() {
+        Log.i("RECEIVER-callback", "onTrackNext() called")
+        // play next song in list
+        val currSong = mMediaControlViewModel.nowPlayingSong.value
+        val currSongQueue = mMediaControlViewModel.nowPlayingSongs.value
+        val currSongPosition = currSongQueue?.indexOf(currSong)
+        val maxSongPosition = (currSongQueue?.size)?.minus(1)
+        val repeatState = mMediaControlViewModel.repeatMode.value
+        if (currSongPosition != null && repeatState != null) {
+            when (repeatState) {
+                RepeatTriStateButton.NO_REPEAT -> {
+                    if (currSongPosition == maxSongPosition) {
+                        // move to the first song and pause
+                        runBlocking {
+                            mMediaControlViewModel.isPlaying.value = true
+                        }
+                        runBlocking {
+                            mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
+                        }
+                        uiscope.launch {
+                            mMediaControlViewModel.isPlaying.value = false
+                        }
+                    } else {
+                        // Move to next song
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition + 1]
+                    }
+                }
+                RepeatTriStateButton.REPEAT_ONE -> {
+                    // Play Again
+                    mMediaControlViewModel.nowPlayingSong.value =
+                        currSongQueue[currSongPosition]
+                }
+                RepeatTriStateButton.REPEAT_ALL -> {
+                    if (currSongPosition == maxSongPosition) {
+                        // Start first song
+                        mMediaControlViewModel.nowPlayingSong.value = currSongQueue[0]
+                    } else {
+                        // Move to next song
+                        mMediaControlViewModel.nowPlayingSong.value =
+                            currSongQueue[currSongPosition + 1]
+                    }
+                }
+                else -> {
+                    Log.e("NEXTPREV", "repeatState invalid")
+                }
+            }
+        } else {
+            Log.e("NEXTPREV", "currSongPosition or repeatState is null")
+        }
+    }
+
+    inner class NotificationReceiver() : BroadcastReceiver() {
+        override fun onReceive(
+            context: Context,
+            intent: Intent
+        ) {
+            // Update the notification
+            val action = intent.action
+            when (action) {
+                ACTION_PREVIOUS -> {
+                    onTrackPrevious()
+                    Log.i("RECEIVER", "ACTION_PREVIOUS RECEIVED")
+                }
+                ACTION_PLAY_PAUSE -> {
+                    onTrackPlayPause()
+                    Log.i("RECEIVER", "ACTION_PLAY_PAUSE RECEIVED")
+                }
+                ACTION_NEXT -> {
+                    onTrackNext()
+                    Log.i("RECEIVER", "ACTION_NEXT RECEIVED")
+                }
+            }
         }
     }
 
