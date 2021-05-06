@@ -275,6 +275,7 @@ class MainActivity : AppCompatActivity(), Playable {
 
         mAllSongsViewModel.allSongs.observe(this, Observer {
             //TODO Aman
+            Log.i("FavInQueue", "Database initialized - ${isDatabaseInitialized()}")
             if (it.isNullOrEmpty()) {
                 if (isDatabaseInitialized()) {
                     Log.i("FavInQueue", "Database initialized")
@@ -301,7 +302,7 @@ class MainActivity : AppCompatActivity(), Playable {
                     mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
-            Log.i("FavInQueue","Current queue is ${mMediaControlViewModel.nowPlaylist.value}")
+            Log.i("FavInQueue","Current list is $it")
             val currentQueue = mMediaControlViewModel.nowPlayingSongs.value
             val updatedCurrentQueue = mutableListOf<SongEntity>()
             Log.d("FavInQueue", mMediaControlViewModel.nowPlayingSongs.value.toString())
@@ -1024,11 +1025,15 @@ class MainActivity : AppCompatActivity(), Playable {
             } while (cur.moveToNext())
             cur.close()
 
-            mAllSongsViewModel.insertSongs(mSongs)
+            Log.i("FavInQueue", "1 Database initialized - ${isDatabaseInitialized()}")
             sharedPreferences.edit().putBoolean("songLoaded", true).apply()
+            Log.i("FavInQueue", "2 Database initialized - ${isDatabaseInitialized()}")
+            mAllSongsViewModel.insertSongs(mSongs)
+            Log.i("FavInQueue", "3 Database initialized - ${isDatabaseInitialized()}")
 
-
-        } else {
+        } else
+        {
+            sharedPreferences.edit().putBoolean("songLoaded", true).apply()
             return
         }
     }
