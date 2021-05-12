@@ -1,5 +1,5 @@
 # Sangeet <a href="https://apt.izzysoft.de/fdroid/repo/com.projects.musicplayer_1.apk" target="blank"> <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" width="180"  title="Download apk"> </a>
-A Music Player App to play songs from local storage built on repository pattern and livedata. Users can play songs, keep track of recent songs, mark their favorite songs, create their own playlists and also suffle, repeat song queue.
+A Music Player App to play songs from local storage, built on MVVM architecture with repository pattern and livedata. Users can play songs, keep track of recent songs, mark their favorite songs, create their own playlists and also shuffle & repeat songs.
 
 ***
 
